@@ -1,4 +1,4 @@
-name: Build and deploy dr.deepgridsemi.com
+name: Build and deploy GitHub Pages
 on:
   push:
     branches: [main]
@@ -12,6 +12,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # github.io project site for now. For dr.deepgridsemi.com set PAGES_BASE: / and PAGES_DOMAIN: dr.deepgridsemi.com
+      PAGES_BASE: /deepgrid-dr-silicon/
+      PAGES_DOMAIN: ''
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4

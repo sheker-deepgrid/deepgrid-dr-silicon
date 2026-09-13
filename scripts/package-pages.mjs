@@ -3,23 +3,32 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const source=path.join(root,'dist/client'), output=path.join(root,'dist/pages');
-// Served from the apex of a custom domain, so assets stay at /_next/.
-const domain='dr.deepgridsemi.com', base='/';
+// PAGES_BASE is the URL path the site is served under; PAGES_DOMAIN writes a CNAME when set.
+// github.io project site: PAGES_BASE=/deepgrid-dr-silicon/ PAGES_DOMAIN=
+// custom domain:          PAGES_BASE=/                     PAGES_DOMAIN=dr.deepgridsemi.com
+const base=(process.env.PAGES_BASE||'/deepgrid-dr-silicon/').replace(/\/?$/,'/').replace(/^\/?/,'/');
+const domain=(process.env.PAGES_DOMAIN||'').trim();
 fs.rmSync(output,{recursive:true,force:true});
 fs.cpSync(source,output,{recursive:true});
+if(base!=='/'){
+ // The export emits scripts and styles under an absolute /_next/ prefix, which a project site cannot serve.
+ const walk=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())walk(file);else if(/\.(html|js|rsc|json|css)$/.test(file))fs.writeFileSync(file,fs.readFileSync(file,'utf8').replaceAll('/_next/',base+'_next/'));}};
+ walk(output);
+}
 fs.writeFileSync(path.join(output,'.nojekyll'),'');
-fs.writeFileSync(path.join(output,'CNAME'),domain+'\n');
-fs.writeFileSync(path.join(output,'build-info.json'),JSON.stringify({commit:process.env.GITHUB_SHA||'local',domain,builtAt:new Date().toISOString()}));
+if(domain)fs.writeFileSync(path.join(output,'CNAME'),domain+'\n');
+fs.writeFileSync(path.join(output,'build-info.json'),JSON.stringify({commit:process.env.GITHUB_SHA||'local',base,domain:domain||null,builtAt:new Date().toISOString()}));
 const html=fs.readFileSync(path.join(output,'index.html'),'utf8');
 let checked=0;
 for(const [,ref] of html.matchAll(/(?:src|href)="([^"?#]+)"/g)){
  if(/^(https?:|data:|mailto:|#)/.test(ref))continue;
+ if(ref.startsWith('/')&&!ref.startsWith(base))throw Error('Unprefixed asset: '+ref);
  const relative=ref.startsWith(base)?ref.slice(base.length):ref.replace(/^\.\//,'');
  if(!fs.existsSync(path.join(output,relative)))throw Error('Missing asset: '+ref);
  checked++;
 }
-const source_=fs.readdirSync(path.join(root,'app')).filter(f=>/\.(tsx?|css)$/.test(f)).map(f=>fs.readFileSync(path.join(root,'app',f),'utf8')).join('\n');
-const images=[...new Set([...source_.matchAll(/\.\/images\/([\w.-]+\.(?:webp|png|svg))/g)].map(m=>m[1]))];
+const appSource=fs.readdirSync(path.join(root,'app')).filter(f=>/\.(tsx?|css)$/.test(f)).map(f=>fs.readFileSync(path.join(root,'app',f),'utf8')).join('\n');
+const images=[...new Set([...appSource.matchAll(/\.\/images\/([\w.-]+\.(?:webp|png|svg))/g)].map(m=>m[1]))];
 for(const img of images)if(!fs.existsSync(path.join(output,'images',img)))throw Error('Missing image: '+img);
 if(checked<3)throw Error(`Only ${checked} entry references found; the export looks empty`);
-console.log(`Pages package ready for ${domain}: ${checked} entry references and ${images.length} images verified.`);
+console.log(`Pages package ready at base ${base}${domain?' for '+domain:''}: ${checked} entry references and ${images.length} images verified.`);

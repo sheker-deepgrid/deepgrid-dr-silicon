@@ -1,6 +1,6 @@
 # dr.deepgridsemi.com — DG32 silicon site
 
-Live site: https://dr.deepgridsemi.com/
+Live site: https://shekerkamma.github.io/deepgrid-dr-silicon/ (moves to https://dr.deepgridsemi.com/ once DNS is in place)
 
 The public page for Deepgrid Semi's DG32 motor-control silicon: DG32-LITE (dual-core lockstep
 RISC-V SoC) and DG32-2DOM (the same chip plus an INT8 attention engine). It is built from the
@@ -58,8 +58,17 @@ the page says otherwise; the site states this beside every figure group.
 
 ## Deployment
 
-`.github/workflows/pages.yml` type-checks, builds, verifies every entry asset and image, writes
-`CNAME` and deploys to GitHub Pages on each push to `main`. Pull requests build without deploying.
+`.github/workflows/pages.yml` type-checks, builds, verifies every entry asset and image, and
+deploys to GitHub Pages on each push to `main`. Pull requests build without deploying.
 
-The custom domain needs one DNS record at the `deepgridsemi.com` DNS host:
-`CNAME dr → shekerkamma.github.io`.
+Two workflow variables decide where the site is served:
+
+| Target | `PAGES_BASE` | `PAGES_DOMAIN` |
+| --- | --- | --- |
+| github.io project site (current) | `/deepgrid-dr-silicon/` | empty |
+| dr.deepgridsemi.com | `/` | `dr.deepgridsemi.com` |
+
+To move to the custom domain: add `CNAME dr → shekerkamma.github.io` (DNS only, no proxy) at the
+`deepgridsemi.com` DNS host, switch both variables, push, then set the custom domain and
+Enforce HTTPS under Settings → Pages. Switching before the DNS record resolves makes the
+github.io address redirect to a domain that does not exist.
