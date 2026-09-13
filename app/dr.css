@@ -75,7 +75,7 @@
 .dr-stats strong{display:block;font:400 1.65rem var(--serif);color:#eee6d4}
 .dr-stats span{font:var(--text-meta) monospace;letter-spacing:.5px;color:#93a582}
 .dr-stack{display:flex;gap:2px;height:30px;margin-top:28px}
-.dr-seg{height:100%;transition:width .35s ease}
+.dr-seg{height:100%}
 .dr-seg:first-child{border-radius:4px 0 0 4px}.dr-seg:last-child{border-radius:0 4px 4px 0}
 .dr-seg-hw{background:var(--hw)}.dr-seg-cpu{background:var(--cpu)}
 .dr-legend{display:flex;gap:22px;margin-top:12px;font-size:.9rem;color:#ddd6c6;flex-wrap:wrap}
@@ -143,4 +143,3 @@
  :root,.dark{--label-w:7.5rem;--value-w:3.2rem}
 }
 @media(max-width:540px){.dr-apps{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.dr-seg{transition:none}}
