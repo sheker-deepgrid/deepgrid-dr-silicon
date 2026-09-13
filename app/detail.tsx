@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {ArrowUpRight,Download,Maximize2,Minimize2} from 'lucide-react';
 import type {Explained,Step} from './detail-content';
 
@@ -35,11 +35,14 @@ export function Stats({items}:{items:readonly (readonly [string,string])[]}){ret
 // A draw.io diagram at its native size (its labels are drawn at 10 px), in a frame wider than the
 // text column, with a fit-to-width toggle and the full-size and source links.
 export function Diagram({src,title,alt,width,height,drawio,guide,caption}:{src:string;title:string;alt:string;width:number;height:number;drawio?:string;guide?:string;caption?:React.ReactNode}){
- const [fit,setFit]=useState(false);
+ const [fit,setFit]=useState(false),[more,setMore]=useState(false);
+ const body=useRef<HTMLDivElement>(null);
+ // fade the right edge while part of the diagram is still off to the side
+ useEffect(()=>{const el=body.current;if(!el)return;const check=()=>setMore(el.scrollLeft+el.clientWidth<el.scrollWidth-4);check();const img=el.querySelector('img');el.addEventListener('scroll',check,{passive:true});img?.addEventListener('load',check);const ro=new ResizeObserver(check);ro.observe(el);return ()=>{el.removeEventListener('scroll',check);img?.removeEventListener('load',check);ro.disconnect();};},[fit]);
  return <figure className="dr-diagram">
   <div className="dr-diagram-bar"><div><span className="mono">ARCHITECTURE DIAGRAM · DRAW.IO</span><strong>{title}</strong></div>
    <div className="dr-diagram-actions"><button className="small-button" onClick={()=>setFit(!fit)} aria-pressed={fit}>{fit?<><Maximize2 size={14}/>Actual size</>:<><Minimize2 size={14}/>Fit to width</>}</button><a className="text-link" href={src} target="_blank" rel="noreferrer">Open full size <ArrowUpRight size={15}/></a>{drawio&&<a className="text-link" href={drawio} download>Source (.drawio) <Download size={15}/></a>}{guide&&<a className="text-link" href={guide} download>Guide (.md) <Download size={15}/></a>}</div></div>
-  <div className="dr-diagram-body" tabIndex={0} role="region" aria-label={title+'. Scroll sideways to see all of it.'}><img src={src} alt={alt} width={width} height={height} loading="lazy" style={{minWidth:fit?0:width}}/></div>
+  <div ref={body} className="dr-diagram-body" data-more={more?'':undefined} tabIndex={0} role="region" aria-label={title+'. Scroll sideways to see all of it.'}><img src={src} alt={alt} width={width} height={height} loading="lazy" style={{minWidth:fit?0:width}}/></div>
   {caption&&<figcaption>{caption}</figcaption>}
  </figure>;
 }

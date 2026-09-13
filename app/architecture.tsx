@@ -1,4 +1,5 @@
 'use client';
+import {useRef} from 'react';
 import {ArrowUpRight,Layers,ShieldCheck,Cpu,Gauge,Activity,Cable} from 'lucide-react';
 import Silicon from './silicon';
 import {blocks} from './content';
@@ -12,8 +13,12 @@ const chips=[['lite','DG32-LITE','Lockstep motor-control SoC · one 50 MHz domai
 
 export default function Architecture(props:Props){
  const active=chips.some(c=>c[0]===props.chip)?props.chip:'lite';
+ const mark=useRef<HTMLDivElement>(null);
+ // The tabs stick under the navigation; switching from deep in a long tab starts the new one at its top.
+ const choose=(id:string)=>{const m=mark.current;if(m){const navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||0;const top=m.getBoundingClientRect().top+scrollY-navH;if(scrollY>top)scrollTo({top,behavior:'instant' as ScrollBehavior});}props.update({chip:id==='lite'?undefined:id,block:undefined});};
  return <div className="dr-arch">
-  <div className="dr-arch-tabs" role="tablist" aria-label="Architecture to show">{chips.map(([id,name,sub])=><button key={id} role="tab" aria-selected={active===id} className={active===id?'active':''} onClick={()=>props.update({chip:id==='lite'?undefined:id,block:undefined})}><strong>{name}</strong><span>{sub}</span></button>)}</div>
+  <div ref={mark} className="dr-arch-mark" aria-hidden="true"/>
+  <div className="dr-arch-tabs" role="tablist" aria-label="Architecture to show">{chips.map(([id,name,sub])=><button key={id} role="tab" aria-selected={active===id} className={active===id?'active':''} onClick={()=>choose(id)}><strong>{name}</strong><span>{sub}</span></button>)}</div>
   <div role="tabpanel" aria-label={chips.find(c=>c[0]===active)![1]}>
    {active==='lite'&&<Lite {...props}/>}
    {active==='2dom'&&<Dom go={props.go}/>}

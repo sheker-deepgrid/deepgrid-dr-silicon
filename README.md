@@ -26,6 +26,8 @@ npm run build:pages   # static artifact in dist/pages, with CNAME
 | Every number, spec, block description, comparison row and roadmap item | `app/content.ts` |
 | Detailed explanations: block rationale, design premises, data flows, engine, tape-in, electrical, positioning | `app/detail-content.ts` |
 | Architecture view (DG32-LITE, DG32-2DOM and tape-in tabs) | `app/architecture.tsx`, layout primitives in `app/detail.tsx` |
+| Scroll behaviour: block reveals, page-progress hairline, nav height for sticky elements | `app/motion.tsx` (styles at the end of `app/dr.css`) |
+| The pinned fault trace on the Overview, with its phone and reduced-motion fallback | `app/fault-trace.tsx` |
 | Page layout and copy around the data | `app/page.tsx` |
 | Section styles and chart colours | `app/dr.css` (base tokens in `app/globals.css`, `app/ux.css`) |
 | Interactive 3D package and die model | `app/silicon.tsx` |

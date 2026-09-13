@@ -89,7 +89,7 @@ export const packages: Pkg[] = [
   {
     id: '2dom-datasheet', kind: 'datasheet', name: 'DG32-2DOM', doc: 'Datasheet',
     headline: 'DG32-2DOM: DG32-LITE plus one engine',
-    summary: 'What the DG32-2DOM preliminary datasheet adds — one attention engine on its own clock — and everything it leaves unchanged.',
+    summary: 'What the DG32-2DOM preliminary datasheet adds (one attention engine on its own clock) and everything it leaves unchanged.',
     ...media('dg32-2dom-datasheet'), slideDir: './decks/dg32-2dom-datasheet',
     diagram: null, drawio: null, guide: null,
     duration: domDsFilm.duration, chapters: domDsFilm.chapters, segments: domDsFilm.segments,
