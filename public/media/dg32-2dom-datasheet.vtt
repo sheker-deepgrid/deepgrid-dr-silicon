@@ -1,0 +1,166 @@
+WEBVTT
+
+1
+00:00:00.350 --> 00:00:14.093
+DG32-2DOM is the attention variant of DG32-LITE, and its preliminary datasheet reads like DG32-LITE's with one addition: an INT8 attention engine on its own clock.
+
+2
+00:00:14.643 --> 00:00:19.526
+This deck covers what the datasheet adds, and confirms what it leaves unchanged.
+
+3
+00:00:20.076 --> 00:00:26.451
+Every figure is a design value, a process nominal or an analytic estimate, and each is labelled.
+
+4
+00:00:27.650 --> 00:00:29.270
+Here is the short version.
+
+5
+00:00:29.820 --> 00:00:33.096
+The same sixty-four pins and forty-four signals.
+
+6
+00:00:33.646 --> 00:00:37.292
+The same one point eight and three point three volt rails.
+
+7
+00:00:37.842 --> 00:00:45.011
+One added clock: the engine runs at one hundred fourteen megahertz, beside the fifty megahertz control domain.
+
+8
+00:00:45.561 --> 00:00:50.560
+For a board, DG32-2DOM is a drop-in DG32-LITE.
+
+9
+00:00:51.110 --> 00:00:54.149
+For firmware, it adds one memory-mapped engine.
+
+10
+00:00:55.350 --> 00:00:57.950
+The datasheet lists five new features.
+
+11
+00:00:58.500 --> 00:01:05.283
+An attention accelerator that computes a band of query rows in one kick, bit-exact to the golden model.
+
+12
+00:01:05.833 --> 00:01:09.858
+A shared datapath with a weight table and a forty-bit numerator.
+
+13
+00:01:10.408 --> 00:01:14.648
+A cost of about thirty-two hundred cycles per row, by analysis.
+
+14
+00:01:15.198 --> 00:01:16.721
+A second clock domain.
+
+15
+00:01:17.271 --> 00:01:19.416
+And a larger die of its own.
+
+16
+00:01:20.620 --> 00:01:22.859
+Everything else is unchanged.
+
+17
+00:01:23.409 --> 00:01:34.361
+The package, the pin groups, the rails and their limits, and the boot flow are identical to DG32-LITE, because the engine is internal and adds no pads.
+
+18
+00:01:34.911 --> 00:01:44.635
+The datasheet repeats the same zero point four three watt estimate at fifty megahertz, and it does not yet state a separate figure for the engine.
+
+19
+00:01:45.840 --> 00:01:50.104
+The engine runs on a second clock, at one hundred fourteen megahertz.
+
+20
+00:01:50.654 --> 00:01:56.928
+The CPU, the bus and the peripherals stay at fifty, so the control core's timing is untouched.
+
+21
+00:01:57.478 --> 00:02:03.262
+The engine reaches memory through two-flop clock bridges, so it never stalls the control core.
+
+22
+00:02:03.812 --> 00:02:11.188
+Timing closes with positive slack at both clocks, on a die of three point four by four point five millimetres.
+
+23
+00:02:12.390 --> 00:02:15.154
+Firmware drives the engine in four steps.
+
+24
+00:02:15.704 --> 00:02:19.454
+Tell it where the query, key, value and output buffers live.
+
+25
+00:02:20.004 --> 00:02:24.159
+Set the geometry: rows, keys, and the key and value sizes.
+
+26
+00:02:24.709 --> 00:02:28.201
+Set start, optionally reusing the buffers already loaded.
+
+27
+00:02:28.751 --> 00:02:31.951
+Then poll for done, or take the engine's interrupt.
+
+28
+00:02:32.501 --> 00:02:37.642
+The engine also reports a rejected geometry or an arithmetic overflow.
+
+29
+00:02:38.840 --> 00:02:41.192
+Its limits are fixed in the silicon.
+
+30
+00:02:41.742 --> 00:02:48.360
+Up to sixty-five thousand five hundred thirty-five query rows per kick, and up to four hundred keys per head.
+
+31
+00:02:48.910 --> 00:02:53.735
+Key vectors up to thirty-two bytes, and value vectors up to sixty-four.
+
+32
+00:02:54.285 --> 00:03:04.359
+Sixteen multiply lanes, a two-hundred-fifty-six entry weight table, and a forty-bit numerator that stays exact to one hundred thirty-one thousand keys.
+
+33
+00:03:05.560 --> 00:03:07.653
+For the board, nothing changes.
+
+34
+00:03:08.203 --> 00:03:16.263
+The footprint, the pin map, the supplies and their sequencing, and the boot flash and console are the same as DG32-LITE.
+
+35
+00:03:16.813 --> 00:03:19.650
+The engine adds no board signals at all.
+
+36
+00:03:20.200 --> 00:03:24.089
+The chip's status is design complete, and in physical trials.
+
+37
+00:03:25.290 --> 00:03:27.142
+Three things to take away.
+
+38
+00:03:27.692 --> 00:03:30.519
+The board is a DG32-LITE board.
+
+39
+00:03:31.069 --> 00:03:36.350
+The engine is one memory-mapped block on its own clock that cannot stall control.
+
+40
+00:03:36.900 --> 00:03:44.608
+And its limits are already fixed: four hundred keys, sixty-four-byte values, and about thirty-two hundred cycles per row.
+
+41
+00:03:45.158 --> 00:03:48.989
+First silicon turns these design values into measurements.
+

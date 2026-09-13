@@ -207,3 +207,19 @@
 .dr-slide-link img{width:100%;height:auto}
 @media(max-width:1100px){.dr-lib-film,.dr-lib-diagram{grid-template-columns:1fr}.dr-pkg-cards{grid-template-columns:1fr}}
 @media(max-width:800px){.dr-lib-tabs{grid-template-columns:1fr}.dr-thumbs button{flex-basis:120px}}
+
+/* Library groups and datasheet packages */
+.dr-lib-group{display:grid;gap:10px}
+.dr-lib-group+.dr-lib-group{margin-top:-28px}
+.dr-lib-tabs-datasheet{grid-template-columns:repeat(3,1fr)}
+.dr-lib-tabs-datasheet strong{font-size:1.5rem}
+.dr-figure-links{display:flex;gap:22px;flex-wrap:wrap}
+.dr-part-links{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.dr-pkg-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:22px}
+.dr-pkg-mini-card{display:grid;gap:8px;text-align:left;border:1px solid var(--rule);background:#131615;padding:0 0 16px}
+.dr-pkg-mini-card img{width:100%;height:auto;aspect-ratio:16/9;display:block}
+.dr-pkg-mini-card .mono{font:var(--text-meta) monospace;letter-spacing:1px;color:#93a582;padding:6px 16px 0}
+.dr-pkg-mini-card strong{font:400 1.2rem/1.3 var(--serif);color:#eee6d4;padding:0 16px}
+.dr-pkg-mini-card .open-product{padding:0 16px}
+.dr-pkg-mini-card:hover{border-color:var(--copper)}
+@media(max-width:1100px){.dr-lib-tabs-datasheet,.dr-pkg-mini{grid-template-columns:1fr}}

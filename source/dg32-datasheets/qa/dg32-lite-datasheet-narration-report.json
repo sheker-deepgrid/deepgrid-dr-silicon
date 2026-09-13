@@ -1,0 +1,407 @@
+{
+  "voice": "bm_george",
+  "speed": 1.05,
+  "slide_speeds": {
+    "8": 0.96,
+    "9": 0.96,
+    "12": 0.98
+  },
+  "sentence_pause_s": 0.55,
+  "wpm_band": [
+    140,
+    155
+  ],
+  "wpm_gate": [
+    135,
+    160
+  ],
+  "overall_wpm": 151.9,
+  "median_f0_hz": 141.2,
+  "holt_f0_hz": 135.6,
+  "total_seconds": 306.1,
+  "failed_slides": [],
+  "slides": [
+    {
+      "slide": 1,
+      "speed": 1.05,
+      "seconds": 26.1,
+      "spoken_words": 66,
+      "wpm": 151.7,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "DG32-LITE is Deepgrid Semi's lockstep RISC-V motor-control chip, and this is its preliminary datasheet in twelve slides.",
+          "start": 0.0,
+          "end": 9.512
+        },
+        {
+          "text": "Two cores run in lockstep inside a nine-by-nine millimetre, sixty-four-pin QFN.",
+          "start": 10.062,
+          "end": 16.204
+        },
+        {
+          "text": "Everything here comes from the design as built for first silicon and from process nominals, not from measured parts, and each slide says which is which.",
+          "start": 16.754,
+          "end": 26.099
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "speed": 1.05,
+      "seconds": 23.2,
+      "spoken_words": 61,
+      "wpm": 157.8,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Four facts set every design-in.",
+          "start": 0.0,
+          "end": 2.288
+        },
+        {
+          "text": "The core runs from a one point eight volt rail.",
+          "start": 2.838,
+          "end": 5.918
+        },
+        {
+          "text": "The input and output ring runs at three point three volts.",
+          "start": 6.468,
+          "end": 10.203
+        },
+        {
+          "text": "The whole chip runs from one fifty megahertz clock.",
+          "start": 10.753,
+          "end": 14.046
+        },
+        {
+          "text": "And every signal comes out through forty-four pins of a sixty-four-pin package, with the other twenty pins given to supplies and ground.",
+          "start": 14.596,
+          "end": 23.201
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "speed": 1.05,
+      "seconds": 29.9,
+      "spoken_words": 72,
+      "wpm": 144.5,
+      "median_f0_hz": 142.0,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The datasheet lists nine features.",
+          "start": 0.0,
+          "end": 2.301
+        },
+        {
+          "text": "Two RISC-V cores in lockstep with a fault comparator.",
+          "start": 2.851,
+          "end": 6.772
+        },
+        {
+          "text": "Thirty-two kilobytes of SRAM and a sixty-four kilobyte boot ROM.",
+          "start": 7.322,
+          "end": 12.706
+        },
+        {
+          "text": "Three-phase PWM with a hardware brake, four DShot channels, encoder and Hall inputs, a CORDIC and an on-die ADC.",
+          "start": 13.256,
+          "end": 21.93
+        },
+        {
+          "text": "Serial ports, SPI, I squared C and GPIO, with supervision.",
+          "start": 22.48,
+          "end": 26.557
+        },
+        {
+          "text": "And it boots itself, with no management core.",
+          "start": 27.107,
+          "end": 29.897
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "speed": 1.05,
+      "seconds": 25.93,
+      "spoken_words": 63,
+      "wpm": 145.8,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Forty-four signal pins fall into eleven groups.",
+          "start": 0.0,
+          "end": 3.292
+        },
+        {
+          "text": "Motor PWM and its sample trigger take seven, and so does the QSPI flash.",
+          "start": 3.842,
+          "end": 10.09
+        },
+        {
+          "text": "Position sensing takes six.",
+          "start": 10.64,
+          "end": 12.663
+        },
+        {
+          "text": "Serial, SPI, JTAG and GPIO take fifteen between them.",
+          "start": 13.213,
+          "end": 17.234
+        },
+        {
+          "text": "Three carry safety signals, including the fault output, and the analog inputs, I squared C, and clock and reset take two each.",
+          "start": 17.784,
+          "end": 25.93
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "speed": 1.05,
+      "seconds": 23.37,
+      "spoken_words": 61,
+      "wpm": 156.6,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The pins are placed by job.",
+          "start": 0.0,
+          "end": 2.055
+        },
+        {
+          "text": "One side carries the motor: all six gate outputs, the sample trigger, the encoder and two Hall inputs.",
+          "start": 2.605,
+          "end": 9.265
+        },
+        {
+          "text": "The opposite side carries the boot flash and the serial ports.",
+          "start": 9.815,
+          "end": 13.734
+        },
+        {
+          "text": "The bottom holds JTAG, the clock and the resets, and the top holds I squared C, GPIO, the fault output and the supply-good inputs.",
+          "start": 14.284,
+          "end": 23.368
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "speed": 1.05,
+      "seconds": 27.1,
+      "spoken_words": 67,
+      "wpm": 148.3,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Every electrical limit in this datasheet is a design target or a process nominal, and first-silicon characterisation will replace it.",
+          "start": 0.0,
+          "end": 8.862
+        },
+        {
+          "text": "The core supply runs from one point seven one to one point eight nine volts, and the input and output supply from three to three point six.",
+          "start": 9.412,
+          "end": 18.64
+        },
+        {
+          "text": "The analog inputs accept zero to one point eight volts, and absolute maximums sit just above the operating range.",
+          "start": 19.19,
+          "end": 27.1
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "speed": 1.05,
+      "seconds": 25.1,
+      "spoken_words": 65,
+      "wpm": 155.4,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Power is simple.",
+          "start": 0.0,
+          "end": 1.254
+        },
+        {
+          "text": "All logic, memory and the ADC draw from the one point eight volt user rail.",
+          "start": 1.804,
+          "end": 7.165
+        },
+        {
+          "text": "The other user rails are unused, and are tied to their nominal voltage only to keep protection structures biased.",
+          "start": 7.715,
+          "end": 15.001
+        },
+        {
+          "text": "Bring up three point three volts before or together with one point eight.",
+          "start": 15.551,
+          "end": 19.725
+        },
+        {
+          "text": "The tool estimate is about zero point four three watts at fifty megahertz.",
+          "start": 20.275,
+          "end": 25.098
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "speed": 0.96,
+      "seconds": 27.05,
+      "spoken_words": 69,
+      "wpm": 153.0,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Clocking is just as direct.",
+          "start": 0.0,
+          "end": 2.177
+        },
+        {
+          "text": "One three point three volt clock input drives the whole chip at a fifty megahertz design target, and there is no on-die PLL.",
+          "start": 2.727,
+          "end": 11.967
+        },
+        {
+          "text": "Two active-low resets are combined on the die with the power-on reset, so a board can use either one and pull the other high.",
+          "start": 12.517,
+          "end": 20.868
+        },
+        {
+          "text": "The core itself reaches fifty-five to sixty-two megahertz after place-and-route.",
+          "start": 21.418,
+          "end": 27.05
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "speed": 0.96,
+      "seconds": 26.3,
+      "spoken_words": 69,
+      "wpm": 157.4,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The chip boots with no outside help.",
+          "start": 0.0,
+          "end": 2.639
+        },
+        {
+          "text": "The ROM prints a banner on the console UART, reads and checks the flash image header, copies the image into SRAM over a quad-SPI read, and jumps to it.",
+          "start": 3.189,
+          "end": 15.044
+        },
+        {
+          "text": "Code runs from SRAM, not in place from flash.",
+          "start": 15.594,
+          "end": 19.421
+        },
+        {
+          "text": "If the flash is blank, a UART monitor starts instead, so a bare board can still be inspected.",
+          "start": 19.971,
+          "end": 26.303
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "speed": 1.05,
+      "seconds": 28.07,
+      "spoken_words": 73,
+      "wpm": 156.0,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "These are the limits firmware can plan on.",
+          "start": 0.0,
+          "end": 2.425
+        },
+        {
+          "text": "The UARTs run at one hundred fifteen thousand two hundred baud, SPI to twenty-five megahertz, and I squared C at one hundred or four hundred kilohertz.",
+          "start": 2.975,
+          "end": 12.991
+        },
+        {
+          "text": "PWM dead-time reaches five point one microseconds, and the brake acts within two cycles.",
+          "start": 13.541,
+          "end": 20.444
+        },
+        {
+          "text": "The ADC samples at about two hundred kilosamples per second, and on this silicon it runs untrimmed.",
+          "start": 20.994,
+          "end": 28.07
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "speed": 1.05,
+      "seconds": 23.01,
+      "spoken_words": 55,
+      "wpm": 143.4,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The package is settled: a nine-by-nine millimetre QFN with a half-millimetre pitch and an exposed ground paddle.",
+          "start": 0.0,
+          "end": 7.277
+        },
+        {
+          "text": "Three things are still preliminary.",
+          "start": 7.827,
+          "end": 10.178
+        },
+        {
+          "text": "The pin map waits on the foundry's bond-diagram confirmation, the electrical section waits on characterisation, and the control core stays frozen for feature work until silicon test.",
+          "start": 10.728,
+          "end": 23.005
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "speed": 0.98,
+      "seconds": 21.02,
+      "spoken_words": 54,
+      "wpm": 154.1,
+      "median_f0_hz": 143.7,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "So here is what is fixed and what is not.",
+          "start": 0.0,
+          "end": 2.771
+        },
+        {
+          "text": "Fixed now: the package, the pin groups, the rails, the clock and the boot path.",
+          "start": 3.321,
+          "end": 8.087
+        },
+        {
+          "text": "Measured at first silicon: every electrical limit, and the final pin map.",
+          "start": 8.637,
+          "end": 13.444
+        },
+        {
+          "text": "The register-level detail lives in the engineering datasheet; this deck is the plan you build around.",
+          "start": 13.994,
+          "end": 21.02
+        }
+      ]
+    }
+  ]
+}

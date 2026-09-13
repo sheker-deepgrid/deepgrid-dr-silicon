@@ -1,0 +1,327 @@
+{
+  "voice": "bm_george",
+  "speed": 1.05,
+  "slide_speeds": {
+    "4": 0.98
+  },
+  "sentence_pause_s": 0.55,
+  "wpm_band": [
+    140,
+    155
+  ],
+  "wpm_gate": [
+    135,
+    160
+  ],
+  "overall_wpm": 152.0,
+  "median_f0_hz": 142.0,
+  "holt_f0_hz": 135.6,
+  "total_seconds": 219.0,
+  "failed_slides": [],
+  "slides": [
+    {
+      "slide": 1,
+      "speed": 1.05,
+      "seconds": 26.1,
+      "spoken_words": 69,
+      "wpm": 158.6,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "DG32-2DOM is the attention variant of DG32-LITE, and its preliminary datasheet reads like DG32-LITE's with one addition: an INT8 attention engine on its own clock.",
+          "start": 0.0,
+          "end": 13.743
+        },
+        {
+          "text": "This deck covers what the datasheet adds, and confirms what it leaves unchanged.",
+          "start": 14.293,
+          "end": 19.176
+        },
+        {
+          "text": "Every figure is a design value, a process nominal or an analytic estimate, and each is labelled.",
+          "start": 19.726,
+          "end": 26.101
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "speed": 1.05,
+      "seconds": 26.5,
+      "spoken_words": 68,
+      "wpm": 154.0,
+      "median_f0_hz": 142.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Here is the short version.",
+          "start": 0.0,
+          "end": 1.62
+        },
+        {
+          "text": "The same sixty-four pins and forty-four signals.",
+          "start": 2.17,
+          "end": 5.446
+        },
+        {
+          "text": "The same one point eight and three point three volt rails.",
+          "start": 5.996,
+          "end": 9.642
+        },
+        {
+          "text": "One added clock: the engine runs at one hundred fourteen megahertz, beside the fifty megahertz control domain.",
+          "start": 10.192,
+          "end": 17.361
+        },
+        {
+          "text": "For a board, DG32-2DOM is a drop-in DG32-LITE.",
+          "start": 17.911,
+          "end": 22.91
+        },
+        {
+          "text": "For firmware, it adds one memory-mapped engine.",
+          "start": 23.46,
+          "end": 26.499
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "speed": 1.05,
+      "seconds": 24.07,
+      "spoken_words": 60,
+      "wpm": 149.6,
+      "median_f0_hz": 142.0,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The datasheet lists five new features.",
+          "start": 0.0,
+          "end": 2.6
+        },
+        {
+          "text": "An attention accelerator that computes a band of query rows in one kick, bit-exact to the golden model.",
+          "start": 3.15,
+          "end": 9.933
+        },
+        {
+          "text": "A shared datapath with a weight table and a forty-bit numerator.",
+          "start": 10.483,
+          "end": 14.508
+        },
+        {
+          "text": "A cost of about thirty-two hundred cycles per row, by analysis.",
+          "start": 15.058,
+          "end": 19.298
+        },
+        {
+          "text": "A second clock domain.",
+          "start": 19.848,
+          "end": 21.371
+        },
+        {
+          "text": "And a larger die of its own.",
+          "start": 21.921,
+          "end": 24.066
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "speed": 0.98,
+      "seconds": 24.02,
+      "spoken_words": 61,
+      "wpm": 152.4,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Everything else is unchanged.",
+          "start": 0.0,
+          "end": 2.239
+        },
+        {
+          "text": "The package, the pin groups, the rails and their limits, and the boot flow are identical to DG32-LITE, because the engine is internal and adds no pads.",
+          "start": 2.789,
+          "end": 13.741
+        },
+        {
+          "text": "The datasheet repeats the same zero point four three watt estimate at fifty megahertz, and it does not yet state a separate figure for the engine.",
+          "start": 14.291,
+          "end": 24.015
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "speed": 1.05,
+      "seconds": 25.35,
+      "spoken_words": 65,
+      "wpm": 153.9,
+      "median_f0_hz": 142.0,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The engine runs on a second clock, at one hundred fourteen megahertz.",
+          "start": 0.0,
+          "end": 4.264
+        },
+        {
+          "text": "The CPU, the bus and the peripherals stay at fifty, so the control core's timing is untouched.",
+          "start": 4.814,
+          "end": 11.088
+        },
+        {
+          "text": "The engine reaches memory through two-flop clock bridges, so it never stalls the control core.",
+          "start": 11.638,
+          "end": 17.422
+        },
+        {
+          "text": "Timing closes with positive slack at both clocks, on a die of three point four by four point five millimetres.",
+          "start": 17.972,
+          "end": 25.348
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "speed": 1.05,
+      "seconds": 25.25,
+      "spoken_words": 57,
+      "wpm": 135.4,
+      "median_f0_hz": 144.6,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Firmware drives the engine in four steps.",
+          "start": 0.0,
+          "end": 2.764
+        },
+        {
+          "text": "Tell it where the query, key, value and output buffers live.",
+          "start": 3.314,
+          "end": 7.064
+        },
+        {
+          "text": "Set the geometry: rows, keys, and the key and value sizes.",
+          "start": 7.614,
+          "end": 11.769
+        },
+        {
+          "text": "Set start, optionally reusing the buffers already loaded.",
+          "start": 12.319,
+          "end": 15.811
+        },
+        {
+          "text": "Then poll for done, or take the engine's interrupt.",
+          "start": 16.361,
+          "end": 19.561
+        },
+        {
+          "text": "The engine also reports a rejected geometry or an arithmetic overflow.",
+          "start": 20.111,
+          "end": 25.252
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "speed": 1.05,
+      "seconds": 25.52,
+      "spoken_words": 68,
+      "wpm": 159.9,
+      "median_f0_hz": 139.5,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Its limits are fixed in the silicon.",
+          "start": 0.0,
+          "end": 2.352
+        },
+        {
+          "text": "Up to sixty-five thousand five hundred thirty-five query rows per kick, and up to four hundred keys per head.",
+          "start": 2.902,
+          "end": 9.52
+        },
+        {
+          "text": "Key vectors up to thirty-two bytes, and value vectors up to sixty-four.",
+          "start": 10.07,
+          "end": 14.895
+        },
+        {
+          "text": "Sixteen multiply lanes, a two-hundred-fifty-six entry weight table, and a forty-bit numerator that stays exact to one hundred thirty-one thousand keys.",
+          "start": 15.445,
+          "end": 25.519
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "speed": 1.05,
+      "seconds": 18.53,
+      "spoken_words": 48,
+      "wpm": 155.4,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "For the board, nothing changes.",
+          "start": 0.0,
+          "end": 2.093
+        },
+        {
+          "text": "The footprint, the pin map, the supplies and their sequencing, and the boot flash and console are the same as DG32-LITE.",
+          "start": 2.643,
+          "end": 10.703
+        },
+        {
+          "text": "The engine adds no board signals at all.",
+          "start": 11.253,
+          "end": 14.09
+        },
+        {
+          "text": "The chip's status is design complete, and in physical trials.",
+          "start": 14.64,
+          "end": 18.529
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "speed": 1.05,
+      "seconds": 23.7,
+      "spoken_words": 59,
+      "wpm": 149.4,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Three things to take away.",
+          "start": 0.0,
+          "end": 1.852
+        },
+        {
+          "text": "The board is a DG32-LITE board.",
+          "start": 2.402,
+          "end": 5.229
+        },
+        {
+          "text": "The engine is one memory-mapped block on its own clock that cannot stall control.",
+          "start": 5.779,
+          "end": 11.06
+        },
+        {
+          "text": "And its limits are already fixed: four hundred keys, sixty-four-byte values, and about thirty-two hundred cycles per row.",
+          "start": 11.61,
+          "end": 19.318
+        },
+        {
+          "text": "First silicon turns these design values into measurements.",
+          "start": 19.868,
+          "end": 23.699
+        }
+      ]
+    }
+  ]
+}

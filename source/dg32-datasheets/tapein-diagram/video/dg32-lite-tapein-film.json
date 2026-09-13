@@ -1,0 +1,98 @@
+{
+  "duration": 309.32,
+  "chapters": [
+    {
+      "title": "The die as built",
+      "slides": [
+        1,
+        3
+      ],
+      "start": 0.0,
+      "end": 81.84
+    },
+    {
+      "title": "Cores, memory and bus",
+      "slides": [
+        4,
+        6
+      ],
+      "start": 81.84,
+      "end": 167.28
+    },
+    {
+      "title": "Blocks and pads",
+      "slides": [
+        7,
+        8
+      ],
+      "start": 167.28,
+      "end": 225.45
+    },
+    {
+      "title": "Test and sign-off",
+      "slides": [
+        9,
+        11
+      ],
+      "start": 225.45,
+      "end": 309.32
+    }
+  ],
+  "segments": [
+    {
+      "slide": 1,
+      "start": 0.0,
+      "duration": 26.89
+    },
+    {
+      "slide": 2,
+      "start": 26.89,
+      "duration": 25.06
+    },
+    {
+      "slide": 3,
+      "start": 51.95,
+      "duration": 29.89
+    },
+    {
+      "slide": 4,
+      "start": 81.84,
+      "duration": 28.85
+    },
+    {
+      "slide": 5,
+      "start": 110.69,
+      "duration": 30.34
+    },
+    {
+      "slide": 6,
+      "start": 141.03,
+      "duration": 26.25
+    },
+    {
+      "slide": 7,
+      "start": 167.28,
+      "duration": 27.78
+    },
+    {
+      "slide": 8,
+      "start": 195.06,
+      "duration": 30.39
+    },
+    {
+      "slide": 9,
+      "start": 225.45,
+      "duration": 28.67
+    },
+    {
+      "slide": 10,
+      "start": 254.12,
+      "duration": 29.77
+    },
+    {
+      "slide": 11,
+      "start": 283.89,
+      "duration": 25.43
+    }
+  ]
+}

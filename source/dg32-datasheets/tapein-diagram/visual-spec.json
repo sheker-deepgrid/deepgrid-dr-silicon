@@ -1,0 +1,215 @@
+{
+  "contract_version": "1.0",
+  "deck": {
+    "output_mode": "native",
+    "editability": "Every title, card, table, chain and diagram is a native PowerPoint object; the deck places no images.",
+    "reference_deck": null
+  },
+  "visuals": [
+    {
+      "id": "s01-native",
+      "slide_ids": [
+        1
+      ],
+      "purpose": "Slide 1 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      },
+      "source": {
+        "path": "DG32-LITE_block_diagram.pdf",
+        "page": 1,
+        "frame": null,
+        "timestamp": null,
+        "crop": null
+      }
+    },
+    {
+      "id": "s02-native",
+      "slide_ids": [
+        2
+      ],
+      "purpose": "Slide 2 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s03-native",
+      "slide_ids": [
+        3
+      ],
+      "purpose": "Slide 3 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s04-native",
+      "slide_ids": [
+        4
+      ],
+      "purpose": "Slide 4 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s05-native",
+      "slide_ids": [
+        5
+      ],
+      "purpose": "Slide 5 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s06-native",
+      "slide_ids": [
+        6
+      ],
+      "purpose": "Slide 6 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s07-native",
+      "slide_ids": [
+        7
+      ],
+      "purpose": "Slide 7 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s08-native",
+      "slide_ids": [
+        8
+      ],
+      "purpose": "Slide 8 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s09-native",
+      "slide_ids": [
+        9
+      ],
+      "purpose": "Slide 9 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s10-native",
+      "slide_ids": [
+        10
+      ],
+      "purpose": "Slide 10 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Data, claims and structure stay native and editable; the source PDF supplies information, not artwork",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "s11-native",
+      "slide_ids": [
+        11
+      ],
+      "purpose": "Slide 11 structured content: tables, KPIs, chains, diagrams and cards",
+      "artifact_type": "other",
+      "evidence_status": "not-applicable",
+      "route": "none",
+      "reason": "Takeaway text; decoration would add nothing",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    }
+  ]
+}

@@ -31,23 +31,26 @@ npm run build:pages   # static artifact in dist/pages, with CNAME
 
 ## Decks & films
 
-The **Decks & films** view links the architecture package for each chip. Every file is served
+The **Decks & films** view links one package per source document: the two architecture documents, both datasheets and the tape-in block diagram. Every file is served
 from this repository:
 
 | Package | Deck | Film | Diagram | Guide |
 | --- | --- | --- | --- | --- |
 | DG32-LITE | `public/downloads/dg32-lite-architecture.pptx` (16 slides) | `public/media/dg32-lite-architecture.mp4` + `.vtt` | `public/diagrams/dg32-lite-architecture.svg`, source `public/downloads/*.drawio` | `public/downloads/dg32-lite-architecture-guide.md` |
 | DG32-2DOM | `public/downloads/dg32-2dom-architecture.pptx` (13 slides) | `public/media/dg32-2dom-architecture.mp4` + `.vtt` | `public/diagrams/dg32-2dom-architecture.svg` | `public/downloads/dg32-2dom-architecture-guide.md` |
+| DG32-LITE datasheet | `public/downloads/dg32-lite-datasheet.pptx` (12 slides) | `public/media/dg32-lite-datasheet.mp4` + `.vtt` | — | — |
+| DG32-2DOM datasheet | `public/downloads/dg32-2dom-datasheet.pptx` (9 slides) | `public/media/dg32-2dom-datasheet.mp4` + `.vtt` | — | — |
+| DG32-LITE tape-in block diagram | `public/downloads/dg32-lite-tapein.pptx` (11 slides) | `public/media/dg32-lite-tapein.mp4` + `.vtt` | — | — |
 
 Slide images in `public/decks/` are PowerPoint's own 1920×1080 exports of the reviewed decks,
 resized to 1600 px. Film chapter and slide timing lives in `app/data/*-film.json`, written by the
 film assembler, so the deck viewer can follow the film. The builders, story packs, narration and
-QA records live in `content-ideas/runs/2026-09-13-dg32-architecture-package/`.
+QA records are committed under `source/dg32-architecture/` and `source/dg32-datasheets/`.
 
 To refresh a package: rebuild the deck there, export frames through PowerPoint, re-narrate
 (Kokoro, Holt profile), reassemble the film, then copy the reviewed `.pptx`, `slide-NN.webp`,
-`.mp4`, `.vtt`, poster and `*-film.json` here. `npm run build:pages` fails if any referenced
-file or slide image is missing.
+`.mp4`, `.vtt`, poster and `*-film.json` here. `npm run build:pages` fails if any package's deck, film,
+captions, poster or slide image is missing.
 
 ## Sources
 

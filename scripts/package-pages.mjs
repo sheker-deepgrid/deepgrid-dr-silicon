@@ -36,9 +36,19 @@ const appSource=fs.readdirSync(path.join(root,'app')).filter(f=>/\.(tsx?|css)$/.
 // plus one slide image per film segment, since slide paths are built at runtime.
 const images=[...new Set([...appSource.matchAll(/\.\/((?:images|decks|media|downloads|diagrams)\/[\w./-]+\.(?:webp|png|svg|jpg|mp4|vtt|pptx|drawio|md))/g)].map(m=>m[1]))];
 for(const rel of images)if(!fs.existsSync(path.join(output,rel)))throw Error('Missing asset: '+rel);
-for(const [film,dir] of [['dg32-lite-film.json','dg32-lite'],['dg32-2dom-film.json','dg32-2dom']]){
+for(const film of fs.readdirSync(path.join(root,'app/data')).filter(f=>f.endsWith('-film.json'))){
+ const dir=film.replace(/-film\.json$/,'');
  const data=JSON.parse(fs.readFileSync(path.join(root,'app/data',film),'utf8'));
  for(const seg of data.segments){const f=path.join(output,'decks',dir,`slide-${String(seg.slide).padStart(2,'0')}.webp`);if(!fs.existsSync(f))throw Error('Missing slide image: '+f);}
 }
+// library-data.ts builds each package's deck, film, captions and poster paths from a slug, so the
+// literal scan above cannot see them; check every media('<slug>') package explicitly.
+const pkgSource=fs.readFileSync(path.join(root,'app/library-data.ts'),'utf8');
+const slugs=[...pkgSource.matchAll(/media\('([\w-]+)'\)/g)].map(m=>m[1]);
+if(slugs.length<5)throw Error(`Expected at least 5 packages in library-data.ts, found ${slugs.length}`);
+for(const slug of slugs)for(const rel of [`downloads/${slug}.pptx`,`media/${slug}.mp4`,`media/${slug}.vtt`,`media/${slug}-poster.jpg`]){
+ if(!fs.existsSync(path.join(output,rel)))throw Error('Missing package file: '+rel);
+ images.push(rel);
+}
 if(checked<3)throw Error(`Only ${checked} entry references found; the export looks empty`);
-console.log(`Pages package ready at base ${base}${domain?' for '+domain:''}: ${checked} entry references and ${images.length} asset paths verified.`);
+console.log(`Pages package ready at base ${base}${domain?' for '+domain:''}: ${checked} entry references and ${images.length} asset paths verified across ${slugs.length} packages.`);

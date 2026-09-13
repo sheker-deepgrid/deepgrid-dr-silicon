@@ -1,0 +1,206 @@
+WEBVTT
+
+1
+00:00:00.350 --> 00:00:08.441
+This is DG32-LITE as recorded in its tape-in block diagram: the die as built, block by block.
+
+2
+00:00:08.991 --> 00:00:21.726
+It covers the clock and reset, the lockstep pair, memory and fetch, the bus and the eighteen blocks around it, the pad plan, production test, and the four sign-off gates the die must pass.
+
+3
+00:00:22.276 --> 00:00:26.043
+It is a design record, not a measurement of silicon.
+
+4
+00:00:27.240 --> 00:00:28.364
+The short version.
+
+5
+00:00:28.914 --> 00:00:36.819
+One fifty megahertz clock domain, with the lockstep core measured at fifty-five to sixty-two megahertz after place-and-route.
+
+6
+00:00:37.369 --> 00:00:42.744
+A checker that runs two cycles behind and sees the main core's bus responses.
+
+7
+00:00:43.294 --> 00:00:46.591
+Forty-four wrapper pads, every one of them allocated.
+
+8
+00:00:47.141 --> 00:00:51.104
+And four sign-off gates that must all pass on the final die.
+
+9
+00:00:52.300 --> 00:00:55.473
+One clock and one reset drive the whole block.
+
+10
+00:00:56.023 --> 00:00:59.048
+The clock arrives from a pad at fifty megahertz.
+
+11
+00:00:59.598 --> 00:01:08.862
+Eight software clock gates switch off idle peripherals: both UARTs, SPI, I squared C, PWM, the timers, the DMA and the CORDIC.
+
+12
+00:01:09.412 --> 00:01:12.014
+Test mode forces every gate open.
+
+13
+00:01:12.564 --> 00:01:20.993
+Reset is asynchronous, the supervisor deglitches the supply-good inputs, and the checker leaves reset two cycles after the main core.
+
+14
+00:01:22.190 --> 00:01:25.616
+The lockstep pair is built to survive real firmware.
+
+15
+00:01:26.166 --> 00:01:29.201
+The main core runs the code and owns the bus.
+
+16
+00:01:29.751 --> 00:01:38.748
+The checker replays the same work two cycles later, with its inputs and bus responses mirrored, and the comparator checks every committed store.
+
+17
+00:01:39.298 --> 00:01:47.037
+So interrupts are safe, firmware may branch on a peripheral read, and the pair has been verified under interrupts in simulation.
+
+18
+00:01:47.587 --> 00:01:49.840
+A mismatch drives the fault pad.
+
+19
+00:01:51.040 --> 00:01:55.086
+Code runs from SRAM through a dedicated fetch port.
+
+20
+00:01:55.636 --> 00:02:03.010
+The fetch decoder sends boot fetches to the ROM and application fetches to the SRAM's second port.
+
+21
+00:02:03.560 --> 00:02:07.020
+Anything else is a bus error and an instruction fault.
+
+22
+00:02:07.570 --> 00:02:16.964
+The ROM is sixteen thousand words of mask-programmed logic that prints the banner, checks the flash header, copies the application and jumps.
+
+23
+00:02:17.514 --> 00:02:20.178
+Blank flash opens a UART monitor.
+
+24
+00:02:21.380 --> 00:02:24.057
+The bus serves one requester at a time.
+
+25
+00:02:24.607 --> 00:02:33.604
+The CPU has priority over the DMA, and each read or write target is latched at the request and held until the response.
+
+26
+00:02:34.154 --> 00:02:37.484
+Every peripheral is a thirty-two-bit register slave.
+
+27
+00:02:38.034 --> 00:02:46.428
+A clock-gated or undecoded slot answers with an error instead of hanging, and the QSPI window serves data, not code.
+
+28
+00:02:47.630 --> 00:02:49.889
+Eighteen blocks sit around that bus.
+
+29
+00:02:50.439 --> 00:02:57.519
+Six handle connectivity: the UARTs, SPI, I squared C, the QSPI window, GPIO and the timers.
+
+30
+00:02:58.069 --> 00:03:04.610
+Six serve the motor: PWM, DShot, encoder and Hall, CORDIC, the ADC and interrupts.
+
+31
+00:03:05.160 --> 00:03:14.210
+And six handle system, safety and test: system control, the watchdog, the fault register, the error slave, scan, and the JTAG port.
+
+32
+00:03:15.410 --> 00:03:19.286
+Every one of the forty-four wrapper pads has a job.
+
+33
+00:03:19.836 --> 00:03:28.316
+Seven carry the QSPI flash, seven the PWM outputs and trigger, and six the encoder and Hall inputs.
+
+34
+00:03:28.866 --> 00:03:32.507
+Four each go to the UARTs, SPI and JTAG.
+
+35
+00:03:33.057 --> 00:03:34.816
+Three are GPIO.
+
+36
+00:03:35.366 --> 00:03:44.599
+Two each carry I squared C, supply-good and the analog ADC inputs, and one each carry the clock, the reset and the fault output.
+
+37
+00:03:45.800 --> 00:03:49.230
+Production test reaches the logic through JTAG.
+
+38
+00:03:49.780 --> 00:04:02.829
+A tester drives the four JTAG pins into a test access port in the wrapper, which selects scan enable, scan mode, a chain, or bypass, and reaches thirteen scan chains inside the hardened block.
+
+39
+00:04:03.379 --> 00:04:08.116
+Test mode forces every clock gate open, so scan reaches every block.
+
+40
+00:04:08.666 --> 00:04:13.268
+Interactive CPU debug over JTAG is a roadmap item.
+
+41
+00:04:14.470 --> 00:04:17.213
+Four gates must all pass before tape-in.
+
+42
+00:04:17.763 --> 00:04:20.145
+The layout must be design-rule clean.
+
+43
+00:04:20.695 --> 00:04:24.627
+Layout versus schematic must match uniquely, pins included.
+
+44
+00:04:25.177 --> 00:04:31.723
+A connectivity check on the final layout must show every pad reaching logic, with no floating net.
+
+45
+00:04:32.273 --> 00:04:37.208
+And a gate-level simulation of the routed netlist must boot and print the banner.
+
+46
+00:04:37.758 --> 00:04:43.036
+The connectivity gate exists because the first two can pass while a pad pin floats.
+
+47
+00:04:44.240 --> 00:04:46.092
+Three things to take away.
+
+48
+00:04:46.642 --> 00:04:52.058
+One clock and one reset, with eight clock gates and a checker released two cycles late.
+
+49
+00:04:52.608 --> 00:04:59.347
+Nothing hangs and nothing floats: bad accesses return errors, and all forty-four pads are allocated.
+
+50
+00:04:59.897 --> 00:05:03.124
+And four gates stand between the design and tape-in.
+
+51
+00:05:03.674 --> 00:05:08.474
+The next milestone is first silicon, on the September twenty twenty-six shuttle.
+
