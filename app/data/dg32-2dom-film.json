@@ -1,0 +1,99 @@
+{
+  "duration": 346.56,
+  "chapters": [
+    {
+      "title": "What DG32-2DOM adds",
+      "slides": [
+        1,
+        5
+      ],
+      "start": 0.0,
+      "end": 137.96
+    },
+    {
+      "title": "Inside the engine",
+      "slides": [
+        6,
+        9
+      ],
+      "start": 137.96,
+      "end": 241.32
+    },
+    {
+      "title": "Cost, timing and roadmap",
+      "slides": [
+        10,
+        13
+      ],
+      "start": 241.32,
+      "end": 346.56
+    }
+  ],
+  "segments": [
+    {
+      "slide": 1,
+      "start": 0.0,
+      "duration": 30.47
+    },
+    {
+      "slide": 2,
+      "start": 30.47,
+      "duration": 28.2
+    },
+    {
+      "slide": 3,
+      "start": 58.67,
+      "duration": 26.6
+    },
+    {
+      "slide": 4,
+      "start": 85.27,
+      "duration": 26.22
+    },
+    {
+      "slide": 5,
+      "start": 111.49,
+      "duration": 26.47
+    },
+    {
+      "slide": 6,
+      "start": 137.96,
+      "duration": 25.77
+    },
+    {
+      "slide": 7,
+      "start": 163.73,
+      "duration": 26.05
+    },
+    {
+      "slide": 8,
+      "start": 189.78,
+      "duration": 27.31
+    },
+    {
+      "slide": 9,
+      "start": 217.09,
+      "duration": 24.23
+    },
+    {
+      "slide": 10,
+      "start": 241.32,
+      "duration": 28.67
+    },
+    {
+      "slide": 11,
+      "start": 269.99,
+      "duration": 24.29
+    },
+    {
+      "slide": 12,
+      "start": 294.28,
+      "duration": 26.15
+    },
+    {
+      "slide": 13,
+      "start": 320.43,
+      "duration": 26.13
+    }
+  ]
+}

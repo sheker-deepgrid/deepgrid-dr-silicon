@@ -29,15 +29,39 @@ npm run build:pages   # static artifact in dist/pages, with CNAME
 | Interactive 3D package and die model | `app/silicon.tsx` |
 | Images | `public/images/` |
 
+## Decks & films
+
+The **Decks & films** view links the architecture package for each chip. Every file is served
+from this repository:
+
+| Package | Deck | Film | Diagram | Guide |
+| --- | --- | --- | --- | --- |
+| DG32-LITE | `public/downloads/dg32-lite-architecture.pptx` (16 slides) | `public/media/dg32-lite-architecture.mp4` + `.vtt` | `public/diagrams/dg32-lite-architecture.svg`, source `public/downloads/*.drawio` | `public/downloads/dg32-lite-architecture-guide.md` |
+| DG32-2DOM | `public/downloads/dg32-2dom-architecture.pptx` (13 slides) | `public/media/dg32-2dom-architecture.mp4` + `.vtt` | `public/diagrams/dg32-2dom-architecture.svg` | `public/downloads/dg32-2dom-architecture-guide.md` |
+
+Slide images in `public/decks/` are PowerPoint's own 1920×1080 exports of the reviewed decks,
+resized to 1600 px. Film chapter and slide timing lives in `app/data/*-film.json`, written by the
+film assembler, so the deck viewer can follow the film. The builders, story packs, narration and
+QA records live in `content-ideas/runs/2026-09-13-dg32-architecture-package/`.
+
+To refresh a package: rebuild the deck there, export frames through PowerPoint, re-narrate
+(Kokoro, Holt profile), reassemble the film, then copy the reviewed `.pptx`, `slide-NN.webp`,
+`.mp4`, `.vtt`, poster and `*-film.json` here. `npm run build:pages` fails if any referenced
+file or slide image is missing.
+
 ## Sources
 
-All figures come from five Deepgrid Semi documents (September 2026):
+All figures come from Deepgrid Semi's September 2026 documents:
 
 - `DG32-LITE_block_diagram_investor.pdf` — architecture, STM32G0 positioning, roadmap
 - `DG32-LITE_block_diagram.pdf` — tape-in block diagram
 - `DG32-LITE_Block_Architecture.pdf` — per-block rationale, loop budget, post-route fmax
 - `DG32-LITE_Datasheet-3.pdf` — preliminary datasheet
 - `DG32-2DOM_Datasheet-1.pdf` — preliminary datasheet, attention variant
+- `DG32-2DOM_Block_Architecture.pdf` — attention engine, clock bridges, analytic cost
+- `DG32-LITE_3D_Walkthrough_Script_2026-09-11.pdf` — claim control only (no tapeout-ready or LVS-clean claims)
+
+The full slide-by-source map is `source-map.md` in the run folder.
 
 The source documents are marked confidential and are **not** in this repository. The site
 publishes investor-level content only: no register maps, memory map, boot magic values,

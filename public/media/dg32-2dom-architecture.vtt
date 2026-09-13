@@ -1,0 +1,214 @@
+WEBVTT
+
+1
+00:00:00.350 --> 00:00:08.601
+DG32-2DOM is the attention variant of Deepgrid Semi's DG32-LITE motor-control chip.
+
+2
+00:00:09.151 --> 00:00:18.808
+It keeps the dual-core lockstep controller and adds an INT8 attention engine on its own clock, so a drive can watch its own motor for faults.
+
+3
+00:00:19.358 --> 00:00:22.842
+The design is complete and in physical trials.
+
+4
+00:00:23.392 --> 00:00:29.620
+Every figure here is a post-route, simulated or analytic value, and each one is labelled.
+
+5
+00:00:30.820 --> 00:00:33.115
+Here is the answer on one slide.
+
+6
+00:00:33.665 --> 00:00:39.862
+DG32-2DOM is DG32-LITE plus an attention engine, not a new core.
+
+7
+00:00:40.412 --> 00:00:46.160
+The lockstep CPU pair, boot path, peripherals and sixty-four-pin pinout are identical.
+
+8
+00:00:46.710 --> 00:00:57.819
+The engine runs at one hundred fourteen megahertz, its output is bit-exact to the software model, and one query row costs about thirty-two hundred cycles, by analysis.
+
+9
+00:00:59.020 --> 00:01:01.529
+Three findings forced the design.
+
+10
+00:01:02.079 --> 00:01:09.766
+The lockstep core tops out around fifty-five to sixty-two megahertz, so the control domain has to stay at fifty.
+
+11
+00:01:10.316 --> 00:01:15.163
+The engine is the throughput consumer, so it gets its own faster clock.
+
+12
+00:01:15.713 --> 00:01:24.419
+And adding its memory to the DG32-LITE floorplan made routing time out, so the variant gets a larger die of its own.
+
+13
+00:01:25.620 --> 00:01:27.344
+This is the architecture.
+
+14
+00:01:27.894 --> 00:01:33.354
+On the left, the fifty megahertz control domain: everything in DG32-LITE.
+
+15
+00:01:33.904 --> 00:01:40.963
+On the right, the one hundred fourteen megahertz compute domain: the attention engine and its key and value buffers.
+
+16
+00:01:41.513 --> 00:01:44.384
+Between them sit three clock-domain bridges.
+
+17
+00:01:44.934 --> 00:01:50.637
+The engine reaches memory only through those bridges, so it can never stall the control core.
+
+18
+00:01:51.840 --> 00:01:56.356
+Everything proven on DG32-LITE carries over unchanged.
+
+19
+00:01:56.906 --> 00:02:06.022
+The lockstep pair, fault latch, boot ROM, SRAM, motor drive, sensing and connectivity are the same blocks from the same design source.
+
+20
+00:02:06.572 --> 00:02:17.109
+The control loop still costs about three hundred hardware cycles, and the package is the same nine-by-nine millimetre QFN, because the engine adds no pads.
+
+21
+00:02:18.310 --> 00:02:23.078
+One kick computes a band of query rows of one attention head, end to end.
+
+22
+00:02:23.628 --> 00:02:25.375
+Firmware programs the shapes.
+
+23
+00:02:25.925 --> 00:02:30.071
+A shared multiply array computes Q times K transpose.
+
+24
+00:02:30.621 --> 00:02:34.263
+A row maximum indexes a table of softmax weights.
+
+25
+00:02:34.813 --> 00:02:42.878
+The engine forms the weighted sum, divides once per row, saturates the result to INT8, and writes the output back to memory.
+
+26
+00:02:44.080 --> 00:02:46.062
+Why INT8, and not INT4?
+
+27
+00:02:46.612 --> 00:02:52.149
+With about four hundred similar keys, each softmax weight is close to one four-hundredth.
+
+28
+00:02:52.699 --> 00:02:57.332
+INT4 rounds that to zero, and the output came out identically zero.
+
+29
+00:02:57.882 --> 00:03:08.930
+The engine keeps fifteen-bit weights all the way into a forty-bit numerator, which stays exact to more than one hundred thousand keys, and it saturates only the final output.
+
+30
+00:03:10.130 --> 00:03:14.385
+Memory traffic decides whether the engine fights the rest of the chip.
+
+31
+00:03:14.935 --> 00:03:23.135
+Keys and values load once per kick and are re-read for every query row, which keeps one head's bus traffic around one percent.
+
+32
+00:03:23.685 --> 00:03:28.499
+Streaming the values row by row would cost about four hundred times that.
+
+33
+00:03:29.049 --> 00:03:36.240
+A DMA and the SRAM's idle read port can feed the engine without contending with the CPU.
+
+34
+00:03:37.440 --> 00:03:43.668
+Crossings between the two clocks are rare: keys and values load once, and outputs write back once.
+
+35
+00:03:44.218 --> 00:03:50.763
+So the bridges use a small four-phase handshake through two-flop synchronisers instead of a FIFO.
+
+36
+00:03:51.313 --> 00:04:00.467
+One bridge carries programming, one transaction at a time, and two burst bridges batch a whole read or a whole write into a single crossing.
+
+37
+00:04:01.670 --> 00:04:10.749
+Here is what one query row costs, by analysis, at sixteen lanes, four hundred keys, thirty-two-byte keys and sixty-four-byte values.
+
+38
+00:04:11.299 --> 00:04:15.514
+The value pass is the largest share, at sixteen hundred cycles.
+
+39
+00:04:16.064 --> 00:04:22.025
+The key pass takes eight hundred, requantisation about seven hundred, and the divide forty-eight.
+
+40
+00:04:22.575 --> 00:04:26.330
+That totals about thirty-two hundred and forty cycles.
+
+41
+00:04:26.880 --> 00:04:29.142
+The measured figure comes at bring-up.
+
+42
+00:04:30.340 --> 00:04:33.512
+Both domains close timing on the larger die.
+
+43
+00:04:34.062 --> 00:04:44.587
+The fifty megahertz control domain closes with zero point three nanoseconds of slack, and the one hundred fourteen megahertz compute domain with zero point one nine.
+
+44
+00:04:45.137 --> 00:04:48.876
+The die is three point four by four point five millimetres.
+
+45
+00:04:49.426 --> 00:04:53.432
+These are post-route results; silicon measurements follow bring-up.
+
+46
+00:04:54.630 --> 00:05:03.742
+The engine is designed for condition monitoring inside the drive: bearing-fault and anomaly detection, on the chip that already turns the motor.
+
+47
+00:05:04.292 --> 00:05:11.145
+Against the STM32G0, which runs AI in software, that is a hardware differentiator.
+
+48
+00:05:11.695 --> 00:05:19.582
+It sits on the roadmap alongside DG32-LITE first silicon, with its own design complete and in physical trials.
+
+49
+00:05:20.780 --> 00:05:22.632
+Three things to take away.
+
+50
+00:05:23.182 --> 00:05:28.066
+The engine is an addition, not a redesign: the safety core is untouched.
+
+51
+00:05:28.616 --> 00:05:35.142
+Its arithmetic is exact: INT8 output, bit-exact to the model, with no weight rounded to zero.
+
+52
+00:05:35.692 --> 00:05:41.326
+And its cost is known before silicon: about thirty-two hundred cycles per query row.
+
+53
+00:05:41.876 --> 00:05:45.707
+First silicon turns these design values into measurements.
+
