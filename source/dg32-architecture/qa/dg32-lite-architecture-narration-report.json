@@ -1,0 +1,545 @@
+{
+  "voice": "bm_george",
+  "speed": 1.05,
+  "slide_speeds": {
+    "5": 0.95,
+    "12": 0.95
+  },
+  "sentence_pause_s": 0.55,
+  "wpm_band": [
+    140,
+    155
+  ],
+  "wpm_gate": [
+    135,
+    160
+  ],
+  "overall_wpm": 147.8,
+  "median_f0_hz": 141.2,
+  "holt_f0_hz": 135.6,
+  "total_seconds": 418.7,
+  "failed_slides": [],
+  "slides": [
+    {
+      "slide": 1,
+      "speed": 1.05,
+      "seconds": 30.15,
+      "spoken_words": 68,
+      "wpm": 135.3,
+      "median_f0_hz": 137.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "DG32-LITE is Deepgrid Semi's motor-control chip, and it makes one argument: hardware lockstep safety no longer needs an automotive-class microcontroller.",
+          "start": 0.0,
+          "end": 11.024
+        },
+        {
+          "text": "Two RISC-V cores check each other on every write, inside a nine-by-nine millimetre package.",
+          "start": 11.574,
+          "end": 17.864
+        },
+        {
+          "text": "First silicon rides the September 2026 multi-project shuttle, so every figure you will see is a design value, verified in simulation and timing analysis.",
+          "start": 18.414,
+          "end": 30.151
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "speed": 1.05,
+      "seconds": 26.31,
+      "spoken_words": 61,
+      "wpm": 139.1,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Here is the whole story on one slide.",
+          "start": 0.0,
+          "end": 2.642
+        },
+        {
+          "text": "One 130 nanometre chip carries the microcontroller, the motor-control peripherals and a hardware safety monitor.",
+          "start": 3.192,
+          "end": 10.815
+        },
+        {
+          "text": "The two cores run in lockstep.",
+          "start": 11.365,
+          "end": 13.639
+        },
+        {
+          "text": "The current loop reaches about one hundred kilohertz in simulation, and a CPU disagreement latches within thirty-nine cycles and drives a fault pin that can switch the power bridge off.",
+          "start": 14.189,
+          "end": 26.315
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "speed": 1.05,
+      "seconds": 29.32,
+      "spoken_words": 72,
+      "wpm": 147.3,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Why build it this way?",
+          "start": 0.0,
+          "end": 1.483
+        },
+        {
+          "text": "A motor drive switches power transistors thousands of times a second.",
+          "start": 2.033,
+          "end": 6.615
+        },
+        {
+          "text": "If the CPU silently computes a wrong value, it writes a wrong PWM edge, and a wrong edge can short a bridge leg.",
+          "start": 7.165,
+          "end": 15.496
+        },
+        {
+          "text": "Entry-level motor MCUs catch faults with watchdogs and periodic software self-test.",
+          "start": 16.046,
+          "end": 22.291
+        },
+        {
+          "text": "Hardware lockstep has lived in automotive parts such as AURIX, S32K and Hercules.",
+          "start": 22.841,
+          "end": 29.324
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "speed": 1.05,
+      "seconds": 27.09,
+      "spoken_words": 68,
+      "wpm": 150.6,
+      "median_f0_hz": 142.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "DG32-LITE is six block groups on one bus.",
+          "start": 0.0,
+          "end": 3.695
+        },
+        {
+          "text": "The safety core, memory and supervision sit above it; motor drive, sensing, connectivity and test sit below.",
+          "start": 4.245,
+          "end": 11.589
+        },
+        {
+          "text": "The bus has two masters, the CPU and a DMA, with deterministic latency.",
+          "start": 12.139,
+          "end": 17.847
+        },
+        {
+          "text": "Any address that is unmapped or disabled answers with a bus error instead of hanging, which matters on a chip with no debugger halt.",
+          "start": 18.397,
+          "end": 27.091
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "speed": 0.95,
+      "seconds": 26.59,
+      "spoken_words": 67,
+      "wpm": 151.2,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Four hard constraints shaped every block.",
+          "start": 0.0,
+          "end": 2.841
+        },
+        {
+          "text": "There is no debugger halt, so nothing may hang.",
+          "start": 3.391,
+          "end": 6.541
+        },
+        {
+          "text": "The lockstep core tops out around fifty-five to sixty-two megahertz, so the die runs at fifty.",
+          "start": 7.091,
+          "end": 13.602
+        },
+        {
+          "text": "The core costs about eight clock cycles per instruction, so the loop moves into hardware.",
+          "start": 14.152,
+          "end": 19.872
+        },
+        {
+          "text": "And the memory macros have no spare bits, so the chip ships without ECC, and says so.",
+          "start": 20.422,
+          "end": 26.587
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "speed": 1.05,
+      "seconds": 24.2,
+      "spoken_words": 61,
+      "wpm": 151.2,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "This is the safety core.",
+          "start": 0.0,
+          "end": 1.675
+        },
+        {
+          "text": "MAIN runs the application.",
+          "start": 2.225,
+          "end": 4.569
+        },
+        {
+          "text": "CHECKER runs the same instructions two cycles later, on the same inputs, and the comparator checks every committed store.",
+          "start": 5.119,
+          "end": 12.708
+        },
+        {
+          "text": "On a mismatch, the first cause is latched and FAULT_N goes low.",
+          "start": 13.258,
+          "end": 17.329
+        },
+        {
+          "text": "Route that pin to the gate-driver enable, and the bridge turns off in hardware, without waiting for firmware.",
+          "start": 17.879,
+          "end": 24.2
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "speed": 1.05,
+      "seconds": 25.73,
+      "spoken_words": 68,
+      "wpm": 158.6,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The chip boots itself.",
+          "start": 0.0,
+          "end": 1.565
+        },
+        {
+          "text": "At power-on the mask ROM prints a banner, validates the flash image header, copies the application from external QSPI flash into SRAM, and jumps to it.",
+          "start": 2.115,
+          "end": 13.669
+        },
+        {
+          "text": "If the flash is blank, the ROM starts a UART monitor instead, so a bare board can still be inspected.",
+          "start": 14.219,
+          "end": 21.102
+        },
+        {
+          "text": "The trade-off is loading at boot instead of executing in place.",
+          "start": 21.652,
+          "end": 25.728
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "speed": 1.05,
+      "seconds": 28.53,
+      "spoken_words": 72,
+      "wpm": 151.4,
+      "median_f0_hz": 140.4,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Every expensive step of field-oriented control runs in a dedicated block.",
+          "start": 0.0,
+          "end": 5.261
+        },
+        {
+          "text": "Encoder and Hall inputs give position, with edge timestamps.",
+          "start": 5.811,
+          "end": 9.835
+        },
+        {
+          "text": "The PWM fires the ADC at the centre of each period, where ripple is lowest.",
+          "start": 10.385,
+          "end": 16.084
+        },
+        {
+          "text": "The CORDIC computes the Park transforms, the CPU runs only the two PI regulators, and the PWM block applies the new duty cycles, with a hardware brake behind it.",
+          "start": 16.634,
+          "end": 28.531
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "speed": 1.05,
+      "seconds": 24.43,
+      "spoken_words": 60,
+      "wpm": 147.4,
+      "median_f0_hz": 143.7,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Here is what one loop costs.",
+          "start": 0.0,
+          "end": 1.89
+        },
+        {
+          "text": "The current sample takes one hundred seventy-seven cycles.",
+          "start": 2.44,
+          "end": 6.107
+        },
+        {
+          "text": "Each CORDIC operation takes fifty-three to fifty-eight.",
+          "start": 6.657,
+          "end": 10.14
+        },
+        {
+          "text": "The regulators cost about eight cycles per instruction.",
+          "start": 10.69,
+          "end": 14.094
+        },
+        {
+          "text": "Together the hardware part is about three hundred cycles, and it is the same at every loop rate.",
+          "start": 14.644,
+          "end": 20.515
+        },
+        {
+          "text": "At twenty kilohertz, that is twelve percent of the period.",
+          "start": 21.065,
+          "end": 24.426
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "speed": 1.05,
+      "seconds": 24.31,
+      "spoken_words": 58,
+      "wpm": 143.2,
+      "median_f0_hz": 142.9,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "So the question becomes how much firmware fits.",
+          "start": 0.0,
+          "end": 2.967
+        },
+        {
+          "text": "At ten kilohertz there are about forty-seven hundred cycles left: enough for a full current and speed loop with an observer.",
+          "start": 3.517,
+          "end": 11.27
+        },
+        {
+          "text": "At twenty kilohertz, twenty-two hundred, enough for field-weakening.",
+          "start": 11.82,
+          "end": 15.855
+        },
+        {
+          "text": "At fifty kilohertz, seven hundred, an inner current loop only.",
+          "start": 16.405,
+          "end": 20.391
+        },
+        {
+          "text": "The simulated ceiling is about one hundred kilohertz.",
+          "start": 20.941,
+          "end": 24.308
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "speed": 1.05,
+      "seconds": 22.9,
+      "spoken_words": 58,
+      "wpm": 152.0,
+      "median_f0_hz": 141.6,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Timing tells the same story.",
+          "start": 0.0,
+          "end": 1.937
+        },
+        {
+          "text": "After place-and-route, the GPIO, DShot, QSPI and PWM blocks all run above one hundred sixty-five megahertz, and CORDIC and the supervisor above ninety.",
+          "start": 2.487,
+          "end": 14.342
+        },
+        {
+          "text": "Only the lockstep core, at fifty-five to sixty-two megahertz, sets the clock.",
+          "start": 14.892,
+          "end": 19.746
+        },
+        {
+          "text": "No peripheral is ever the timing wall.",
+          "start": 20.296,
+          "end": 22.899
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "speed": 0.95,
+      "seconds": 24.71,
+      "spoken_words": 62,
+      "wpm": 150.5,
+      "median_f0_hz": 139.5,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "All of this fits in a nine-by-nine millimetre QFN with sixty-four pins: forty-four signals, and the rest supplies and ground.",
+          "start": 0.0,
+          "end": 9.224
+        },
+        {
+          "text": "Seven pins drive the bridge, six read position, two carry the analog current input, and one, FAULT_N, is the hardware trip.",
+          "start": 9.774,
+          "end": 18.644
+        },
+        {
+          "text": "The compute variant, DG32-2DOM, uses exactly the same pinout.",
+          "start": 19.194,
+          "end": 24.715
+        }
+      ]
+    },
+    {
+      "slide": 13,
+      "speed": 1.05,
+      "seconds": 28.6,
+      "spoken_words": 73,
+      "wpm": 153.1,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "DG32-2DOM keeps everything in DG32-LITE and adds an INT8 attention engine on its own one hundred fourteen megahertz clock.",
+          "start": 0.0,
+          "end": 10.289
+        },
+        {
+          "text": "It reaches memory through clock-domain-crossing bridges, so it never stalls the fifty megahertz control core.",
+          "start": 10.839,
+          "end": 17.601
+        },
+        {
+          "text": "Its output is bit-exact to the software model, and timing closes at both clocks.",
+          "start": 18.151,
+          "end": 23.369
+        },
+        {
+          "text": "It is designed for bearing-fault and anomaly detection inside the drive.",
+          "start": 23.919,
+          "end": 28.604
+        }
+      ]
+    },
+    {
+      "slide": 14,
+      "speed": 1.05,
+      "seconds": 25.88,
+      "spoken_words": 69,
+      "wpm": 160.0,
+      "median_f0_hz": 141.2,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Against the STM32G0, the entry-level incumbent, the comparison is honest.",
+          "start": 0.0,
+          "end": 6.371
+        },
+        {
+          "text": "DG32 leads on hardware lockstep, native DShot, hardware CORDIC and the on-chip AI variant, with an open RISC-V core.",
+          "start": 6.921,
+          "end": 16.053
+        },
+        {
+          "text": "The G0 leads clearly on its twelve-bit multi-channel ADC, embedded flash, USB and CAN-FD, and on production maturity.",
+          "start": 16.603,
+          "end": 25.877
+        }
+      ]
+    },
+    {
+      "slide": 15,
+      "speed": 1.05,
+      "seconds": 26.07,
+      "spoken_words": 59,
+      "wpm": 135.8,
+      "median_f0_hz": 143.7,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "The roadmap closes those gaps in order.",
+          "start": 0.0,
+          "end": 2.732
+        },
+        {
+          "text": "First silicon on the September 2026 shuttle measures what simulation predicted.",
+          "start": 3.282,
+          "end": 9.542
+        },
+        {
+          "text": "The second spin adds a twelve-bit multi-channel ADC and embedded flash.",
+          "start": 10.092,
+          "end": 15.143
+        },
+        {
+          "text": "Then come CAN-FD and interactive CPU debug.",
+          "start": 15.693,
+          "end": 19.392
+        },
+        {
+          "text": "DG32-2DOM runs in parallel, with its design complete and in physical trials.",
+          "start": 19.942,
+          "end": 26.071
+        }
+      ]
+    },
+    {
+      "slide": 16,
+      "speed": 1.05,
+      "seconds": 23.84,
+      "spoken_words": 55,
+      "wpm": 138.4,
+      "median_f0_hz": 142.0,
+      "in_gate": true,
+      "sentences": [
+        {
+          "text": "Three things to take away.",
+          "start": 0.0,
+          "end": 1.852
+        },
+        {
+          "text": "Safety is in the core: two CPUs must agree, in hardware.",
+          "start": 2.402,
+          "end": 6.493
+        },
+        {
+          "text": "Control is in silicon: the loop cost is fixed and known.",
+          "start": 7.043,
+          "end": 10.986
+        },
+        {
+          "text": "And the next milestone is measurement: first silicon turns these design values into measured ones.",
+          "start": 11.536,
+          "end": 17.806
+        },
+        {
+          "text": "This deck claims no measured silicon results and no functional-safety certification yet.",
+          "start": 18.356,
+          "end": 23.839
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,9 @@ name: Build and deploy GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore: ['source/**']
   pull_request:
+    paths-ignore: ['source/**']
   workflow_dispatch:
 permissions:
   contents: read

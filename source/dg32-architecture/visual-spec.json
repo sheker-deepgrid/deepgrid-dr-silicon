@@ -1,0 +1,313 @@
+{
+  "contract_version": "1.0",
+  "deck": {
+    "output_mode": "native",
+    "editability": "Every title, card, table, chart, chain, rail and diagram is a native PowerPoint object; the deck places no images.",
+    "reference_deck": null
+  },
+  "visuals": [
+    {
+      "id": "cover-package-motif",
+      "slide_ids": [
+        1
+      ],
+      "purpose": "Show the product as a QFN-64 package with a die and lockstep pair, labelled illustrative",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "A package motif is geometry built from datasheet facts (64 leads, pin-1 mark); native shapes keep it editable and text-free imagery adds nothing",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "exec-kpi-grid",
+      "slide_ids": [
+        1,
+        2
+      ],
+      "purpose": "Four proof KPIs: lockstep cores, loop rate, fault latency, power estimate",
+      "artifact_type": "data",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Numbers are claims and stay native with qualifiers",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "fault-consequence-chain",
+      "slide_ids": [
+        3
+      ],
+      "purpose": "CPU fault to bridge damage causal chain",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Process flow is structured meaning",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "architecture-block-map",
+      "slide_ids": [
+        4
+      ],
+      "purpose": "Six block groups around one on-chip bus",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Architecture diagrams are redrawn natively from the block-diagram information; the supplied PDF figure is a source of information, not required exact artwork. The editable draw.io diagram is a separate deliverable.",
+      "source": {
+        "path": "DG32-LITE_block_diagram_investor.pdf",
+        "page": 1,
+        "frame": null,
+        "timestamp": null,
+        "crop": null
+      },
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "design-premises-table",
+      "slide_ids": [
+        5
+      ],
+      "purpose": "Constraint to consequence table",
+      "artifact_type": "data",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Tabular claims",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "safety-fault-chain",
+      "slide_ids": [
+        6
+      ],
+      "purpose": "MAIN to FAULT_N lockstep chain on a dark technical slide",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Flow diagram",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "boot-chain",
+      "slide_ids": [
+        7
+      ],
+      "purpose": "Four-step boot sequence",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Process flow",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "foc-signal-chain",
+      "slide_ids": [
+        8
+      ],
+      "purpose": "Six-stage field-oriented-control chain",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Process flow",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "loop-cost-table-and-proportion",
+      "slide_ids": [
+        9
+      ],
+      "purpose": "Stage costs and a to-scale 20 kHz period split",
+      "artifact_type": "chart",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "A proportion claim is drawn to scale with shapes",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "headroom-bars",
+      "slide_ids": [
+        10
+      ],
+      "purpose": "Firmware cycle budget per loop rate",
+      "artifact_type": "chart",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Shape-chart with direct labels per the design system",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "fmax-bars",
+      "slide_ids": [
+        11
+      ],
+      "purpose": "Post-route fmax per block with the 50 MHz clock marker",
+      "artifact_type": "chart",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Ranked bars with direct labels",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "pin-group-table",
+      "slide_ids": [
+        12
+      ],
+      "purpose": "44 signal pins by function plus package facts",
+      "artifact_type": "data",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Summarised pin information is data, not required artwork; the datasheet pinout figure is not reproduced",
+      "source": {
+        "path": "DG32-LITE_Datasheet-3.pdf",
+        "page": 2,
+        "frame": null,
+        "timestamp": null,
+        "crop": null
+      },
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "two-domain-diagram",
+      "slide_ids": [
+        13
+      ],
+      "purpose": "DG32-2DOM control and compute clock domains with bridges",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Architecture diagram",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "positioning-table",
+      "slide_ids": [
+        14
+      ],
+      "purpose": "DG32-LITE versus STM32G0 with the DG32 column highlighted",
+      "artifact_type": "data",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Comparison table",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "roadmap-rail",
+      "slide_ids": [
+        15
+      ],
+      "purpose": "Milestone rail from first silicon to the second spin",
+      "artifact_type": "diagram",
+      "evidence_status": "underlying-information",
+      "route": "native",
+      "reason": "Timeline",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    },
+    {
+      "id": "close-takeaways",
+      "slide_ids": [
+        16
+      ],
+      "purpose": "Close with three takeaways",
+      "artifact_type": "other",
+      "evidence_status": "not-applicable",
+      "route": "none",
+      "reason": "Dense takeaway text; a decorative image would add nothing",
+      "qa": {
+        "visual_checked": true,
+        "legible": true,
+        "not_cropped": true,
+        "background_matched": null,
+        "provenance_recorded": true
+      }
+    }
+  ]
+}
