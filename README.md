@@ -56,6 +56,17 @@ To refresh a package: rebuild the deck there, export frames through PowerPoint, 
 `.mp4`, `.vtt`, poster and `*-film.json` here. `npm run build:pages` fails if any package's deck, film,
 captions, poster or slide image is missing.
 
+## Verify a deploy
+
+`scripts/verify-site.mjs` is the site's browser gate: every view and architecture tab at 1440 and 390 px,
+reveals that actually finished, all five packages (film, captions, chapters, slides, downloads), the pinned
+fault trace and its phone and reduced-motion fallbacks, sticky architecture tabs and the diagram edge hint.
+It exits 1 on any failure and saves the fault-trace frames.
+
+```sh
+PLAYWRIGHT=/path/to/node_modules/playwright/index.mjs node scripts/verify-site.mjs https://shekerkamma.github.io/deepgrid-dr-silicon/
+```
+
 ## Sources
 
 All figures come from Deepgrid Semi's September 2026 documents:
