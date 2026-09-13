@@ -12,8 +12,12 @@ fs.rmSync(output,{recursive:true,force:true});
 fs.cpSync(source,output,{recursive:true});
 if(base!=='/'){
  // The export emits scripts and styles under an absolute /_next/ prefix, which a project site cannot serve.
- const walk=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())walk(file);else if(/\.(html|js|rsc|json|css)$/.test(file))fs.writeFileSync(file,fs.readFileSync(file,'utf8').replaceAll('/_next/',base+'_next/'));}};
+ // Vite's preload map lists deps as "_next/static/..." and its URL builder prepends "/", so those
+ // need the base without its leading slash or every preload 404s beside the working import.
+ const walk=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())walk(file);else if(/\.(html|js|rsc|json|css)$/.test(file)){let text=fs.readFileSync(file,'utf8').replaceAll('/_next/',base+'_next/');if(file.endsWith('.js'))text=text.replaceAll('"_next/static/','"'+base.slice(1)+'_next/static/');fs.writeFileSync(file,text);}}};
  walk(output);
+ const chunks=path.join(output,'_next/static/chunks');
+ for(const f of fs.readdirSync(chunks).filter(f=>f.endsWith('.js')))if(fs.readFileSync(path.join(chunks,f),'utf8').includes('"_next/static/'))throw Error('Unprefixed preload dependency in '+f);
 }
 fs.writeFileSync(path.join(output,'.nojekyll'),'');
 if(domain)fs.writeFileSync(path.join(output,'CNAME'),domain+'\n');
