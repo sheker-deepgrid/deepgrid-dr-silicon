@@ -161,7 +161,7 @@ function ControlLoop({go}:{go:(hash:string)=>void}){
 
   <Sec kicker="PERIPHERAL LIMITS" title="Numbers a firmware plan" em="can count on." copy="Capability and timing per block, from the datasheet’s block notes. Design and simulated values, pending silicon.">
    <DataTable caption="Peripheral limits" head={['Block','Limit','Note']} rows={peripheralLimits}/>
-   <Callout label="WITH DG32-2DOM">The attention engine runs on its own 114 MHz clock and reaches memory only through clock-domain bridges, so none of these loop numbers change while it runs. <button className="text-link" onClick={()=>go('architecture?chip=2dom')}>How the engine is isolated <ArrowUpRight size={15}/></button></Callout>
+   <Callout label="WITH DG32-2DOM" action={<button className="text-link" onClick={()=>go('architecture?chip=2dom')}>How the engine is isolated <ArrowUpRight size={15}/></button>}>The attention engine runs on its own 114 MHz clock and reaches memory only through clock-domain bridges, so none of these loop numbers change while it runs.</Callout>
   </Sec>
  </section>;
 }
