@@ -28,7 +28,7 @@ export const parts: Part[] = [
     summary:
       'One chip carries the MCU, the motor-control peripherals and a hardware safety monitor. A second identical core checks the first on every committed store, so a datapath fault becomes a FAULT pin, not a wrong PWM edge.',
     specs: [
-      ['CPU', '2 × DgridRiscv RV32IM, 32-bit, lockstep'],
+      ['CPU', '2 × RV32IM, 32-bit, in hardware lockstep'],
       ['Clock', 'One 50 MHz domain; core measured at ~55–62 MHz post-route'],
       ['Memory', '64 KB boot ROM · 32 KB SRAM · external QSPI flash'],
       ['Motor', '3-phase PWM with dead-time and hardware brake · 4 × DShot'],
@@ -202,10 +202,12 @@ export const comparison = [
   ['Program memory', '64 KB mask ROM + external QSPI flash; application runs from SRAM', '16–512 KB embedded flash', 'G0 executes in place. Embedded flash is on the DG32 roadmap.'],
   ['RAM', '32 KB dual-port SRAM', '8–144 KB SRAM', 'Enough for control loops; G0B1 has more for communication stacks.'],
   ['Motor PWM', '3-phase with dead-time, centre-aligned ADC trigger, hardware brake; 4 × DShot in hardware', 'TIM1 advanced timer with dead-time and break; DShot in software', 'Equivalent 3-phase capability. DShot is native on DG32.'],
+  ['Position sensing', 'Quadrature encoder with index and 3 Hall inputs, decoded in hardware with edge timestamps', 'Timer encoder mode and Hall sensor interface', 'Equivalent.'],
   ['Analog', '8-bit differential SAR, ~200 kSa/s, 2 pins', '12-bit, 2.5 MSa/s, up to 16 channels', 'G0 leads clearly. A 12-bit multi-channel ADC is the first roadmap item.'],
   ['Math', 'Hardware CORDIC', 'None (CORDIC appears on STM32G4)', 'FOC transforms run in hardware on DG32.'],
   ['On-chip AI', 'DG32-2DOM: INT8 attention engine', 'None; NanoEdge AI runs in software', 'Condition monitoring inside the drive itself.'],
   ['Communications', '2 × UART, SPI, I²C, QSPI, 3 × GPIO', 'Up to 6 × USART, 3 × SPI, 3 × I²C, USB FS, 2 × FDCAN', 'G0 has the broader catalogue. CAN-FD is on the DG32 roadmap.'],
+  ['Test & debug', 'JTAG test access and scan chains; UART boot monitor', 'SWD debug; boundary scan on larger packages', 'Production test is covered. Interactive CPU debug over JTAG is a roadmap item.'],
   ['Process & status', '130 nm; first silicon September 2026', '90 nm; in volume production since 2018', 'DG32-LITE proves the architecture; it is not yet a production part.'],
 ] as const;
 

@@ -1,21 +1,20 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {ArrowUpRight,ArrowRight,ArrowLeft,Menu,Layers,ShieldCheck,Cpu,Gauge,Activity,Cable,BrainCircuit,Check,Play,Download} from 'lucide-react';
+import {ArrowUpRight,ArrowRight,ArrowLeft,Menu,ShieldCheck,Gauge,BrainCircuit,Check,Play,Download} from 'lucide-react';
 import {Sheet,SheetContent,SheetTitle,SheetDescription} from '@/components/ui/sheet';
 import Silicon from './silicon';
 import Library from './library';
-import {packages,fmtTime,pkgById} from './library-data';
+import Architecture from './architecture';
+import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
-import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,roadmap,applications,bootFlow} from './content';
+import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,applications} from './content';
+import {Eyebrow,SectionHead,Sec,ExplainedGrid,Steps,DataTable,Callout,Stats} from './detail';
+import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail} from './detail-content';
 
 const titles:Record<string,string>={overview:'Overview',library:'Decks & films',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout',roadmap:'Position & roadmap'};
-const blockIcons=[ShieldCheck,Layers,Gauge,Activity,Cable,Cpu];
 const PRE_SILICON='Pre-silicon. Figures are design values verified in simulation and static timing, not measurements on fabricated parts, unless marked otherwise.';
 
 function Brand(){return <><span className="brand-mark"><i/><i/><i/><i/></span><span className="wordmark">deepgrid<span>SEMI</span></span></>}
-function Eyebrow({children}:{children:React.ReactNode}){return <p className="eyebrow"><span/> {children}</p>}
-function SectionHead({tag,title,copy}:{tag:string;title:string;copy:string}){return <header className="section-head"><div><Eyebrow>{tag}</Eyebrow><h1>{title}</h1></div><p>{copy}</p></header>}
-function ArrowDown(){return <span className="pipeline-arrow">↓</span>}
 
 export default function Home(){
  const {route,navigate:go,update}=useNavigation();
@@ -41,17 +40,26 @@ export default function Home(){
   <div className="hero-annotation"><span className="cross">+</span><div>DG32-LITE<small>QFN-64 · 9 × 9 MM · 130 NM CMOS</small></div></div><p className="image-disclaimer">ILLUSTRATIVE MODEL · NOT A MASK LAYOUT · DRAG TO ROTATE</p><div className="hero-bottom"><span>DEEPGRID SEMI PVT LTD / HYDERABAD, INDIA</span></div></section>
  <section className="metrics-strip">{headline.map(([v,l])=><div key={l}><strong>{v}</strong><span>{l}</span></div>)}<p>Pre-silicon figures.<br/>Design values, not measurements.</p></section>
 
- <section className="content-section"><div className="section-label"><Eyebrow>01 / THE PROBLEM</Eyebrow><span>WHY A SECOND CORE</span></div><div className="thesis-heading"><h2>A silent CPU fault<br/><em>can destroy a bridge.</em></h2><div><p>A motor drive switches power transistors thousands of times a second. On an entry-level motor-control MCU, faults are caught by watchdogs and software self-test. Hardware lockstep has lived in automotive MCUs such as Infineon AURIX, NXP S32K and TI Hercules.</p><p className="muted">DG32 brings a second, checking core to the entry-level tier and gives it one job: catch the first core when it is wrong.</p><button className="text-link" onClick={()=>navigate('roadmap')}>Compare with STM32G0 <ArrowUpRight size={18}/></button></div></div>
+ <section className="content-section"><div className="section-label"><Eyebrow>01 / THE PROBLEM</Eyebrow><span>WHY A SECOND CORE</span></div><div className="thesis-heading"><h2>A silent CPU fault<br/><em>can destroy a bridge.</em></h2><div><p>A motor drive switches power transistors thousands of times a second. If the CPU silently computes a wrong value, it writes a wrong PWM edge, and a wrong edge can short a leg of the power bridge: the power stage fails, not only the code.</p><p>On an entry-level motor-control MCU, faults are caught by watchdogs, brown-out reset and periodic software self-test. Those checks run between faults, not during them. Hardware lockstep, which checks every value as it is committed, has lived in automotive MCUs such as Infineon AURIX, NXP S32K and TI Hercules.</p><p className="muted">DG32 brings a second, checking core to the entry-level tier and gives it one job: catch the first core when it is wrong.</p><button className="text-link" onClick={()=>navigate('roadmap')}>Compare with STM32G0 <ArrowUpRight size={18}/></button></div></div>
   <div className="dr-cards">
-   <button className="dr-card" onClick={()=>openBlock(0)}><span className="mono">01 / SAFETY</span><ShieldCheck size={26}/><h3>Two cores<br/>must agree.</h3><p>CHECKER trails MAIN by two cycles and compares every committed store. Divergence latches the first cause and drives the FAULT pin.</p><span className="open-product">Safety core <ArrowRight size={16}/></span></button>
-   <button className="dr-card" onClick={()=>navigate('control')}><span className="mono">02 / CONTROL</span><Gauge size={26}/><h3>The loop runs<br/>in hardware.</h3><p>Current sampling, Park transforms and PWM edges run in dedicated blocks. The CPU keeps only the two PI regulators.</p><span className="open-product">Loop budget <ArrowRight size={16}/></span></button>
-   <button className="dr-card" onClick={()=>navigate('family')}><span className="mono">03 / COMPUTE</span><BrainCircuit size={26}/><h3>Monitoring on<br/>the drive chip.</h3><p>DG32-2DOM adds an INT8 attention engine on its own 114 MHz clock, with the same pinout and the same frozen control core.</p><span className="open-product">Product family <ArrowRight size={16}/></span></button>
+   <button className="dr-card" onClick={()=>openBlock(0)}><span className="mono">01 / SAFETY</span><ShieldCheck size={26}/><h3>Two cores<br/>must agree.</h3><p>CHECKER trails MAIN by two cycles on mirrored inputs and compares every committed store. Divergence latches the first cause and drives the FAULT pin.</p><span className="open-product">Safety core <ArrowRight size={16}/></span></button>
+   <button className="dr-card" onClick={()=>navigate('control')}><span className="mono">02 / CONTROL</span><Gauge size={26}/><h3>The loop runs<br/>in hardware.</h3><p>Current sampling, Park transforms and PWM edges run in dedicated blocks, so one loop costs about 300 hardware cycles at any rate. The CPU keeps only the two PI regulators.</p><span className="open-product">Loop budget <ArrowRight size={16}/></span></button>
+   <button className="dr-card" onClick={()=>go('architecture?chip=2dom')}><span className="mono">03 / COMPUTE</span><BrainCircuit size={26}/><h3>Monitoring on<br/>the drive chip.</h3><p>DG32-2DOM adds an INT8 attention engine on its own 114 MHz clock, behind bridges, with the same pinout and the same frozen control core.</p><span className="open-product">Inside DG32-2DOM <ArrowRight size={16}/></span></button>
   </div>
  </section>
 
  <section className="content-section dr-apps-section"><div className="section-label"><Eyebrow>02 / WHERE IT GOES</Eyebrow><span>SAFETY-RELEVANT BRUSHLESS DRIVES</span></div><div className="dr-apps">{applications.map(([t,d],i)=><div key={t}><span className="mono">0{i+1}</span><h3>{t}</h3><p>{d}</p></div>)}</div></section>
 
- <section className="silicon-teaser"><div><Eyebrow>THE ARCHITECTURE / EXPLORABLE IN 3D</Eyebrow><h2>Six block groups.<br/><em>One 64-pin package.</em></h2><p>Safety core, memory and boot, motor drive, sensing, connectivity and the bus that ties them together. Select a group and see where it sits on the die.</p><button className="primary" onClick={()=>navigate('architecture')}>Inside the architecture <ArrowUpRight size={19}/></button></div><div className="teaser-canvas"><Silicon reduced={reduced} exploded selected={2}/><span className="canvas-caption">DRAG TO ROTATE · ILLUSTRATIVE</span></div></section>
+ <section className="content-section"><div className="section-label"><Eyebrow>03 / HOW A FAULT IS STOPPED</Eyebrow><span>IN HARDWARE, WITHOUT FIRMWARE</span></div>
+  <div className="dr-two"><div><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)}>Inside the safety core <ArrowUpRight size={18}/></button></div><Steps steps={faultPath} label="How a CPU fault is stopped"/></div>
+ </section>
+
+ <section className="content-section"><div className="section-label"><Eyebrow>04 / WHAT THE NUMBERS MEAN</Eyebrow><span>PRE-SILICON, LABELLED</span></div>
+  <div className="dr-two"><div><h2 className="dr-h2">Every figure says<br/><em>how it was obtained.</em></h2><p className="dr-lead">DG32 is pre-silicon. Each number on this site comes from one of five kinds of evidence, and first-silicon bring-up turns these design values into measurements.</p></div><div className="dr-ladder">{evidenceLadder.map(e=><div key={e.kind}><span className="mono">{e.kind.toUpperCase()}</span><p>{e.means}</p><small>{e.examples}</small></div>)}</div></div>
+  <div className="dr-notclaimed"><p className="dr-kicker">WHAT THIS SITE DOES NOT CLAIM</p><ul>{notClaimed.map(n=><li key={n}>{n}</li>)}</ul></div>
+ </section>
+
+ <section className="silicon-teaser"><div><Eyebrow>THE ARCHITECTURE / EXPLORABLE IN 3D</Eyebrow><h2>Six block groups.<br/><em>One 64-pin package.</em></h2><p>Safety core, memory and boot, motor drive, sensing, connectivity and the bus that ties them together. Select a group and see where it sits on the die, what each block does and why.</p><button className="primary" onClick={()=>navigate('architecture')}>Inside the architecture <ArrowUpRight size={19}/></button></div><div className="teaser-canvas"><Silicon reduced={reduced} exploded selected={2}/><span className="canvas-caption">DRAG TO ROTATE · ILLUSTRATIVE</span></div></section>
 
  <section className="proof-section"><Eyebrow>THE ARCHITECTURE PACKAGES</Eyebrow><h2>Two chips. <em>A deck and a film for each.</em></h2><div className="dr-pkg-cards">{packages.filter(p=>p.kind==='architecture').map(p=><article className="dr-pkg-card" key={p.id}><button className="dr-pkg-poster" onClick={()=>go('library?pkg='+p.id)} aria-label={'Watch the '+p.name+' architecture film'}><img src={p.poster} alt="" loading="lazy" width={1280} height={720}/><span className="dr-play"><Play size={20} fill="currentColor"/></span></button><div className="dr-pkg-body"><span className="mono">{p.name} · {p.slides.length} SLIDES · {fmtTime(p.duration)} FILM</span><h3>{p.headline}</h3><p>{p.summary}</p><div className="dr-pkg-actions"><button className="primary" onClick={()=>go('library?pkg='+p.id)}>Watch and browse <ArrowUpRight size={17}/></button><a className="text-link" href={p.deck} download>Download .pptx <Download size={16}/></a></div></div></article>)}</div><div className="dr-pkg-mini">{packages.filter(p=>p.kind==='datasheet').map(p=><button key={p.id} className="dr-pkg-mini-card" onClick={()=>go('library?pkg='+p.id)}><img src={p.poster} alt="" loading="lazy" width={1280} height={720}/><span className="mono">{p.name} {p.doc.toUpperCase()} · {fmtTime(p.duration)}</span><strong>{p.headline}</strong><span className="open-product">Deck and film <ArrowRight size={15}/></span></button>)}</div><div className="proof-bottom"><p>Client-ready PowerPoint decks and narrated films for every source document — the two architecture documents, both datasheets and the tape-in block diagram — plus draw.io diagrams. {PRE_SILICON}</p><button className="text-link" onClick={()=>navigate('library')}>All decks and films <ArrowUpRight size={18}/></button></div></section>
  </>}
@@ -59,36 +67,56 @@ export default function Home(){
  {view==='library'&&<section className="page-wrap"><SectionHead tag="02 / DECKS & FILMS" title="Architecture decks, films and diagrams" copy="One package per source document: a client-ready PowerPoint deck and a narrated film of the same slides, with draw.io diagrams for the two architectures."/><Library pkgId={route.params.get('pkg')||'lite'} slide={Number(route.params.get('slide'))||1} onChange={update}/></section>}
 
  {view==='family'&&<section className="page-wrap"><SectionHead tag="02 / PRODUCT FAMILY" title="One footprint, two chips" copy="DG32-LITE is the motor-control SoC. DG32-2DOM keeps every pin and peripheral and adds an INT8 attention engine, so a board designed for one takes the other."/>
-  <div className="dr-parts">{parts.map(p=><article className="dr-part" key={p.id}><div className="dr-part-head"><span className="mono">{p.id==='lite'?'PART 01':'PART 02'} / {p.tagline.toUpperCase()}</span><h2>{p.name}</h2><span className="dr-status"><i/>{p.status}</span><p>{p.summary}</p></div><dl className="dr-specs">{p.specs.map(([k,v])=><div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>{p.adds.length>0&&<div className="dr-adds"><span className="mono">WHAT THE ENGINE IS FOR</span><ul>{p.adds.map(a=><li key={a}><Check size={15}/>{a}</li>)}</ul></div>}<div className="dr-part-links"><button className="primary" onClick={()=>go('library?pkg='+p.id)}>Architecture deck and film <ArrowUpRight size={17}/></button><button className="text-link" onClick={()=>go('library?pkg='+p.id+'-datasheet')}>Datasheet deck and film <ArrowRight size={16}/></button></div></article>)}</div>
+  <div className="dr-parts">{parts.map(p=><article className="dr-part" key={p.id}><div className="dr-part-head"><span className="mono">{p.id==='lite'?'PART 01':'PART 02'} / {p.tagline.toUpperCase()}</span><h2>{p.name}</h2><span className="dr-status"><i/>{p.status}</span><p>{p.summary}</p></div><dl className="dr-specs">{p.specs.map(([k,v])=><div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>{p.adds.length>0&&<div className="dr-adds"><span className="mono">WHAT THE ENGINE IS FOR</span><ul>{p.adds.map(a=><li key={a}><Check size={15}/>{a}</li>)}</ul></div>}<div className="dr-part-links"><button className="primary" onClick={()=>go('architecture'+(p.id==='lite'?'':'?chip=2dom'))}>Inside the architecture <ArrowUpRight size={17}/></button><button className="text-link" onClick={()=>go('library?pkg='+p.id)}>Architecture deck and film <ArrowRight size={16}/></button><button className="text-link" onClick={()=>go('library?pkg='+p.id+'-datasheet')}>Datasheet deck and film <ArrowRight size={16}/></button></div></article>)}</div>
   <p className="disclaimer">{PRE_SILICON} The ~0.43 W power figure is a vectorless tool estimate at 25 °C and 1.8 V.</p>
+  <Sec kicker="SIDE BY SIDE" title="What stays identical," em="and what DG32-2DOM adds." copy="Everything outside the engine is the same design from the same source, which is why a DG32-LITE board takes DG32-2DOM unchanged and the control-loop budget carries over exactly.">
+   <DataTable caption="DG32-LITE and DG32-2DOM compared" head={['Area','DG32-LITE','DG32-2DOM']} rows={familyCompare} wide/>
+  </Sec>
+  <Sec kicker="CHOOSING BETWEEN THEM" title="Same board, same firmware base," em="one added capability.">
+   <ExplainedGrid cols={2} items={[
+    {name:'Choose DG32-LITE',what:'For a drive that needs hardware lockstep safety, hardware FOC acceleration and native DShot in a 64-pin part.',why:'It is the first-silicon part: on the September 2026 shuttle, with bring-up measuring the loop costs, fault latency and timing it was designed to.'},
+    {name:'Choose DG32-2DOM',what:'For a drive that should also watch its own motor: bearing-fault or anomaly detection on phase-current data, without a second processor.',why:'The engine runs on its own clock behind bridges, so condition monitoring cannot extend the control core’s worst-case execution time. Design complete, in physical trials.'},
+   ]}/>
+   <div className="dr-links dr-sec-gap"><button className="text-link" onClick={()=>navigate('pinout')}>Package, supplies and electrical limits <ArrowUpRight size={16}/></button><button className="text-link" onClick={()=>go('architecture?chip=2dom')}>How the engine is isolated <ArrowUpRight size={16}/></button></div>
+  </Sec>
  </section>}
 
- {view==='architecture'&&<section className="page-wrap"><SectionHead tag="03 / ARCHITECTURE" title="Faults are contained, never silent" copy="Every block on DG32-LITE is a 32-bit register slave on one deterministic bus. A bad access returns an error instead of hanging, and a CPU disagreement raises a pin."/>
-  <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-LITE / ILLUSTRATIVE MODEL</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon selected={block} exploded={exploded} reduced={reduced} label={'Interactive 3D model of DG32-LITE with the '+blocks[block].name+' group highlighted. Drag to rotate; use the block list for details.'}/><div className="stage-bottom"><span>DRAG TO ROTATE · NOT A MASK LAYOUT</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded}><Layers size={14}/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
-   <aside className="domain-panel"><Eyebrow>SIX BLOCK GROUPS</Eyebrow>{blocks.map((b,i)=>{const Icon=blockIcons[i];return <button className={block===i?'selected':''} key={b.code} onClick={()=>update({block:String(i)})} aria-pressed={block===i}><Icon size={18}/><div><span>{b.code}<b>0{i+1}</b></span><strong>{b.name}</strong>{block===i&&<p>{b.short}</p>}</div><ArrowUpRight size={16}/></button>})}</aside></div>
-  <div className="dr-block" aria-live="polite"><div><Eyebrow>{blocks[block].code} / {blocks[block].name.toUpperCase()}</Eyebrow><ul>{blocks[block].what.map(w=><li key={w}>{w}</li>)}</ul></div><div className="dr-why"><span className="mono">WHY IT IS BUILT THIS WAY</span><p>{blocks[block].why}</p></div></div>
-  <div className="spec-grid">{[['50 MHz','CLOCK DOMAIN'],['64 KB','BOOT ROM'],['32 KB','SRAM'],['16','INTERRUPT SOURCES'],['2','BUS MASTERS'],['8','CLOCK GATES']].map(([v,k])=><div key={k}><span>{k}</span><strong>{v}</strong></div>)}</div>
-  <div className="split-section"><div><Eyebrow>THE BOOT PATH</Eyebrow><h2>No management core.<br/><em>No fallback needed.</em></h2><p>The mask ROM starts the chip on its own. It loads the application from external QSPI flash into SRAM and runs it there. If the flash is blank, it drops to a UART monitor, so a bare board can still be inspected.</p></div><div className="pipeline">{bootFlow.map(([n,t,d])=><div key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div><ArrowDown/></div>)}</div></div>
-  <div className="dr-figure-head"><p className="eyebrow"><span/> THE FULL DIAGRAM</p><span className="dr-figure-links"><button className="text-link" onClick={()=>go('library?pkg=lite')}>Architecture film <ArrowUpRight size={17}/></button><button className="text-link" onClick={()=>go('library?pkg=lite-tapein')}>Tape-in block diagram deck <ArrowUpRight size={17}/></button></span></div><div className="figure-scroll dr-figure"><img src="./diagrams/dg32-lite-architecture.svg" alt="DG32-LITE system architecture diagram: safety core, memory and boot, supervision, on-chip bus, motor drive, sensing and math, connectivity and test, with the numbered current-control loop and the fault path" loading="lazy"/></div>
-  <p className="disclaimer">The 3D model is illustrative: region placement indicates grouping, not the fabricated floorplan. {PRE_SILICON}</p>
+ {view==='architecture'&&<section className="page-wrap"><SectionHead tag="03 / ARCHITECTURE" title="Two chips, one frozen safety core" copy="DG32-LITE is the lockstep motor-control SoC; DG32-2DOM adds an INT8 attention engine on its own clock. Choose one for its diagram, every block and why it exists, the constraints that shaped it and how data moves through it, or see the die as recorded for tape-in."/>
+  <Architecture chip={route.params.get('chip')||'lite'} block={block} reduced={reduced} setReduced={setReduced} exploded={exploded} setExploded={setExploded} update={update} go={go}/>
+  <p className="disclaimer">{PRE_SILICON}</p>
  </section>}
 
- {view==='control'&&<ControlLoop/>}
+ {view==='control'&&<ControlLoop go={go}/>}
 
- {view==='pinout'&&<section className="page-wrap"><SectionHead tag="05 / PINOUT & PACKAGE" title="44 signals in a 9 × 9 mm package" copy="The 64-pin QFN carries every signal a brushless drive needs; the remaining 20 pins are supplies and grounds. DG32-2DOM uses the identical pinout."/>
-  <div className="dr-pinout"><figure className="dr-pin-figure"><button className="dr-slide-link" onClick={()=>go('library?pkg=lite-datasheet&slide=5')} aria-label="Open slide 5 of the DG32-LITE datasheet deck"><img src="./decks/dg32-lite-datasheet/slide-05.webp" alt="DG32-LITE datasheet deck, slide 5: each side of the package groups related signals" loading="lazy" width={1600} height={900}/></button><figcaption>Slide 5 of the DG32-LITE datasheet deck. Pin map awaiting the foundry’s bond-diagram confirmation.</figcaption></figure>
+ {view==='pinout'&&<section className="page-wrap"><SectionHead tag="05 / PINOUT & PACKAGE" title="44 signals in a 9 × 9 mm package" copy="The 64-pin QFN carries every signal a brushless drive needs; the remaining 20 pins are supplies and grounds. DG32-2DOM uses the identical pinout, supplies and limits."/>
+  <div className="dr-pinout"><PackageDiagram/>
    <div className="table-scroll"><table className="dr-table"><caption>Signal pins by function</caption><thead><tr><th scope="col">Function</th><th scope="col">Signals</th><th scope="col" className="num">Pins</th></tr></thead><tbody>{pinGroups.map(([f,s,n])=><tr key={f}><th scope="row">{f}</th><td>{s}</td><td className="num">{n}</td></tr>)}</tbody><tfoot><tr><th scope="row">Total</th><td>Signal pins</td><td className="num">{pinGroups.reduce((a,[, ,n])=>a+Number(n),0)}</td></tr></tfoot></table></div></div>
-  <div className="spec-grid">{[['QFN-64','PACKAGE'],['9 × 9 mm','BODY'],['0.5 mm','PITCH'],['Ground','EXPOSED PADDLE'],['1.8 V','CORE SUPPLY'],['3.3 V','I/O SUPPLY']].map(([v,k])=><div key={k}><span>{k}</span><strong>{v}</strong></div>)}</div>
-  <div className="investment-grid"><div><Eyebrow>DESIGNING IT IN</Eyebrow><h2>Three things<br/><em>a board must respect.</em></h2><p>DG32 is designed to sit between a gate driver, a position sensor and a boot flash. These are the constraints that shape the carrier board.</p></div><div className="risk-list">{[['01','Fault goes to hardware','FAULT_N is an active-low output from the lockstep and supervisor. Route it to the gate-driver enable so a CPU disagreement trips the bridge without firmware.'],['02','Analog inputs are 1.8 V','The two SAR ADC inputs are differential and accept 0 to 1.8 V. Scale the phase-current shunt amplifier into that window.'],['03','Flash is part of the boot path','The application lives in external QSPI NOR flash. Without it, the ROM stops at the UART monitor instead of running the drive.']].map(([n,t,c])=><div key={n}><span>{n}</span><div><h3>{t}</h3><p>{c}</p></div></div>)}</div></div>
-  <p className="disclaimer">Preliminary pin map. Electrical limits are process nominals pending first-silicon characterisation.</p>
+  <Stats items={[['QFN-64','PACKAGE'],['9 × 9 mm','BODY'],['0.5 mm','PITCH'],['Ground','EXPOSED PADDLE'],['1.8 V','CORE SUPPLY'],['3.3 V','I/O SUPPLY']]}/>
+  <Sec kicker="POWER, CLOCK AND RESET" title="One rail powers" em="all of the logic." copy="The parts of the datasheet a design commits to first: which supplies exist, the order they come up, and the single clock the whole die runs from.">
+   <ExplainedGrid items={powerNotes}/>
+  </Sec>
+  <Sec kicker="ELECTRICAL" title="Every electrical limit" em="is a nominal until silicon." copy="130 nm process nominals for each supply domain, the same on DG32-LITE and DG32-2DOM. First-silicon characterisation replaces this section.">
+   <div className="dr-two-tables"><DataTable caption="Recommended operating conditions" head={['Parameter','Min','Typ','Max','Note']} rows={operating}/><DataTable caption="Absolute maximum ratings" head={['Parameter','Min','Max']} rows={absoluteMax}/></div>
+   <p className="disclaimer">Power: ~0.43 W at 50 MHz, a vectorless tool estimate at 25 °C and 1.8 V, not a measurement.</p>
+  </Sec>
+  <Sec kicker="STATUS" title="What a design can lock now," em="and what waits for silicon.">
+   <div className="dr-fixed">{fixedVsPreliminary.map(f=><div key={f.state}><p className="dr-kicker">{f.state.toUpperCase()}</p><ul>{f.items.map(i=><li key={i}>{i}</li>)}</ul></div>)}</div>
+   <div className="dr-links dr-sec-gap"><button className="text-link" onClick={()=>go('library?pkg=lite-datasheet')}>DG32-LITE datasheet deck and film <ArrowUpRight size={16}/></button><button className="text-link" onClick={()=>go('library?pkg=2dom-datasheet')}>DG32-2DOM datasheet deck and film <ArrowUpRight size={16}/></button></div>
+  </Sec>
+  <p className="disclaimer">Preliminary pin map. Register maps, the memory map and board-level design rules are in the engineering datasheet, not on this site.</p>
  </section>}
 
  {view==='roadmap'&&<section className="page-wrap"><SectionHead tag="06 / POSITION & ROADMAP" title="Where DG32 leads, and where it does not yet" copy="Measured against the STM32G0, the incumbent entry-level motor-control MCU. DG32 wins on safety hardware and control acceleration; the G0 wins on analog, memory and maturity."/>
   <div className="table-scroll"><table className="dr-table dr-compare"><caption>DG32-LITE compared with the STM32G0 series</caption><thead><tr><th scope="col">Dimension</th><th scope="col">DG32-LITE</th><th scope="col">STM32G0 series</th><th scope="col">What it means</th></tr></thead><tbody>{comparison.map(([d,a,b,m])=><tr key={d}><th scope="row">{d}</th><td>{a}</td><td>{b}</td><td>{m}</td></tr>)}</tbody></table></div>
   <p className="disclaimer">STM32G0 column: public datasheet values for the STM32G0x1 / G0B1 family (Arm Cortex-M0+). DG32-LITE column: first-silicon design values, verified in simulation and static timing, not yet measured on silicon.</p>
   <div className="dr-leadgap"><div><Eyebrow>WHERE DG32 LEADS</Eyebrow><ul>{leads.map(l=><li key={l}><Check size={15}/>{l}</li>)}</ul></div><div><Eyebrow>WHERE THE G0 LEADS TODAY</Eyebrow><ul>{gaps.map(l=><li key={l}><span aria-hidden="true">—</span>{l}</li>)}</ul></div></div>
-  <div className="section-label"><Eyebrow>THE ROADMAP</Eyebrow><span>CLOSING THE GAPS IN ORDER</span></div>
-  <ol className="dr-roadmap">{roadmap.map(([when,t,d])=><li key={t}><span className="mono">{when}</span><h3>{t}</h3><p>{d}</p></li>)}</ol>
+  <Sec kicker="READING THE COMPARISON" title="Why each gap exists," em="and why it closes in this order.">
+   <ExplainedGrid items={positionNotes} cols={2}/>
+  </Sec>
+  <Sec kicker="THE ROADMAP" title="Closing the gaps" em="in order." copy="Each step has a job: first silicon proves the architecture, the second spin closes the largest gaps, and connectivity follows.">
+   <ol className="dr-roadmap">{roadmapDetail.map(([when,t,what,proves])=><li key={t}><span className="mono">{when}</span><h3>{t}</h3><p>{what}</p><p className="dr-proves"><span className="mono">WHAT IT DELIVERS</span>{proves}</p></li>)}</ol>
+  </Sec>
+  <div className="dr-notclaimed"><p className="dr-kicker">WHAT THIS SITE DOES NOT CLAIM</p><ul>{notClaimed.map(n=><li key={n}>{n}</li>)}</ul></div>
  </section>}
 
  <nav className="section-pagination" aria-label="Section navigation">{viewIndex>0?<a href={'#'+views[viewIndex-1]} onClick={e=>{e.preventDefault();navigate(views[viewIndex-1])}}><ArrowLeft size={19}/><span><small>Previous section</small>{titles[views[viewIndex-1]]}</span></a>:<span/>}{viewIndex<views.length-1&&<a href={'#'+views[viewIndex+1]} onClick={e=>{e.preventDefault();navigate(views[viewIndex+1])}}><span><small>Next section</small>{titles[views[viewIndex+1]]}</span><ArrowRight size={19}/></a>}</nav>
@@ -98,13 +126,26 @@ export default function Home(){
  </div>;
 }
 
-function ControlLoop(){
+function PackageDiagram(){
+ const side=(k:string)=>{const x=packageSides.find(s=>s.side===k)!;return <div className={'dr-qfn-side dr-qfn-'+k}><span className="mono">{k.toUpperCase()} · PINS {x.pins}</span><strong>{x.groups}</strong><p>{x.signals}</p></div>;};
+ return <figure className="dr-package" aria-label="DG32-LITE QFN-64 top view, with the signal groups on each side of the package">
+  {side('top')}{side('left')}<div className="dr-qfn-body" aria-hidden="true"><i className="dr-pin1"/><strong>DG32-LITE</strong><span>QFN-64 · 9 × 9 MM</span><span>TOP VIEW</span></div>{side('right')}{side('bottom')}
+  <figcaption>Supplies and grounds sit between the groups on every side. Pin 1 (dot) is upper left, numbered counter-clockwise. Pin map awaiting the foundry’s bond-diagram confirmation.</figcaption>
+ </figure>;
+}
+
+function ControlLoop({go}:{go:(hash:string)=>void}){
  const [rate,setRate]=useState(1);
  const r=loopRates[rate],period=CLOCK_HZ/(r.khz*1000),budget=period-HW_FIXED_CYCLES,hwPct=HW_FIXED_CYCLES/period*100;
  const maxF=180,target=50;
  return <section className="page-wrap"><SectionHead tag="04 / CONTROL LOOP" title="The CPU runs two regulators, not the loop" copy="Each field-oriented-control tick samples current, transforms it, regulates it and updates the bridge. DG32 moves every expensive step into hardware, so the loop cost is fixed and known."/>
   <ol className="dr-loop">{loopStages.map(([n,t,d,c])=><li key={n}><span className="dr-loop-n">{n}</span><div><h3>{t}</h3><p>{d}</p></div><strong>{c}</strong></li>)}</ol>
   <p className="disclaimer">Cycle costs measured in simulation at the 50 MHz clock, where one cycle is 20 ns.</p>
+
+  <Sec kicker="WHY THE LOOP RUNS IN HARDWARE" title="The CPU is fetch-bound," em="so the peripherals do the maths." copy="The core fetches every instruction over the bus. That one measured constant is what the whole peripheral set is designed around.">
+   <div className="dr-factcards">{fetchBound.map(([v,l,d])=><div key={l}><strong>{v}</strong><span className="mono">{l}</span><p>{d}</p></div>)}</div>
+   <ExplainedGrid items={controlNotes} cols={2}/>
+  </Sec>
 
   <div className="dr-budget"><div className="dr-budget-copy"><Eyebrow>LOOP BUDGET</Eyebrow><h2>~300 cycles of hardware.<br/><em>The rest is firmware.</em></h2><p>One ADC sample, two CORDIC operations and a PWM write cost about 300 cycles at any loop rate. Pick a rate to see what is left for the regulators and observers.</p>
    <div className="dr-rates" role="group" aria-label="Loop rate">{loopRates.map((x,i)=><button key={x.khz} aria-pressed={rate===i} className={rate===i?'active':''} onClick={()=>setRate(i)}>{x.khz} kHz</button>)}</div></div>
@@ -114,8 +155,13 @@ function ControlLoop(){
     <p className="dr-fits"><span className="mono">WHAT FITS AT {r.khz} KHZ</span>{r.fits}</p>
     <p className="disclaimer">*Derived: CPU budget ÷ ~8 cycles per instruction, the measured cost of this fetch-bound core.</p></div></div>
 
-  <div className="dr-fmax"><div><Eyebrow>TIMING HEADROOM</Eyebrow><h2>Only the lockstep core<br/><em>sets the clock.</em></h2><p>Maximum frequency of each hardened block after place-and-route. Every peripheral clears 90 MHz; the lockstep core reaches ~55–62 MHz, which is why the die runs at 50 MHz.</p></div>
+  <div className="dr-fmax"><div><Eyebrow>TIMING HEADROOM</Eyebrow><h2>Only the lockstep core<br/><em>sets the clock.</em></h2><p>Maximum frequency of each hardened block after place-and-route. Every peripheral clears 90 MHz; the lockstep core reaches ~55–62 MHz, which is why the die runs at 50 MHz. The same limit is why DG32-2DOM puts its engine on a second clock instead of raising this one.</p></div>
    <figure className="dr-chart"><figcaption className="sr-only">Post-route maximum frequency by block, in MHz</figcaption><div className="dr-chart-plot">{fmax.map(([n,v])=><div className="dr-bar-row" key={n}><span className="dr-bar-label">{n}</span><div className="dr-bar-track"><div className={'dr-bar'+(n==='Lockstep core'?' dr-bar-core':'')} style={{width:(v/maxF*100)+'%'}} tabIndex={0} aria-label={`${n}: ${n==='Lockstep core'?'55–62':v} MHz`}><span className="dr-tip" role="tooltip">{n} · {n==='Lockstep core'?'55–62':v} MHz</span></div></div><span className="dr-bar-value">{n==='Lockstep core'?'55–62':v}</span></div>)}<div className="dr-target" style={{left:`calc(var(--label-w) + (100% - var(--label-w) - var(--value-w)) * ${target/maxF})`}}><span>50 MHz target</span></div></div><div className="dr-axis"><span>0</span><span>{maxF} MHz</span></div></figure></div>
   <p className="disclaimer">Post-route figures on the 130 nm process. The lockstep-core bar is drawn at 55 MHz, the low end of its measured range.</p>
+
+  <Sec kicker="PERIPHERAL LIMITS" title="Numbers a firmware plan" em="can count on." copy="Capability and timing per block, from the datasheet’s block notes. Design and simulated values, pending silicon.">
+   <DataTable caption="Peripheral limits" head={['Block','Limit','Note']} rows={peripheralLimits}/>
+   <Callout label="WITH DG32-2DOM">The attention engine runs on its own 114 MHz clock and reaches memory only through clock-domain bridges, so none of these loop numbers change while it runs. <button className="text-link" onClick={()=>go('architecture?chip=2dom')}>How the engine is isolated <ArrowUpRight size={15}/></button></Callout>
+  </Sec>
  </section>;
 }

@@ -24,6 +24,8 @@ npm run build:pages   # static artifact in dist/pages, with CNAME
 | Change | Edit |
 | --- | --- |
 | Every number, spec, block description, comparison row and roadmap item | `app/content.ts` |
+| Detailed explanations: block rationale, design premises, data flows, engine, tape-in, electrical, positioning | `app/detail-content.ts` |
+| Architecture view (DG32-LITE, DG32-2DOM and tape-in tabs) | `app/architecture.tsx`, layout primitives in `app/detail.tsx` |
 | Page layout and copy around the data | `app/page.tsx` |
 | Section styles and chart colours | `app/dr.css` (base tokens in `app/globals.css`, `app/ux.css`) |
 | Interactive 3D package and die model | `app/silicon.tsx` |
