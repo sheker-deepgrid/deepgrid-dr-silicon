@@ -1,5 +1,5 @@
 {
-  "duration": 229.84,
+  "duration": 259.21,
   "chapters": [
     {
       "title": "What changes",
@@ -8,7 +8,7 @@
         4
       ],
       "start": 0.0,
-      "end": 105.49
+      "end": 116.38
     },
     {
       "title": "The engine",
@@ -16,8 +16,8 @@
         5,
         7
       ],
-      "start": 105.49,
-      "end": 185.21
+      "start": 116.38,
+      "end": 208.94
     },
     {
       "title": "Board and takeaways",
@@ -25,55 +25,55 @@
         8,
         9
       ],
-      "start": 185.21,
-      "end": 229.84
+      "start": 208.94,
+      "end": 259.21
     }
   ],
   "segments": [
     {
       "slide": 1,
       "start": 0.0,
-      "duration": 27.3
+      "duration": 28.15
     },
     {
       "slide": 2,
-      "start": 27.3,
-      "duration": 27.7
+      "start": 28.15,
+      "duration": 30.64
     },
     {
       "slide": 3,
-      "start": 55.0,
-      "duration": 25.27
+      "start": 58.79,
+      "duration": 32.37
     },
     {
       "slide": 4,
-      "start": 80.27,
+      "start": 91.16,
       "duration": 25.22
     },
     {
       "slide": 5,
-      "start": 105.49,
-      "duration": 26.55
+      "start": 116.38,
+      "duration": 28.92
     },
     {
       "slide": 6,
-      "start": 132.04,
-      "duration": 26.45
+      "start": 145.3,
+      "duration": 30.31
     },
     {
       "slide": 7,
-      "start": 158.49,
-      "duration": 26.72
+      "start": 175.61,
+      "duration": 33.33
     },
     {
       "slide": 8,
-      "start": 185.21,
-      "duration": 19.73
+      "start": 208.94,
+      "duration": 20.21
     },
     {
       "slide": 9,
-      "start": 204.94,
-      "duration": 24.9
+      "start": 229.15,
+      "duration": 30.06
     }
   ]
 }

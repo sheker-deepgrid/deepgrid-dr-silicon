@@ -1,5 +1,5 @@
 {
-  "duration": 437.86,
+  "duration": 463.13,
   "chapters": [
     {
       "title": "Why lockstep",
@@ -8,7 +8,7 @@
         3
       ],
       "start": 0.0,
-      "end": 89.38
+      "end": 91.88
     },
     {
       "title": "Inside the architecture",
@@ -16,8 +16,8 @@
         4,
         8
       ],
-      "start": 89.38,
-      "end": 227.52
+      "start": 91.88,
+      "end": 239.68
     },
     {
       "title": "The control-loop budget",
@@ -25,8 +25,8 @@
         9,
         11
       ],
-      "start": 227.52,
-      "end": 302.76
+      "start": 239.68,
+      "end": 314.92
     },
     {
       "title": "Package, variant and roadmap",
@@ -34,8 +34,8 @@
         12,
         16
       ],
-      "start": 302.76,
-      "end": 437.86
+      "start": 314.92,
+      "end": 463.13
     }
   ],
   "segments": [
@@ -47,77 +47,77 @@
     {
       "slide": 2,
       "start": 31.35,
-      "duration": 27.51
+      "duration": 30.01
     },
     {
       "slide": 3,
-      "start": 58.86,
+      "start": 61.36,
       "duration": 30.52
     },
     {
       "slide": 4,
-      "start": 89.38,
-      "duration": 28.29
+      "start": 91.88,
+      "duration": 30.09
     },
     {
       "slide": 5,
-      "start": 117.67,
-      "duration": 27.79
+      "start": 121.97,
+      "duration": 31.46
     },
     {
       "slide": 6,
-      "start": 145.46,
+      "start": 153.43,
       "duration": 25.4
     },
     {
       "slide": 7,
-      "start": 170.86,
-      "duration": 26.93
+      "start": 178.83,
+      "duration": 31.12
     },
     {
       "slide": 8,
-      "start": 197.79,
+      "start": 209.95,
       "duration": 29.73
     },
     {
       "slide": 9,
-      "start": 227.52,
+      "start": 239.68,
       "duration": 25.63
     },
     {
       "slide": 10,
-      "start": 253.15,
+      "start": 265.31,
       "duration": 25.51
     },
     {
       "slide": 11,
-      "start": 278.66,
+      "start": 290.82,
       "duration": 24.1
     },
     {
       "slide": 12,
-      "start": 302.76,
-      "duration": 25.91
+      "start": 314.92,
+      "duration": 28.45
     },
     {
       "slide": 13,
-      "start": 328.67,
+      "start": 343.37,
       "duration": 29.8
     },
     {
       "slide": 14,
-      "start": 358.47,
-      "duration": 27.08
+      "start": 373.17,
+      "duration": 28.24
     },
     {
       "slide": 15,
-      "start": 385.55,
-      "duration": 27.27
+      "start": 401.41,
+      "duration": 32.13
     },
     {
       "slide": 16,
-      "start": 412.82,
-      "duration": 25.04
+      "start": 433.54,
+      "duration": 29.59
     }
   ]
 }

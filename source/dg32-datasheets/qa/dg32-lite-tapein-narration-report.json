@@ -2,8 +2,14 @@
   "voice": "bm_george",
   "speed": 1.05,
   "slide_speeds": {
-    "1": 0.91,
-    "8": 0.94
+    "1": 0.99,
+    "3": 1.01,
+    "4": 0.98,
+    "6": 0.96,
+    "7": 0.94,
+    "8": 0.94,
+    "10": 1.0,
+    "11": 0.94
   },
   "sentence_pause_s": 0.55,
   "wpm_band": [
@@ -14,35 +20,35 @@
     135,
     160
   ],
-  "overall_wpm": 150.1,
-  "median_f0_hz": 142.0,
+  "overall_wpm": 153.3,
+  "median_f0_hz": 141.2,
   "holt_f0_hz": 135.6,
-  "total_seconds": 296.1,
+  "total_seconds": 316.7,
   "failed_slides": [],
   "slides": [
     {
       "slide": 1,
-      "speed": 0.91,
-      "seconds": 25.69,
-      "spoken_words": 67,
-      "wpm": 156.5,
+      "speed": 0.99,
+      "seconds": 26.63,
+      "spoken_words": 68,
+      "wpm": 153.2,
       "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "This is DG32-LITE as recorded in its tape-in block diagram: the die as built, block by block.",
+          "text": "Before a chip goes to the foundry, its block diagram is the most complete record of what will be built.",
           "start": 0.0,
-          "end": 8.091
+          "end": 6.649
         },
         {
-          "text": "It covers the clock and reset, the lockstep pair, memory and fetch, the bus and the eighteen blocks around it, the pad plan, production test, and the four sign-off gates the die must pass.",
-          "start": 8.641,
-          "end": 21.376
+          "text": "This film walks DG32-LITE through that record: clocking and reset, the lockstep cores, memory, the bus and its peripherals, the pads, production test, and the checks that stand before tape-in.",
+          "start": 7.199,
+          "end": 20.202
         },
         {
-          "text": "It is a design record, not a measurement of silicon.",
-          "start": 21.926,
-          "end": 25.693
+          "text": "Everything here describes the intended die; nothing has yet been measured on silicon.",
+          "start": 20.752,
+          "end": 26.63
         }
       ]
     },
@@ -84,171 +90,161 @@
     },
     {
       "slide": 3,
-      "speed": 1.05,
-      "seconds": 28.69,
-      "spoken_words": 72,
-      "wpm": 150.6,
-      "median_f0_hz": 142.0,
+      "speed": 1.01,
+      "seconds": 28.66,
+      "spoken_words": 73,
+      "wpm": 152.8,
+      "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "One clock and one reset drive the whole block.",
+          "text": "Timing starts simple on purpose.",
           "start": 0.0,
-          "end": 3.173
+          "end": 2.36
         },
         {
-          "text": "The clock arrives from a pad at fifty megahertz.",
-          "start": 3.723,
-          "end": 6.748
+          "text": "A single fifty megahertz input clocks everything, so there is no crossing between domains to verify.",
+          "start": 2.91,
+          "end": 9.425
         },
         {
-          "text": "Eight software clock gates switch off idle peripherals: both UARTs, SPI, I squared C, PWM, the timers, the DMA and the CORDIC.",
-          "start": 7.298,
-          "end": 16.562
+          "text": "Software can shut off the clock to eight blocks it is not using, from the serial ports to the CORDIC, and in test mode all eight are forced on.",
+          "start": 9.975,
+          "end": 19.164
         },
         {
-          "text": "Test mode forces every gate open.",
-          "start": 17.112,
-          "end": 19.714
-        },
-        {
-          "text": "Reset is asynchronous, the supervisor deglitches the supply-good inputs, and the checker leaves reset two cycles after the main core.",
-          "start": 20.264,
-          "end": 28.693
+          "text": "Reset is asynchronous, a supervisor cleans up the supply-good signals, and the checker core leaves reset two cycles after the main core.",
+          "start": 19.714,
+          "end": 28.665
         }
       ]
     },
     {
       "slide": 4,
-      "speed": 1.05,
-      "seconds": 27.65,
-      "spoken_words": 69,
-      "wpm": 149.7,
-      "median_f0_hz": 142.0,
+      "speed": 0.98,
+      "seconds": 28.45,
+      "spoken_words": 73,
+      "wpm": 153.9,
+      "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "The lockstep pair is built to survive real firmware.",
+          "text": "The hard part of lockstep is not comparing two cores; it is keeping them from disagreeing when nothing is wrong.",
           "start": 0.0,
-          "end": 3.426
+          "end": 7.296
         },
         {
-          "text": "The main core runs the code and owns the bus.",
-          "start": 3.976,
-          "end": 7.011
+          "text": "Interrupts and peripheral reads are the usual culprits, because the second core would see them at a different moment.",
+          "start": 7.846,
+          "end": 14.865
         },
         {
-          "text": "The checker replays the same work two cycles later, with its inputs and bus responses mirrored, and the comparator checks every committed store.",
-          "start": 7.561,
-          "end": 16.558
+          "text": "Here the checker gets a delayed copy of everything the main core saw, so normal code cannot split them.",
+          "start": 15.415,
+          "end": 22.256
         },
         {
-          "text": "So interrupts are safe, firmware may branch on a peripheral read, and the pair has been verified under interrupts in simulation.",
-          "start": 17.108,
-          "end": 24.847
-        },
-        {
-          "text": "A mismatch drives the fault pad.",
-          "start": 25.397,
-          "end": 27.65
+          "text": "That behaviour has been checked in simulation, and a real mismatch trips the fault pin.",
+          "start": 22.806,
+          "end": 28.451
         }
       ]
     },
     {
       "slide": 5,
       "speed": 1.05,
-      "seconds": 29.14,
-      "spoken_words": 68,
-      "wpm": 140.0,
-      "median_f0_hz": 142.4,
+      "seconds": 32.53,
+      "spoken_words": 79,
+      "wpm": 145.7,
+      "median_f0_hz": 139.5,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Code runs from SRAM through a dedicated fetch port.",
+          "text": "Instructions never compete with data.",
           "start": 0.0,
-          "end": 4.046
+          "end": 2.627
         },
         {
-          "text": "The fetch decoder sends boot fetches to the ROM and application fetches to the SRAM's second port.",
-          "start": 4.596,
-          "end": 11.97
+          "text": "Each SRAM block has two ports: the processor fetches code through one while data moves through the other, so data traffic cannot stall execution.",
+          "start": 3.177,
+          "end": 13.263
         },
         {
-          "text": "Anything else is a bus error and an instruction fault.",
-          "start": 12.52,
-          "end": 15.98
+          "text": "A fetch aimed anywhere but the ROM or that code port raises a fault instead of running whatever it finds.",
+          "start": 13.813,
+          "end": 21.207
         },
         {
-          "text": "The ROM is sixteen thousand words of mask-programmed logic that prints the banner, checks the flash header, copies the application and jumps.",
-          "start": 16.53,
-          "end": 25.924
-        },
-        {
-          "text": "Blank flash opens a UART monitor.",
-          "start": 26.474,
-          "end": 29.138
+          "text": "The ROM is hard-wired logic that checks the flash image, copies it into SRAM and hands over, or opens a serial monitor if the flash is blank.",
+          "start": 21.757,
+          "end": 32.535
         }
       ]
     },
     {
       "slide": 6,
-      "speed": 1.05,
-      "seconds": 25.05,
-      "spoken_words": 66,
-      "wpm": 158.1,
-      "median_f0_hz": 140.4,
+      "speed": 0.96,
+      "seconds": 31.25,
+      "spoken_words": 81,
+      "wpm": 155.5,
+      "median_f0_hz": 141.2,
       "in_gate": true,
       "sentences": [
         {
-          "text": "The bus serves one requester at a time.",
+          "text": "The bus is built so that no access can hang the chip.",
           "start": 0.0,
-          "end": 2.677
+          "end": 3.507
         },
         {
-          "text": "The CPU has priority over the DMA, and each read or write target is latched at the request and held until the response.",
-          "start": 3.227,
-          "end": 12.224
+          "text": "Only two things can drive it, the processor and the DMA, and the processor wins any tie.",
+          "start": 4.057,
+          "end": 10.471
         },
         {
-          "text": "Every peripheral is a thirty-two-bit register slave.",
-          "start": 12.774,
-          "end": 16.104
+          "text": "Once a transfer starts, its destination is locked until the reply comes back.",
+          "start": 11.021,
+          "end": 16.438
         },
         {
-          "text": "A clock-gated or undecoded slot answers with an error instead of hanging, and the QSPI window serves data, not code.",
-          "start": 16.654,
-          "end": 25.048
+          "text": "If software touches an address with nothing behind it, or a peripheral whose clock is switched off, it gets an error instead of a hang.",
+          "start": 16.988,
+          "end": 25.588
+        },
+        {
+          "text": "Flash is visible only as data; code always runs from SRAM.",
+          "start": 26.138,
+          "end": 31.254
         }
       ]
     },
     {
       "slide": 7,
-      "speed": 1.05,
-      "seconds": 26.58,
-      "spoken_words": 68,
-      "wpm": 153.5,
+      "speed": 0.94,
+      "seconds": 30.96,
+      "spoken_words": 81,
+      "wpm": 157.0,
       "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Eighteen blocks sit around that bus.",
+          "text": "Eighteen blocks share that bus, in three groups of six.",
           "start": 0.0,
-          "end": 2.259
+          "end": 3.528
         },
         {
-          "text": "Six handle connectivity: the UARTs, SPI, I squared C, the QSPI window, GPIO and the timers.",
-          "start": 2.809,
-          "end": 9.889
+          "text": "Six connect the chip to the outside world: the UARTs, SPI, I squared C, the QSPI window, GPIO and the timers.",
+          "start": 4.078,
+          "end": 12.634
         },
         {
           "text": "Six serve the motor: PWM, DShot, encoder and Hall, CORDIC, the ADC and interrupts.",
-          "start": 10.439,
-          "end": 16.98
+          "start": 13.184,
+          "end": 20.309
         },
         {
-          "text": "And six handle system, safety and test: system control, the watchdog, the fault register, the error slave, scan, and the JTAG port.",
-          "start": 17.53,
-          "end": 26.58
+          "text": "The last six are there so the chip can be trusted and tested: system control, the watchdog, the fault register, the error slave, scan and JTAG.",
+          "start": 20.859,
+          "end": 30.957
         }
       ]
     },
@@ -291,108 +287,113 @@
     {
       "slide": 9,
       "speed": 1.05,
-      "seconds": 27.47,
-      "spoken_words": 65,
-      "wpm": 142.0,
-      "median_f0_hz": 140.4,
+      "seconds": 27.41,
+      "spoken_words": 70,
+      "wpm": 153.2,
+      "median_f0_hz": 142.0,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Production test reaches the logic through JTAG.",
+          "text": "Every manufactured part needs a production test, and the JTAG port is how DG32-LITE gets one.",
           "start": 0.0,
-          "end": 3.43
+          "end": 7.282
         },
         {
-          "text": "A tester drives the four JTAG pins into a test access port in the wrapper, which selects scan enable, scan mode, a chain, or bypass, and reaches thirteen scan chains inside the hardened block.",
-          "start": 3.98,
-          "end": 17.029
+          "text": "A tester switches the chip into scan mode and shifts patterns through thirteen chains of flip-flops.",
+          "start": 7.832,
+          "end": 14.048
         },
         {
-          "text": "Test mode forces every clock gate open, so scan reaches every block.",
-          "start": 17.579,
-          "end": 22.316
+          "text": "Because test mode turns every gated clock back on, no block is hidden from those patterns.",
+          "start": 14.598,
+          "end": 20.371
         },
         {
-          "text": "Interactive CPU debug over JTAG is a roadmap item.",
-          "start": 22.866,
-          "end": 27.468
+          "text": "The same pins do not offer interactive CPU debugging yet; that is a later roadmap item.",
+          "start": 20.921,
+          "end": 27.415
         }
       ]
     },
     {
       "slide": 10,
-      "speed": 1.05,
-      "seconds": 28.57,
-      "spoken_words": 70,
-      "wpm": 147.0,
-      "median_f0_hz": 143.7,
+      "speed": 1.0,
+      "seconds": 31.35,
+      "spoken_words": 80,
+      "wpm": 153.1,
+      "median_f0_hz": 145.5,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Four gates must all pass before tape-in.",
+          "text": "Tape-in waits on four checks.",
           "start": 0.0,
-          "end": 2.743
+          "end": 2.225
         },
         {
-          "text": "The layout must be design-rule clean.",
-          "start": 3.293,
-          "end": 5.675
+          "text": "The layout must obey every manufacturing rule.",
+          "start": 2.775,
+          "end": 5.997
         },
         {
-          "text": "Layout versus schematic must match uniquely, pins included.",
-          "start": 6.225,
-          "end": 10.157
+          "text": "It must describe exactly the circuit that was designed, down to its pins.",
+          "start": 6.547,
+          "end": 11.232
         },
         {
-          "text": "A connectivity check on the final layout must show every pad reaching logic, with no floating net.",
-          "start": 10.707,
-          "end": 17.253
+          "text": "Every pad must be wired through to logic.",
+          "start": 11.782,
+          "end": 14.675
         },
         {
-          "text": "And a gate-level simulation of the routed netlist must boot and print the banner.",
-          "start": 17.803,
-          "end": 22.738
+          "text": "And the routed netlist, simulated gate by gate, must boot and print its banner.",
+          "start": 15.225,
+          "end": 20.181
         },
         {
-          "text": "The connectivity gate exists because the first two can pass while a pad pin floats.",
-          "start": 23.288,
-          "end": 28.566
+          "text": "The third check is there because a layout can clear the first two and still leave a pad unconnected.",
+          "start": 20.731,
+          "end": 26.865
+        },
+        {
+          "text": "What this film states is the bar, not whether it has been cleared.",
+          "start": 27.415,
+          "end": 31.353
         }
       ]
     },
     {
       "slide": 11,
-      "speed": 1.05,
-      "seconds": 24.23,
-      "spoken_words": 60,
-      "wpm": 148.5,
-      "median_f0_hz": 143.7,
+      "speed": 0.94,
+      "seconds": 26.41,
+      "spoken_words": 68,
+      "wpm": 154.5,
+      "median_f0_hz": 145.5,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Three things to take away.",
+          "text": "If you keep three points from this, make them these.",
           "start": 0.0,
-          "end": 1.852
+          "end": 3.275
         },
         {
-          "text": "One clock and one reset, with eight clock gates and a checker released two cycles late.",
-          "start": 2.402,
-          "end": 7.818
+          "text": "The die has one clock, so its timing has no domain crossings to go wrong.",
+          "start": 3.825,
+          "end": 8.715
         },
         {
-          "text": "Nothing hangs and nothing floats: bad accesses return errors, and all forty-four pads are allocated.",
-          "start": 8.368,
-          "end": 15.107
+          "text": "No access can hang it, and no pad is left without a job.",
+          "start": 9.265,
+          "end": 13.221
         },
         {
-          "text": "And four gates stand between the design and tape-in.",
-          "start": 15.657,
-          "end": 18.884
+          "text": "And nothing goes to the foundry until four checks all pass.",
+          "start": 13.771,
+          "end": 17.875
         },
         {
-          "text": "The next milestone is first silicon, on the September twenty twenty-six shuttle.",
-          "start": 19.434,
-          "end": 24.234
+          "text": "What comes next is first silicon, via the September twenty twenty-six shuttle, where these design records meet measurement.",
+          "start": 18.425,
+          "end": 26.409
         }
       ]
     }

@@ -1,5 +1,5 @@
 {
-  "duration": 320.55,
+  "duration": 332.99,
   "chapters": [
     {
       "title": "What it is",
@@ -8,7 +8,7 @@
         3
       ],
       "start": 0.0,
-      "end": 82.8
+      "end": 86.02
     },
     {
       "title": "Pins and package",
@@ -16,8 +16,8 @@
         4,
         5
       ],
-      "start": 82.8,
-      "end": 134.5
+      "start": 86.02,
+      "end": 139.52
     },
     {
       "title": "Electrical and power",
@@ -25,8 +25,8 @@
         6,
         7
       ],
-      "start": 134.5,
-      "end": 189.1
+      "start": 139.52,
+      "end": 194.79
     },
     {
       "title": "Clock, reset and boot",
@@ -34,8 +34,8 @@
         8,
         9
       ],
-      "start": 189.1,
-      "end": 244.85
+      "start": 194.79,
+      "end": 250.47
     },
     {
       "title": "Limits and status",
@@ -43,8 +43,8 @@
         10,
         12
       ],
-      "start": 244.85,
-      "end": 320.55
+      "start": 250.47,
+      "end": 332.99
     }
   ],
   "segments": [
@@ -56,57 +56,57 @@
     {
       "slide": 2,
       "start": 27.3,
-      "duration": 24.4
+      "duration": 25.06
     },
     {
       "slide": 3,
-      "start": 51.7,
-      "duration": 31.1
+      "start": 52.36,
+      "duration": 33.66
     },
     {
       "slide": 4,
-      "start": 82.8,
+      "start": 86.02,
       "duration": 27.13
     },
     {
       "slide": 5,
-      "start": 109.93,
-      "duration": 24.57
+      "start": 113.15,
+      "duration": 26.37
     },
     {
       "slide": 6,
-      "start": 134.5,
+      "start": 139.52,
       "duration": 28.3
     },
     {
       "slide": 7,
-      "start": 162.8,
-      "duration": 26.3
+      "start": 167.82,
+      "duration": 26.97
     },
     {
       "slide": 8,
-      "start": 189.1,
-      "duration": 28.25
+      "start": 194.79,
+      "duration": 27.91
     },
     {
       "slide": 9,
-      "start": 217.35,
-      "duration": 27.5
+      "start": 222.7,
+      "duration": 27.77
     },
     {
       "slide": 10,
-      "start": 244.85,
-      "duration": 29.27
+      "start": 250.47,
+      "duration": 32.66
     },
     {
       "slide": 11,
-      "start": 274.12,
-      "duration": 24.21
+      "start": 283.13,
+      "duration": 25.13
     },
     {
       "slide": 12,
-      "start": 298.33,
-      "duration": 22.22
+      "start": 308.26,
+      "duration": 24.73
     }
   ]
 }

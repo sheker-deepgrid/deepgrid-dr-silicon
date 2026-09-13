@@ -16,8 +16,9 @@ keeps its `visual-spec.json`, film timing (`video/*-film.json`) and narration re
 
 Rebuild follows `../dg32-architecture/README.md`: build the deck, run the gates, export frames
 through PowerPoint, narrate with `narrate_kokoro.py` (Holt profile), cut the film with
-`make_film.py`. Per-slide speeds used: DG32-LITE datasheet `8:0.96,9:0.96,12:0.98`, DG32-2DOM
-datasheet `4:0.98`, tape-in `1:0.91,8:0.94`.
+`make_film.py`. Per-slide speeds used: DG32-LITE datasheet `2:1.0,5:1.0,7:1.01,8:0.97,9:0.95,10:1.0`,
+DG32-2DOM datasheet `1:0.99,2:0.98,3:1.0,4:0.98,5:0.99,6:0.99,7:0.96,8:1.01,9:0.99`, tape-in
+`1:0.99,3:1.01,4:0.98,6:0.96,7:0.94,8:0.94,10:1.0,11:0.94`. Narration is gated before voicing with `narrated-deck-film/scripts/check_narration.py <narration.json> --deck <reviewed.pptx>`: at most 18% of any slide's narration may repeat the slide's own wording, and every line must make a point rather than list. 
 
 Investor-level only: no register maps, memory map, magic values, board-design rules, internal names,
 repository or sign-off run history. The tape-in deck lists the sign-off gates and makes no claim that

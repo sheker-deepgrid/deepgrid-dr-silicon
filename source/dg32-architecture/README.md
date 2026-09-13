@@ -31,8 +31,9 @@ Paths in the scripts are absolute to the working copy above; run them from there
    when all pass (`qa/gate-record.md`).
 3. **Frames** — export the reviewed deck through PowerPoint at 1920×1080 into `frames/slide-NN.png`.
 4. **Narration** — `~/.venvs/kokoro/bin/python narrate_kokoro.py <pkg dir>`; Kokoro `bm_george`,
-   gated on 135–160 spoken-word wpm (Holt target 140–155). Dense slides take `SLIDE_SPEEDS`:
-   DG32-LITE `5:0.95,12:0.95`, DG32-2DOM `1:0.93,3:0.92`.
+   gated on 135–160 spoken-word wpm (Holt target 140–155). Slides off the target take `SLIDE_SPEEDS`
+   (measured speed × 150 ÷ measured wpm): DG32-LITE `4:0.95,5:0.99,12:0.96,14:0.98`, DG32-2DOM
+   `1:0.96,2:1.01,3:0.94,5:1.01,7:0.99,8:0.96,12:1.0,13:0.99`. Narration is gated before voicing with `narrated-deck-film/scripts/check_narration.py <narration.json> --deck <reviewed.pptx>`: at most 18% of any slide's narration may repeat the slide's own wording, and every line must make a point rather than list. 
 5. **Film** — `python3 make_film.py <pkg dir> <slug> "<chapters>"`.
 6. **Publish** — `publish_to_site.sh` copies films, captions, posters and timing into this repo and
    builds; copy slide images and reviewed decks per the site README.

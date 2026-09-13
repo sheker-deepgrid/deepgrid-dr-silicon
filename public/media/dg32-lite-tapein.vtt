@@ -1,206 +1,202 @@
 WEBVTT
 
 1
-00:00:00.350 --> 00:00:08.441
-This is DG32-LITE as recorded in its tape-in block diagram: the die as built, block by block.
+00:00:00.350 --> 00:00:06.999
+Before a chip goes to the foundry, its block diagram is the most complete record of what will be built.
 
 2
-00:00:08.991 --> 00:00:21.726
-It covers the clock and reset, the lockstep pair, memory and fetch, the bus and the eighteen blocks around it, the pad plan, production test, and the four sign-off gates the die must pass.
+00:00:07.549 --> 00:00:20.552
+This film walks DG32-LITE through that record: clocking and reset, the lockstep cores, memory, the bus and its peripherals, the pads, production test, and the checks that stand before tape-in.
 
 3
-00:00:22.276 --> 00:00:26.043
-It is a design record, not a measurement of silicon.
+00:00:21.102 --> 00:00:26.980
+Everything here describes the intended die; nothing has yet been measured on silicon.
 
 4
-00:00:27.240 --> 00:00:28.364
+00:00:28.180 --> 00:00:29.304
 The short version.
 
 5
-00:00:28.914 --> 00:00:36.819
+00:00:29.854 --> 00:00:37.759
 One fifty megahertz clock domain, with the lockstep core measured at fifty-five to sixty-two megahertz after place-and-route.
 
 6
-00:00:37.369 --> 00:00:42.744
+00:00:38.309 --> 00:00:43.684
 A checker that runs two cycles behind and sees the main core's bus responses.
 
 7
-00:00:43.294 --> 00:00:46.591
+00:00:44.234 --> 00:00:47.531
 Forty-four wrapper pads, every one of them allocated.
 
 8
-00:00:47.141 --> 00:00:51.104
+00:00:48.081 --> 00:00:52.044
 And four sign-off gates that must all pass on the final die.
 
 9
-00:00:52.300 --> 00:00:55.473
-One clock and one reset drive the whole block.
+00:00:53.240 --> 00:00:55.600
+Timing starts simple on purpose.
 
 10
-00:00:56.023 --> 00:00:59.048
-The clock arrives from a pad at fifty megahertz.
+00:00:56.150 --> 00:01:02.665
+A single fifty megahertz input clocks everything, so there is no crossing between domains to verify.
 
 11
-00:00:59.598 --> 00:01:08.862
-Eight software clock gates switch off idle peripherals: both UARTs, SPI, I squared C, PWM, the timers, the DMA and the CORDIC.
+00:01:03.215 --> 00:01:12.404
+Software can shut off the clock to eight blocks it is not using, from the serial ports to the CORDIC, and in test mode all eight are forced on.
 
 12
-00:01:09.412 --> 00:01:12.014
-Test mode forces every gate open.
+00:01:12.954 --> 00:01:21.905
+Reset is asynchronous, a supervisor cleans up the supply-good signals, and the checker core leaves reset two cycles after the main core.
 
 13
-00:01:12.564 --> 00:01:20.993
-Reset is asynchronous, the supervisor deglitches the supply-good inputs, and the checker leaves reset two cycles after the main core.
+00:01:23.100 --> 00:01:30.396
+The hard part of lockstep is not comparing two cores; it is keeping them from disagreeing when nothing is wrong.
 
 14
-00:01:22.190 --> 00:01:25.616
-The lockstep pair is built to survive real firmware.
+00:01:30.946 --> 00:01:37.965
+Interrupts and peripheral reads are the usual culprits, because the second core would see them at a different moment.
 
 15
-00:01:26.166 --> 00:01:29.201
-The main core runs the code and owns the bus.
+00:01:38.515 --> 00:01:45.356
+Here the checker gets a delayed copy of everything the main core saw, so normal code cannot split them.
 
 16
-00:01:29.751 --> 00:01:38.748
-The checker replays the same work two cycles later, with its inputs and bus responses mirrored, and the comparator checks every committed store.
+00:01:45.906 --> 00:01:51.551
+That behaviour has been checked in simulation, and a real mismatch trips the fault pin.
 
 17
-00:01:39.298 --> 00:01:47.037
-So interrupts are safe, firmware may branch on a peripheral read, and the pair has been verified under interrupts in simulation.
+00:01:52.750 --> 00:01:55.377
+Instructions never compete with data.
 
 18
-00:01:47.587 --> 00:01:49.840
-A mismatch drives the fault pad.
+00:01:55.927 --> 00:02:06.013
+Each SRAM block has two ports: the processor fetches code through one while data moves through the other, so data traffic cannot stall execution.
 
 19
-00:01:51.040 --> 00:01:55.086
-Code runs from SRAM through a dedicated fetch port.
+00:02:06.563 --> 00:02:13.957
+A fetch aimed anywhere but the ROM or that code port raises a fault instead of running whatever it finds.
 
 20
-00:01:55.636 --> 00:02:03.010
-The fetch decoder sends boot fetches to the ROM and application fetches to the SRAM's second port.
+00:02:14.507 --> 00:02:25.285
+The ROM is hard-wired logic that checks the flash image, copies it into SRAM and hands over, or opens a serial monitor if the flash is blank.
 
 21
-00:02:03.560 --> 00:02:07.020
-Anything else is a bus error and an instruction fault.
+00:02:26.480 --> 00:02:29.987
+The bus is built so that no access can hang the chip.
 
 22
-00:02:07.570 --> 00:02:16.964
-The ROM is sixteen thousand words of mask-programmed logic that prints the banner, checks the flash header, copies the application and jumps.
+00:02:30.537 --> 00:02:36.951
+Only two things can drive it, the processor and the DMA, and the processor wins any tie.
 
 23
-00:02:17.514 --> 00:02:20.178
-Blank flash opens a UART monitor.
+00:02:37.501 --> 00:02:42.918
+Once a transfer starts, its destination is locked until the reply comes back.
 
 24
-00:02:21.380 --> 00:02:24.057
-The bus serves one requester at a time.
+00:02:43.468 --> 00:02:52.068
+If software touches an address with nothing behind it, or a peripheral whose clock is switched off, it gets an error instead of a hang.
 
 25
-00:02:24.607 --> 00:02:33.604
-The CPU has priority over the DMA, and each read or write target is latched at the request and held until the response.
+00:02:52.618 --> 00:02:57.734
+Flash is visible only as data; code always runs from SRAM.
 
 26
-00:02:34.154 --> 00:02:37.484
-Every peripheral is a thirty-two-bit register slave.
+00:02:58.930 --> 00:03:02.458
+Eighteen blocks share that bus, in three groups of six.
 
 27
-00:02:38.034 --> 00:02:46.428
-A clock-gated or undecoded slot answers with an error instead of hanging, and the QSPI window serves data, not code.
+00:03:03.008 --> 00:03:11.564
+Six connect the chip to the outside world: the UARTs, SPI, I squared C, the QSPI window, GPIO and the timers.
 
 28
-00:02:47.630 --> 00:02:49.889
-Eighteen blocks sit around that bus.
-
-29
-00:02:50.439 --> 00:02:57.519
-Six handle connectivity: the UARTs, SPI, I squared C, the QSPI window, GPIO and the timers.
-
-30
-00:02:58.069 --> 00:03:04.610
+00:03:12.114 --> 00:03:19.239
 Six serve the motor: PWM, DShot, encoder and Hall, CORDIC, the ADC and interrupts.
 
-31
-00:03:05.160 --> 00:03:14.210
-And six handle system, safety and test: system control, the watchdog, the fault register, the error slave, scan, and the JTAG port.
+29
+00:03:19.789 --> 00:03:29.887
+The last six are there so the chip can be trusted and tested: system control, the watchdog, the fault register, the error slave, scan and JTAG.
 
-32
-00:03:15.410 --> 00:03:19.286
+30
+00:03:31.090 --> 00:03:34.966
 Every one of the forty-four wrapper pads has a job.
 
-33
-00:03:19.836 --> 00:03:28.316
+31
+00:03:35.516 --> 00:03:43.996
 Seven carry the QSPI flash, seven the PWM outputs and trigger, and six the encoder and Hall inputs.
 
-34
-00:03:28.866 --> 00:03:32.507
+32
+00:03:44.546 --> 00:03:48.187
 Four each go to the UARTs, SPI and JTAG.
 
-35
-00:03:33.057 --> 00:03:34.816
+33
+00:03:48.737 --> 00:03:50.496
 Three are GPIO.
 
-36
-00:03:35.366 --> 00:03:44.599
+34
+00:03:51.046 --> 00:04:00.279
 Two each carry I squared C, supply-good and the analog ADC inputs, and one each carry the clock, the reset and the fault output.
 
+35
+00:04:01.480 --> 00:04:08.762
+Every manufactured part needs a production test, and the JTAG port is how DG32-LITE gets one.
+
+36
+00:04:09.312 --> 00:04:15.528
+A tester switches the chip into scan mode and shifts patterns through thirteen chains of flip-flops.
+
 37
-00:03:45.800 --> 00:03:49.230
-Production test reaches the logic through JTAG.
+00:04:16.078 --> 00:04:21.851
+Because test mode turns every gated clock back on, no block is hidden from those patterns.
 
 38
-00:03:49.780 --> 00:04:02.829
-A tester drives the four JTAG pins into a test access port in the wrapper, which selects scan enable, scan mode, a chain, or bypass, and reaches thirteen scan chains inside the hardened block.
+00:04:22.401 --> 00:04:28.895
+The same pins do not offer interactive CPU debugging yet; that is a later roadmap item.
 
 39
-00:04:03.379 --> 00:04:08.116
-Test mode forces every clock gate open, so scan reaches every block.
+00:04:30.090 --> 00:04:32.315
+Tape-in waits on four checks.
 
 40
-00:04:08.666 --> 00:04:13.268
-Interactive CPU debug over JTAG is a roadmap item.
+00:04:32.865 --> 00:04:36.087
+The layout must obey every manufacturing rule.
 
 41
-00:04:14.470 --> 00:04:17.213
-Four gates must all pass before tape-in.
+00:04:36.637 --> 00:04:41.322
+It must describe exactly the circuit that was designed, down to its pins.
 
 42
-00:04:17.763 --> 00:04:20.145
-The layout must be design-rule clean.
+00:04:41.872 --> 00:04:44.765
+Every pad must be wired through to logic.
 
 43
-00:04:20.695 --> 00:04:24.627
-Layout versus schematic must match uniquely, pins included.
+00:04:45.315 --> 00:04:50.271
+And the routed netlist, simulated gate by gate, must boot and print its banner.
 
 44
-00:04:25.177 --> 00:04:31.723
-A connectivity check on the final layout must show every pad reaching logic, with no floating net.
+00:04:50.821 --> 00:04:56.955
+The third check is there because a layout can clear the first two and still leave a pad unconnected.
 
 45
-00:04:32.273 --> 00:04:37.208
-And a gate-level simulation of the routed netlist must boot and print the banner.
+00:04:57.505 --> 00:05:01.443
+What this film states is the bar, not whether it has been cleared.
 
 46
-00:04:37.758 --> 00:04:43.036
-The connectivity gate exists because the first two can pass while a pad pin floats.
+00:05:02.640 --> 00:05:05.915
+If you keep three points from this, make them these.
 
 47
-00:04:44.240 --> 00:04:46.092
-Three things to take away.
+00:05:06.465 --> 00:05:11.355
+The die has one clock, so its timing has no domain crossings to go wrong.
 
 48
-00:04:46.642 --> 00:04:52.058
-One clock and one reset, with eight clock gates and a checker released two cycles late.
+00:05:11.905 --> 00:05:15.861
+No access can hang it, and no pad is left without a job.
 
 49
-00:04:52.608 --> 00:04:59.347
-Nothing hangs and nothing floats: bad accesses return errors, and all forty-four pads are allocated.
+00:05:16.411 --> 00:05:20.515
+And nothing goes to the foundry until four checks all pass.
 
 50
-00:04:59.897 --> 00:05:03.124
-And four gates stand between the design and tape-in.
-
-51
-00:05:03.674 --> 00:05:08.474
-The next milestone is first silicon, on the September twenty twenty-six shuttle.
+00:05:21.065 --> 00:05:29.049
+What comes next is first silicon, via the September twenty twenty-six shuttle, where these design records meet measurement.
 

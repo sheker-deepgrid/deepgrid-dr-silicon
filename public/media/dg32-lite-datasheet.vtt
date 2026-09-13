@@ -13,190 +13,186 @@ Two cores run in lockstep inside a nine-by-nine millimetre, sixty-four-pin QFN.
 Everything here comes from the design as built for first silicon and from process nominals, not from measured parts, and each slide says which is which.
 
 4
-00:00:27.650 --> 00:00:29.938
+00:00:27.650 --> 00:00:30.019
 Four facts set every design-in.
 
 5
-00:00:30.488 --> 00:00:33.568
+00:00:30.569 --> 00:00:33.733
 The core runs from a one point eight volt rail.
 
 6
-00:00:34.118 --> 00:00:37.853
+00:00:34.283 --> 00:00:38.129
 The input and output ring runs at three point three volts.
 
 7
-00:00:38.403 --> 00:00:41.696
+00:00:38.679 --> 00:00:42.085
 The whole chip runs from one fifty megahertz clock.
 
 8
-00:00:42.246 --> 00:00:50.851
+00:00:42.635 --> 00:00:51.514
 And every signal comes out through forty-four pins of a sixty-four-pin package, with the other twenty pins given to supplies and ground.
 
 9
-00:00:52.050 --> 00:00:54.351
-The datasheet lists nine features.
+00:00:52.710 --> 00:00:58.837
+The datasheet lists nine features, so one chip can boot, drive and guard a motor by itself.
 
 10
-00:00:54.901 --> 00:00:58.822
-Two RISC-V cores in lockstep with a fault comparator.
+00:00:59.387 --> 00:01:03.912
+Two RISC-V cores in lockstep with a comparator that flags faults.
 
 11
-00:00:59.372 --> 00:01:04.756
+00:01:04.462 --> 00:01:09.847
 Thirty-two kilobytes of SRAM and a sixty-four kilobyte boot ROM.
 
 12
-00:01:05.306 --> 00:01:13.980
+00:01:10.397 --> 00:01:19.070
 Three-phase PWM with a hardware brake, four DShot channels, encoder and Hall inputs, a CORDIC and an on-die ADC.
 
 13
-00:01:14.530 --> 00:01:18.607
-Serial ports, SPI, I squared C and GPIO, with supervision.
+00:01:19.620 --> 00:01:25.169
+Serial ports, SPI, I squared C and GPIO, with supervision, and no management core.
 
 14
-00:01:19.157 --> 00:01:21.947
-And it boots itself, with no management core.
-
-15
-00:01:23.150 --> 00:01:26.442
+00:01:26.370 --> 00:01:29.662
 Forty-four signal pins fall into eleven groups.
 
-16
-00:01:26.992 --> 00:01:33.240
+15
+00:01:30.212 --> 00:01:36.460
 Motor PWM and its sample trigger take seven, and so does the QSPI flash.
 
-17
-00:01:33.790 --> 00:01:35.813
+16
+00:01:37.010 --> 00:01:39.033
 Position sensing takes six.
 
-18
-00:01:36.363 --> 00:01:40.384
+17
+00:01:39.583 --> 00:01:43.604
 Serial, SPI, JTAG and GPIO take fifteen between them.
 
-19
-00:01:40.934 --> 00:01:49.080
+18
+00:01:44.154 --> 00:01:52.300
 Three carry safety signals, including the fault output, and the analog inputs, I squared C, and clock and reset take two each.
 
-20
-00:01:50.280 --> 00:01:52.335
-The pins are placed by job.
+19
+00:01:53.500 --> 00:01:56.776
+The pins are grouped by job rather than scattered.
 
-21
-00:01:52.885 --> 00:01:59.545
+20
+00:01:57.326 --> 00:02:04.175
 One side carries the motor: all six gate outputs, the sample trigger, the encoder and two Hall inputs.
 
-22
-00:02:00.095 --> 00:02:04.014
+21
+00:02:04.725 --> 00:02:08.747
 The opposite side carries the boot flash and the serial ports.
 
-23
-00:02:04.564 --> 00:02:13.648
+22
+00:02:09.297 --> 00:02:18.673
 The bottom holds JTAG, the clock and the resets, and the top holds I squared C, GPIO, the fault output and the supply-good inputs.
 
-24
-00:02:14.850 --> 00:02:23.712
+23
+00:02:19.870 --> 00:02:28.732
 Every electrical limit in this datasheet is a design target or a process nominal, and first-silicon characterisation will replace it.
 
-25
-00:02:24.262 --> 00:02:33.490
+24
+00:02:29.282 --> 00:02:38.510
 The core supply runs from one point seven one to one point eight nine volts, and the input and output supply from three to three point six.
 
-26
-00:02:34.040 --> 00:02:41.950
+25
+00:02:39.060 --> 00:02:46.970
 The analog inputs accept zero to one point eight volts, and absolute maximums sit just above the operating range.
 
-27
-00:02:43.150 --> 00:02:44.404
+26
+00:02:48.170 --> 00:02:49.462
 Power is simple.
 
-28
-00:02:44.954 --> 00:02:50.315
+27
+00:02:50.012 --> 00:02:55.471
 All logic, memory and the ADC draw from the one point eight volt user rail.
 
-29
-00:02:50.865 --> 00:02:58.151
+28
+00:02:56.021 --> 00:03:03.586
 The other user rails are unused, and are tied to their nominal voltage only to keep protection structures biased.
 
-30
-00:02:58.701 --> 00:03:02.875
+29
+00:03:04.136 --> 00:03:08.407
 Bring up three point three volts before or together with one point eight.
 
-31
-00:03:03.425 --> 00:03:08.248
+30
+00:03:08.957 --> 00:03:13.940
 The tool estimate is about zero point four three watts at fifty megahertz.
 
-32
-00:03:09.450 --> 00:03:11.627
+31
+00:03:15.140 --> 00:03:17.289
 Clocking is just as direct.
 
-33
-00:03:12.177 --> 00:03:21.417
+32
+00:03:17.839 --> 00:03:26.962
 One three point three volt clock input drives the whole chip at a fifty megahertz design target, and there is no on-die PLL.
 
-34
-00:03:21.967 --> 00:03:30.318
+33
+00:03:27.512 --> 00:03:35.738
 Two active-low resets are combined on the die with the power-on reset, so a board can use either one and pull the other high.
 
-35
-00:03:30.868 --> 00:03:36.500
+34
+00:03:36.288 --> 00:03:41.848
 The core itself reaches fifty-five to sixty-two megahertz after place-and-route.
 
-36
-00:03:37.700 --> 00:03:40.339
+35
+00:03:43.050 --> 00:03:45.689
 The chip boots with no outside help.
 
-37
-00:03:40.889 --> 00:03:52.744
+36
+00:03:46.239 --> 00:03:58.277
 The ROM prints a banner on the console UART, reads and checks the flash image header, copies the image into SRAM over a quad-SPI read, and jumps to it.
 
-38
-00:03:53.294 --> 00:03:57.121
+37
+00:03:58.827 --> 00:04:02.692
 Code runs from SRAM, not in place from flash.
 
-39
-00:03:57.671 --> 00:04:04.003
+38
+00:04:03.242 --> 00:04:09.618
 If the flash is blank, a UART monitor starts instead, so a bare board can still be inspected.
 
-40
-00:04:05.200 --> 00:04:07.625
-These are the limits firmware can plan on.
+39
+00:04:10.820 --> 00:04:15.982
+These are the numbers a firmware plan can count on before any part is measured.
 
-41
-00:04:08.175 --> 00:04:18.191
+40
+00:04:16.532 --> 00:04:26.728
 The UARTs run at one hundred fifteen thousand two hundred baud, SPI to twenty-five megahertz, and I squared C at one hundred or four hundred kilohertz.
 
-42
-00:04:18.741 --> 00:04:25.644
+41
+00:04:27.278 --> 00:04:34.391
 PWM dead-time reaches five point one microseconds, and the brake acts within two cycles.
 
-43
-00:04:26.194 --> 00:04:33.270
+42
+00:04:34.941 --> 00:04:42.278
 The ADC samples at about two hundred kilosamples per second, and on this silicon it runs untrimmed.
 
+43
+00:04:43.480 --> 00:04:52.076
+A design team can commit to the package today: nine by nine millimetres, half-millimetre lead spacing, and an exposed paddle for ground.
+
 44
-00:04:34.470 --> 00:04:41.747
-The package is settled: a nine-by-nine millimetre QFN with a half-millimetre pitch and an exposed ground paddle.
+00:04:52.626 --> 00:04:54.500
+Three things can still move.
 
 45
-00:04:42.297 --> 00:04:44.648
-Three things are still preliminary.
+00:04:55.050 --> 00:05:07.413
+Pin assignments wait for the foundry to confirm its bonding plan, the electrical numbers wait for measured parts, and the control core accepts no new features before it has been tested in silicon.
 
 46
-00:04:45.198 --> 00:04:57.475
-The pin map waits on the foundry's bond-diagram confirmation, the electrical section waits on characterisation, and the control core stays frozen for feature work until silicon test.
+00:05:08.610 --> 00:05:10.695
+So the dividing line is clear.
 
 47
-00:04:58.680 --> 00:05:01.451
-So here is what is fixed and what is not.
+00:05:11.245 --> 00:05:17.353
+You can design around the package, the pin groups, the supplies, the clock and the boot sequence now.
 
 48
-00:05:02.001 --> 00:05:06.767
-Fixed now: the package, the pin groups, the rails, the clock and the boot path.
+00:05:17.903 --> 00:05:23.610
+What still needs real parts is all of the electrical limits and the confirmed pin assignment.
 
 49
-00:05:07.317 --> 00:05:12.124
-Measured at first silicon: every electrical limit, and the final pin map.
-
-50
-00:05:12.674 --> 00:05:19.700
-The register-level detail lives in the engineering datasheet; this deck is the plan you build around.
+00:05:24.160 --> 00:05:32.140
+Register-level detail belongs to the engineering datasheet; this overview is what a board and firmware plan starts from.
 

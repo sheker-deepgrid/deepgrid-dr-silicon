@@ -1,5 +1,5 @@
 {
-  "duration": 346.56,
+  "duration": 376.03,
   "chapters": [
     {
       "title": "What DG32-2DOM adds",
@@ -8,7 +8,7 @@
         5
       ],
       "start": 0.0,
-      "end": 137.96
+      "end": 139.53
     },
     {
       "title": "Inside the engine",
@@ -16,8 +16,8 @@
         6,
         9
       ],
-      "start": 137.96,
-      "end": 241.32
+      "start": 139.53,
+      "end": 257.6
     },
     {
       "title": "Cost, timing and roadmap",
@@ -25,75 +25,75 @@
         10,
         13
       ],
-      "start": 241.32,
-      "end": 346.56
+      "start": 257.6,
+      "end": 376.03
     }
   ],
   "segments": [
     {
       "slide": 1,
       "start": 0.0,
-      "duration": 30.47
+      "duration": 29.73
     },
     {
       "slide": 2,
-      "start": 30.47,
-      "duration": 28.2
+      "start": 29.73,
+      "duration": 29.05
     },
     {
       "slide": 3,
-      "start": 58.67,
-      "duration": 26.6
+      "start": 58.78,
+      "duration": 26.32
     },
     {
       "slide": 4,
-      "start": 85.27,
+      "start": 85.1,
       "duration": 26.22
     },
     {
       "slide": 5,
-      "start": 111.49,
-      "duration": 26.47
+      "start": 111.32,
+      "duration": 28.21
     },
     {
       "slide": 6,
-      "start": 137.96,
+      "start": 139.53,
       "duration": 25.77
     },
     {
       "slide": 7,
-      "start": 163.73,
-      "duration": 26.05
+      "start": 165.3,
+      "duration": 32.36
     },
     {
       "slide": 8,
-      "start": 189.78,
-      "duration": 27.31
+      "start": 197.66,
+      "duration": 32.08
     },
     {
       "slide": 9,
-      "start": 217.09,
-      "duration": 24.23
+      "start": 229.74,
+      "duration": 27.86
     },
     {
       "slide": 10,
-      "start": 241.32,
-      "duration": 28.67
+      "start": 257.6,
+      "duration": 32.16
     },
     {
       "slide": 11,
-      "start": 269.99,
-      "duration": 24.29
+      "start": 289.76,
+      "duration": 26.78
     },
     {
       "slide": 12,
-      "start": 294.28,
-      "duration": 26.15
+      "start": 316.54,
+      "duration": 32.37
     },
     {
       "slide": 13,
-      "start": 320.43,
-      "duration": 26.13
+      "start": 348.91,
+      "duration": 27.12
     }
   ]
 }

@@ -2,8 +2,10 @@
   "voice": "bm_george",
   "speed": 1.05,
   "slide_speeds": {
-    "5": 0.95,
-    "12": 0.95
+    "4": 0.95,
+    "5": 0.99,
+    "12": 0.96,
+    "14": 0.98
   },
   "sentence_pause_s": 0.55,
   "wpm_band": [
@@ -14,10 +16,10 @@
     135,
     160
   ],
-  "overall_wpm": 147.8,
-  "median_f0_hz": 141.2,
+  "overall_wpm": 148.7,
+  "median_f0_hz": 140.8,
   "holt_f0_hz": 135.6,
-  "total_seconds": 418.7,
+  "total_seconds": 443.9,
   "failed_slides": [],
   "slides": [
     {
@@ -49,31 +51,31 @@
     {
       "slide": 2,
       "speed": 1.05,
-      "seconds": 26.31,
-      "spoken_words": 61,
-      "wpm": 139.1,
-      "median_f0_hz": 140.4,
+      "seconds": 28.81,
+      "spoken_words": 72,
+      "wpm": 149.9,
+      "median_f0_hz": 139.5,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Here is the whole story on one slide.",
+          "text": "Here is the whole case in brief.",
           "start": 0.0,
-          "end": 2.642
+          "end": 2.29
         },
         {
-          "text": "One 130 nanometre chip carries the microcontroller, the motor-control peripherals and a hardware safety monitor.",
-          "start": 3.192,
-          "end": 10.815
+          "text": "DG32-LITE puts a microcontroller, its motor peripherals and its own safety monitor, built in hardware, into one one-hundred-thirty-nanometre part.",
+          "start": 2.84,
+          "end": 13.393
         },
         {
-          "text": "The two cores run in lockstep.",
-          "start": 11.365,
-          "end": 13.639
+          "text": "The two cores check each other on every stored write.",
+          "start": 13.943,
+          "end": 17.222
         },
         {
-          "text": "The current loop reaches about one hundred kilohertz in simulation, and a CPU disagreement latches within thirty-nine cycles and drives a fault pin that can switch the power bridge off.",
-          "start": 14.189,
-          "end": 26.315
+          "text": "In simulation the current loop reaches about one hundred kilohertz, and a disagreement is latched within thirty-nine cycles, driving a pin that can shut the power bridge off.",
+          "start": 17.772,
+          "end": 28.811
         }
       ]
     },
@@ -115,68 +117,68 @@
     },
     {
       "slide": 4,
-      "speed": 1.05,
-      "seconds": 27.09,
-      "spoken_words": 68,
-      "wpm": 150.6,
-      "median_f0_hz": 142.4,
+      "speed": 0.95,
+      "seconds": 28.89,
+      "spoken_words": 75,
+      "wpm": 155.7,
+      "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "DG32-LITE is six block groups on one bus.",
+          "text": "The architecture is six groups of blocks around a single bus.",
           "start": 0.0,
-          "end": 3.695
+          "end": 4.1
         },
         {
-          "text": "The safety core, memory and supervision sit above it; motor drive, sensing, connectivity and test sit below.",
-          "start": 4.245,
-          "end": 11.589
+          "text": "The safety core, the memory and the supervisors sit on one side of it; the motor drive, sensing and math, and connectivity and test sit on the other.",
+          "start": 4.65,
+          "end": 14.403
         },
         {
-          "text": "The bus has two masters, the CPU and a DMA, with deterministic latency.",
-          "start": 12.139,
-          "end": 17.847
+          "text": "Only the CPU and a DMA can start a transfer, and every transfer takes a predictable time.",
+          "start": 14.953,
+          "end": 21.943
         },
         {
-          "text": "Any address that is unmapped or disabled answers with a bus error instead of hanging, which matters on a chip with no debugger halt.",
-          "start": 18.397,
-          "end": 27.091
+          "text": "Because the chip has no debugger halt, a bad address returns an error rather than freezing it.",
+          "start": 22.493,
+          "end": 28.894
         }
       ]
     },
     {
       "slide": 5,
-      "speed": 0.95,
-      "seconds": 26.59,
-      "spoken_words": 67,
-      "wpm": 151.2,
-      "median_f0_hz": 141.2,
+      "speed": 0.99,
+      "seconds": 30.26,
+      "spoken_words": 78,
+      "wpm": 154.7,
+      "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Four hard constraints shaped every block.",
+          "text": "Every design choice traces back to a limit found while hardening the chip.",
           "start": 0.0,
-          "end": 2.841
+          "end": 4.482
         },
         {
-          "text": "There is no debugger halt, so nothing may hang.",
-          "start": 3.391,
-          "end": 6.541
+          "text": "Nothing outside can halt the CPU, so nothing is allowed to hang.",
+          "start": 5.032,
+          "end": 9.421
         },
         {
-          "text": "The lockstep core tops out around fifty-five to sixty-two megahertz, so the die runs at fifty.",
-          "start": 7.091,
-          "end": 13.602
+          "text": "The lockstep core tops out between fifty-five and sixty-two megahertz, so the entire die is clocked at fifty.",
+          "start": 9.971,
+          "end": 17.171
         },
         {
-          "text": "The core costs about eight clock cycles per instruction, so the loop moves into hardware.",
-          "start": 14.152,
-          "end": 19.872
+          "text": "Each instruction costs about eight clock cycles, too slow for the loop, so the loop moved into hardware.",
+          "start": 17.721,
+          "end": 24.184
         },
         {
-          "text": "And the memory macros have no spare bits, so the chip ships without ECC, and says so.",
-          "start": 20.422,
-          "end": 26.587
+          "text": "And with no spare memory bits, the chip goes out without error correction, stated plainly.",
+          "start": 24.735,
+          "end": 30.256
         }
       ]
     },
@@ -219,31 +221,31 @@
     {
       "slide": 7,
       "speed": 1.05,
-      "seconds": 25.73,
-      "spoken_words": 68,
-      "wpm": 158.6,
-      "median_f0_hz": 141.2,
+      "seconds": 29.92,
+      "spoken_words": 71,
+      "wpm": 142.4,
+      "median_f0_hz": 139.5,
       "in_gate": true,
       "sentences": [
         {
-          "text": "The chip boots itself.",
+          "text": "Reaching running code takes no helper processor or debugger.",
           "start": 0.0,
-          "end": 1.565
+          "end": 4.045
         },
         {
-          "text": "At power-on the mask ROM prints a banner, validates the flash image header, copies the application from external QSPI flash into SRAM, and jumps to it.",
-          "start": 2.115,
-          "end": 13.669
+          "text": "Hard-wired ROM logic greets the serial console, confirms the image in external flash is valid, loads it into SRAM and hands over control.",
+          "start": 4.595,
+          "end": 15.554
         },
         {
-          "text": "If the flash is blank, the ROM starts a UART monitor instead, so a bare board can still be inspected.",
-          "start": 14.219,
-          "end": 21.102
+          "text": "A board with empty flash is not stranded either: the ROM drops into a serial monitor that can program and start it.",
+          "start": 16.104,
+          "end": 24.195
         },
         {
-          "text": "The trade-off is loading at boot instead of executing in place.",
-          "start": 21.652,
-          "end": 25.728
+          "text": "The price is copying code at every boot, since nothing runs directly out of flash.",
+          "start": 24.745,
+          "end": 29.919
         }
       ]
     },
@@ -388,27 +390,27 @@
     },
     {
       "slide": 12,
-      "speed": 0.95,
-      "seconds": 24.71,
-      "spoken_words": 62,
-      "wpm": 150.5,
+      "speed": 0.96,
+      "seconds": 27.25,
+      "spoken_words": 70,
+      "wpm": 154.1,
       "median_f0_hz": 139.5,
       "in_gate": true,
       "sentences": [
         {
-          "text": "All of this fits in a nine-by-nine millimetre QFN with sixty-four pins: forty-four signals, and the rest supplies and ground.",
+          "text": "All of it fits a nine-by-nine millimetre QFN with sixty-four pins: forty-four signals, and the rest power and ground.",
           "start": 0.0,
-          "end": 9.224
+          "end": 8.59
         },
         {
-          "text": "Seven pins drive the bridge, six read position, two carry the analog current input, and one, FAULT_N, is the hardware trip.",
-          "start": 9.774,
-          "end": 18.644
+          "text": "Seven pins drive the bridge, six read position, two carry the analog current input, and a single pin, FAULT_N, shuts the drive down in hardware.",
+          "start": 9.14,
+          "end": 19.488
         },
         {
-          "text": "The compute variant, DG32-2DOM, uses exactly the same pinout.",
-          "start": 19.194,
-          "end": 24.715
+          "text": "Because DG32-2DOM uses exactly this pinout, a board built for one takes either chip.",
+          "start": 20.038,
+          "end": 27.247
         }
       ]
     },
@@ -445,99 +447,99 @@
     },
     {
       "slide": 14,
-      "speed": 1.05,
-      "seconds": 25.88,
+      "speed": 0.98,
+      "seconds": 27.04,
       "spoken_words": 69,
-      "wpm": 160.0,
-      "median_f0_hz": 141.2,
+      "wpm": 153.1,
+      "median_f0_hz": 142.0,
       "in_gate": true,
       "sentences": [
         {
           "text": "Against the STM32G0, the entry-level incumbent, the comparison is honest.",
           "start": 0.0,
-          "end": 6.371
+          "end": 6.737
         },
         {
           "text": "DG32 leads on hardware lockstep, native DShot, hardware CORDIC and the on-chip AI variant, with an open RISC-V core.",
-          "start": 6.921,
-          "end": 16.053
+          "start": 7.287,
+          "end": 16.768
         },
         {
           "text": "The G0 leads clearly on its twelve-bit multi-channel ADC, embedded flash, USB and CAN-FD, and on production maturity.",
-          "start": 16.603,
-          "end": 25.877
+          "start": 17.318,
+          "end": 27.037
         }
       ]
     },
     {
       "slide": 15,
       "speed": 1.05,
-      "seconds": 26.07,
-      "spoken_words": 59,
-      "wpm": 135.8,
-      "median_f0_hz": 143.7,
+      "seconds": 30.93,
+      "spoken_words": 71,
+      "wpm": 137.7,
+      "median_f0_hz": 142.0,
       "in_gate": true,
       "sentences": [
         {
-          "text": "The roadmap closes those gaps in order.",
+          "text": "The roadmap works through those weaknesses, largest first.",
           "start": 0.0,
-          "end": 2.732
+          "end": 3.628
         },
         {
-          "text": "First silicon on the September 2026 shuttle measures what simulation predicted.",
-          "start": 3.282,
-          "end": 9.542
+          "text": "First silicon, on the September twenty twenty-six shuttle, tests the simulations against real parts.",
+          "start": 4.178,
+          "end": 10.607
         },
         {
-          "text": "The second spin adds a twelve-bit multi-channel ADC and embedded flash.",
-          "start": 10.092,
-          "end": 15.143
+          "text": "The following spin tackles the two largest gaps: an analog converter with twelve bits and several channels, and flash on the die.",
+          "start": 11.157,
+          "end": 19.504
         },
         {
-          "text": "Then come CAN-FD and interactive CPU debug.",
-          "start": 15.693,
-          "end": 19.392
+          "text": "Only after that come CAN-FD and interactive debugging.",
+          "start": 20.054,
+          "end": 23.91
         },
         {
-          "text": "DG32-2DOM runs in parallel, with its design complete and in physical trials.",
-          "start": 19.942,
-          "end": 26.071
+          "text": "DG32-2DOM advances meanwhile, its design finished and now in physical trials.",
+          "start": 24.46,
+          "end": 30.927
         }
       ]
     },
     {
       "slide": 16,
       "speed": 1.05,
-      "seconds": 23.84,
-      "spoken_words": 55,
-      "wpm": 138.4,
-      "median_f0_hz": 142.0,
+      "seconds": 28.39,
+      "spoken_words": 72,
+      "wpm": 152.2,
+      "median_f0_hz": 140.4,
       "in_gate": true,
       "sentences": [
         {
-          "text": "Three things to take away.",
+          "text": "Three ideas to hold on to.",
           "start": 0.0,
-          "end": 1.852
+          "end": 2.154
         },
         {
-          "text": "Safety is in the core: two CPUs must agree, in hardware.",
-          "start": 2.402,
-          "end": 6.493
+          "text": "The protection is built into the processor itself, not bolted on in software.",
+          "start": 2.704,
+          "end": 7.849
         },
         {
-          "text": "Control is in silicon: the loop cost is fixed and known.",
-          "start": 7.043,
-          "end": 10.986
+          "text": "The costly parts of motor control are dedicated hardware, so the price of one loop is fixed and known in advance.",
+          "start": 8.399,
+          "end": 15.573
         },
         {
-          "text": "And the next milestone is measurement: first silicon turns these design values into measured ones.",
-          "start": 11.536,
-          "end": 17.806
+          "text": "And the weaknesses are named, with fixes scheduled.",
+          "start": 16.123,
+          "end": 19.317
         },
         {
-          "text": "This deck claims no measured silicon results and no functional-safety certification yet.",
-          "start": 18.356,
-          "end": 23.839
+          "text": "None of this has yet been measured on silicon, and no functional-safety certification is claimed; bring-up is where the numbers become real.",
+          "start": 19.867,
+          "end": 28.393
         }
       ]
     }
