@@ -65,6 +65,10 @@ export const quickPrompts: QuickPrompt[] = [
   { id: 'dshot-bidir', label: 'Bidirectional DShot RX', query: 'Why is DShot receive and bidirectional telemetry implemented in hardware rather than firmware?', category: 'architecture' },
   { id: 'sram-floorplan', label: '28KB vs 32KB SRAM Floorplan', query: 'What is the 28 KB vs 32 KB SRAM floorplan lever for 2DOM?', category: 'architecture' },
   { id: 'gcr-erpm', label: 'GCR 4b→5b eRPM Reply', query: 'How does the hardware telemetry reply engine encode eRPM period and handle early abort?', category: 'architecture' },
+  { id: 'dg32-2dom-clock', label: 'DG32-2DOM Dual Clock', query: 'How do the 50 MHz core and 114 MHz attention clock domains communicate via CDC bridges?', category: 'architecture' },
+  { id: 'int8-attn-math', label: 'INT8 Attention Engine', query: 'Why does the INT8 attention engine require a 40-bit numerator and u15 EXP instead of INT4?', category: 'ai' },
+  { id: 'avip-csa', label: 'AVIP Bearing Fault CSA', query: 'How does AVIP detect bearing faults from stator current without an accelerometer?', category: 'ai' },
+  { id: 'foc-headroom', label: 'FOC Control Loop Budget', query: 'What are the cycle costs of an FOC current loop and how much CPU headroom remains at 10 kHz?', category: 'architecture' },
   { id: 'sip-packaging', label: 'Organic SiP Packaging', query: 'Why organic substrate instead of silicon interposers?', category: 'safety' },
   { id: 'munger-audit', label: 'Charlie Munger Audit', query: 'What are the 14 risks and Stop Rules S1-S4?', category: 'strategy' },
   { id: 'funds-10cr', label: '₹10 Cr Financial Model', query: 'How is the ₹10 Cr seed capital allocated across fabs and ATE?', category: 'strategy' }
@@ -619,6 +623,98 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'View Roadmap', target: 'roadmap' }
     ],
     connectedNodeIds: ['dg32-2dom', 'dg32-lite', 'arch-198loop', 'dshot-bidir-rx']
+  },
+  {
+    id: 'dg32-2dom-system',
+    name: 'DG32-2DOM Dual-Domain System Architecture (CI2612)',
+    category: 'architecture',
+    tagline: 'Dual-clock SoC architecture: 50 MHz lockstep flight-control core + 114 MHz attention engine',
+    nodeFoundry: 'SkyWater sky130A · chipIgnite CI2612 (3400 × 4500 µm Die)',
+    voltageRail: '1.8V Core / 3.3V I/O · 50 MHz clk_i & 114 MHz clk_fast_i',
+    standards: 'AEC-Q100 Grade 1 Target · ISO 26262 ASIL-D Lockstep Flight Control',
+    summary: 'The DG32-2DOM (A3) combines the hardened DG32-LITE motor-control core with an INT8 attention engine on a second clock, connected through 4-phase CDC level bridges on a 15.30 mm² die.',
+    keyFacts: [
+      'PMA Whitelist & 21 Slaves: Hardwired rule fault = !(addr[31] | addr[31:28]==0x1); unmapped accesses return SLVERR to prevent unrecoverable bus hangs.',
+      'Frozen Flight-Control Core: Dual RV32IMC cores in lockstep with private 16 KB DMEM for checker; fetch port is private slave to 64 KB baked Boot ROM.',
+      'Dual-Clock Isolation: 50 MHz core domain timing closure (54 MHz sign-off) is completely untouched by the 114 MHz attention engine.',
+      'Physical Area Breakdown: 18 SRAM macros occupy 5.12 mm² (86% of placed area); total std-cell logic is only 0.751 mm² on a 15.30 mm² die.',
+      'Hardware Offloading: CORDIC (53-58 cyc), SAR ADC (177 cyc), and PWM dead-time offload fetch-bound CPU, leaving 82-90% free headroom.'
+    ],
+    citation: 'DG32-2DOM System Architecture — Block Definition (chipIgnite CI2612, Sept 2026)',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture' },
+      { label: 'Control Loop Timing', target: 'control' }
+    ],
+    connectedNodeIds: ['dg32-lite', 'arch-lockstep', 'int8-attention-engine', 'foc-loop-budget']
+  },
+  {
+    id: 'int8-attention-engine',
+    name: 'Hardware INT8 Attention Engine & 40-Bit Numerator (dgrid_int8_attn)',
+    category: 'ai',
+    tagline: 'Hardware transformer attention engine with u15 softmax exponential and 40-bit accumulator',
+    nodeFoundry: '114 MHz Fast Accelerator Domain (clk_fast_i)',
+    voltageRail: '1.8V Core Logic · 4-Phase CDC Synchronizers',
+    standards: 'Bit-Exact FP32 Match · Softmax Weight Retention',
+    summary: 'Accelerates multi-head self-attention and cross-attention without stalling the CPU domain. Eliminates INT4 quantization collapse by maintaining weights in u15 all the way into a 40-bit signed numerator seat.',
+    keyFacts: [
+      'Why INT8 over INT4: With ~400 near-uniform keys, 1/400 softmax weight rounds to zero in INT4. INT8 keeps weights in u15 into a 40-bit numerator, preventing zero-collapse.',
+      '40-Bit Signed Numerator: Standard int32 overflows at NK=512; 40 bits provides bit-exact precision against golden floating-point models up to NK=131,072.',
+      '48-Step Restoring Divider: Evaluates per-row normalization reciprocal 1/Z in dedicated hardware.',
+      'K/V On-Chip Buffer Residency: K and V buffers loaded once via DMA; re-read locally per row cuts bus traffic by 400× to ~1% bus occupancy.',
+      'Analytic Cycle Cost: 3,242 cycles per query row at LANES=16, KD=32, DV=64, NK=400 on 114 MHz clock.'
+    ],
+    citation: 'DG32-2DOM System Architecture — Section 4.18: INT8 Attention Engine',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture' },
+      { label: 'View Roadmap', target: 'roadmap' }
+    ],
+    connectedNodeIds: ['dg32-2dom-system', 'avip-bearing-diagnostics', 'dg32-30-usecases']
+  },
+  {
+    id: 'avip-bearing-diagnostics',
+    name: 'AVIP Multimodal Classifier & Stator Current Signature Analysis (CSA)',
+    category: 'ai',
+    tagline: 'Zero-accelerometer bearing fault classifier running in 46.7 ms via on-die phase-current SAR ADC',
+    nodeFoundry: 'PWM Ripple Null Current Sampling · 114 MHz Attention Inference',
+    voltageRail: 'Differential Analog Input (1.8V vccd1)',
+    standards: 'ISO 13373 Vibration Standards · MCSA Motor Diagnostics',
+    summary: 'AVIP detects inner race, outer race, and ball bearing defects using Stator Current Signature Analysis (MCSA). Samples motor current at PWM ripple null to derive mechanical fault frequencies, eliminating external accelerometers.',
+    keyFacts: [
+      'Zero Accelerometer Mandate: Physical bearing defect modulates stator current at fe ± k*f_defect; phase-current SAR ADC at PWM ripple null captures the signature.',
+      'Multimodal Model: Time-domain conv/GRU + FFT conv/GRU fused by 2 self-attention blocks and 1 cross-attention block.',
+      'Inference Latency: Shipped CWRU model (47,076 params) executes in 46.7 ms on clk_fast_i at 94-95% held-out-load accuracy.',
+      'Scale Invariance: Full AVIP (478,277 params) has 10× parameters but requires only 1.2× compute (54.5 ms) due to deeper, narrower low-resolution layers.',
+      'Dual Output: Produces classical 9 KB fault score (runs on DG32-LITE without accelerator) + (35,20,20,2) INT8 tensor for 2DOM.'
+    ],
+    citation: 'DG32-2DOM System Architecture — Section 11: AVIP Bearing-Fault Detection',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture' },
+      { label: 'Inspect Full Citations', target: 'ask' }
+    ],
+    connectedNodeIds: ['int8-attention-engine', 'dg32-30-usecases', 'dg32-afe-sensing']
+  },
+  {
+    id: 'foc-loop-budget',
+    name: 'FOC Control-Loop Budget & Fetch-Bound Headroom',
+    category: 'architecture',
+    tagline: '~100 kHz closed-loop bandwidth: 300 cycles fixed hardware cost, >90% free CPU headroom at 10 kHz',
+    nodeFoundry: '50 MHz Core Domain · Hardware Offload Architecture',
+    voltageRail: '1.8V Core / 3.3V I/O',
+    standards: 'Deterministic FOC Timing · 39-Cycle Fault Latch Latency',
+    summary: 'Accounts for every clock cycle in the field-oriented control loop. Offloads ADC sampling (177 cyc) and Park/Clarke transforms (53-58 cyc) to hardware blocks, reserving >90% of execution cycles for firmware observers.',
+    keyFacts: [
+      'Fetch-Bound Core: VexiiRiscv fetches from SRAM at ~8 cycles/instruction; plain-C int8 MAC takes 54 cycles vs 6 with I-cache.',
+      'Fixed Hardware Overhead: ADC sampling (177 cyc) + 2× CORDIC (106 cyc) + PWM write = ~300 cycles (~6 µs).',
+      '10 kHz Headroom: Out of 5,000 cycles, ~4,700 cycles are free for speed loops, field weakening, and Luenberger/EKF state observers.',
+      'Total Loop Bandwidth: ~5 µs acquisition + ~5 µs compute achieves a ~100 kHz closed-loop control rate.',
+      'Measured Block Fmax: Lockstep core achieves 55-62 MHz; peripherals harden at >167 MHz (GPIO, DShot, PWM).'
+    ],
+    citation: 'DG32-2DOM System Architecture — Section 5: Performance and Control-Loop Budget',
+    actions: [
+      { label: 'Control Loop Timing', target: 'control' },
+      { label: 'Explore Architecture', target: 'architecture' }
+    ],
+    connectedNodeIds: ['dg32-lite', 'dg32-2dom-system', 'dshot-bidir-rx', 'sku-1']
   }
 ];
 
@@ -665,6 +761,10 @@ export const graphNodes: GraphNode[] = [
   { id: 'arch-dgridriscv', name: 'DGridRiscV', shortName: 'RV32IM', category: 'architecture', x: 44, y: 44, description: 'Cacheless, non-speculative, deterministic latency processor.' },
   { id: 'dshot-bidir-rx', name: 'DShot RX & Telemetry', shortName: 'DShot RX', category: 'architecture', x: 35, y: 38, description: 'Slot 0xC hardware DShot receiver and bidirectional GCR telemetry reply engine.' },
   { id: 'sram-floorplan-lever', name: 'SRAM Floorplan Lever', shortName: 'SRAM Lever', category: 'architecture', x: 22, y: 24, description: '28 KB vs 32 KB macro placement lever doubling logic strip from 1.75 to 3.40 mm².' },
+  { id: 'dg32-2dom-system', name: '2DOM Dual-Domain', shortName: '2DOM Dual', category: 'architecture', x: 20, y: 28, description: '3400x4500um die with 50MHz core + 114MHz attention engine via CDC.' },
+  { id: 'int8-attention-engine', name: 'INT8 Attention Engine', shortName: 'INT8 Attn', category: 'ai', x: 12, y: 22, description: 'Hardware attention engine with 40-bit numerator, u15 EXP, 48-step divider.' },
+  { id: 'avip-bearing-diagnostics', name: 'AVIP MCSA Diagnostics', shortName: 'AVIP MCSA', category: 'ai', x: 4, y: 32, description: 'Multimodal bearing fault classifier using phase-current SAR ADC with no accelerometer.' },
+  { id: 'foc-loop-budget', name: 'FOC Loop Budget', shortName: 'FOC Budget', category: 'architecture', x: 38, y: 50, description: '100 kHz closed-loop bandwidth: 300 cycles fixed, 4700 cycles free at 10 kHz.' },
 
   // Anchor Customers
   { id: 'anchor-mceme', name: 'MCEME Army', shortName: 'MCEME', category: 'anchor', x: 12, y: 75, description: 'Indian Army MCEME: ₹1.01 Cr contracted pre-ASIC validation.' },
@@ -686,6 +786,11 @@ export const graphEdges: GraphEdge[] = [
   { from: 'dg32-dsp-pipeline', to: 'dg32-afe-sensing', label: 'ISO 13373 Dynamic Range' },
   { from: 'dg32-30-usecases', to: 'dg32-benchmark-audit', label: 'Leakage-Free Validation' },
   { from: 'dg32-30-usecases', to: 'dg32-2dom', label: 'Scalar -> Attention Engine' },
+  { from: 'dg32-2dom-system', to: 'int8-attention-engine', label: '114 MHz CDC' },
+  { from: 'int8-attention-engine', to: 'avip-bearing-diagnostics', label: '46.7 ms Inference' },
+  { from: 'dg32-2dom-system', to: 'foc-loop-budget', label: '50 MHz Control' },
+  { from: 'foc-loop-budget', to: 'dg32-lite', label: 'FOC Offload' },
+  { from: 'avip-bearing-diagnostics', to: 'dg32-afe-sensing', label: 'Current Signature' },
 
   // DG32 & DShot Connections
   { from: 'dg32-lite', to: 'arch-lockstep', label: 'Safety Core' },
@@ -801,6 +906,10 @@ export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
     if (q.includes('failsafe') && item.id === 'track-b-d100') score += 60;
     if ((q.includes('dshot') || q.includes('erpm') || q.includes('gcr') || q.includes('telemetry') || q.includes('bidirectional') || q.includes('esc') || q.includes('slot 0xc')) && item.id === 'dshot-bidir-rx') score += 80;
     if ((q.includes('sram') || q.includes('floorplan') || q.includes('28kb') || q.includes('32kb') || q.includes('macro') || q.includes('2dom/13') || q.includes('2dom/12') || q.includes('ayaz')) && item.id === 'sram-floorplan-lever') score += 80;
+    if ((q.includes('2dom') || q.includes('ci2612') || q.includes('dual clock') || q.includes('3400') || q.includes('pma')) && item.id === 'dg32-2dom-system') score += 85;
+    if ((q.includes('attention') || q.includes('int8') || q.includes('softmax') || q.includes('40-bit') || q.includes('u15') || q.includes('restoring divider')) && item.id === 'int8-attention-engine') score += 85;
+    if ((q.includes('avip') || q.includes('csa') || q.includes('bearing') || q.includes('current signature') || q.includes('no accelerometer') || q.includes('stator current')) && item.id === 'avip-bearing-diagnostics') score += 85;
+    if ((q.includes('foc') || q.includes('headroom') || q.includes('budget') || q.includes('fetch-bound') || q.includes('100 khz') || q.includes('300 cycles')) && item.id === 'foc-loop-budget') score += 85;
 
     return { item, score };
   });
