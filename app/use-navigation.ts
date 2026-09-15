@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 export type Route={view:string;params:URLSearchParams};
-export const views=['overview','library','family','architecture','control','pinout','roadmap'];
+export const views=['overview','library','family','architecture','control','pinout','roadmap','ask'];
 function parse(hash:string):Route{const [v,q='']=hash.replace(/^#/,'').split('?');return {view:views.includes(v)?v:'overview',params:new URLSearchParams(q)};}
 export function useNavigation(){
  const [route,setRoute]=useState<Route>({view:'overview',params:new URLSearchParams()});

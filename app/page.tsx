@@ -6,6 +6,7 @@ import Silicon from './silicon';
 import Library from './library';
 import Architecture from './architecture';
 import FaultTrace from './fault-trace';
+import AskDeepGrid from './ask';
 import {useReveal,useScrollVars} from './motion';
 import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
@@ -13,7 +14,7 @@ import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCL
 import {Eyebrow,SectionHead,Sec,ExplainedGrid,DataTable,Callout,Stats} from './detail';
 import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail} from './detail-content';
 
-const titles:Record<string,string>={overview:'Overview',library:'Decks & films',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout',roadmap:'Position & roadmap'};
+const titles:Record<string,string>={overview:'Overview',library:'Decks & films',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout',roadmap:'Position & roadmap',ask:'Ask DeepGrid'};
 const PRE_SILICON='Pre-silicon. Figures are design values verified in simulation and static timing, not measurements on fabricated parts, unless marked otherwise.';
 
 function Brand(){return <><span className="brand-mark"><i/><i/><i/><i/></span><span className="wordmark">deepgrid<span>SEMI</span></span></>}
@@ -53,6 +54,8 @@ export default function Home(){
  </section>
 
  <section className="content-section dr-apps-section"><div className="section-label"><Eyebrow>WHERE IT GOES</Eyebrow><span>SAFETY-RELEVANT BRUSHLESS DRIVES</span></div><div className="dr-apps">{applications.map(([t,d],i)=><div key={t}><h3>{t}</h3><p>{d}</p></div>)}</div></section>
+
+ <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>GROUNDED Q&A CONSOLE</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')}>Launch Ask DeepGrid Console <ArrowUpRight size={18}/></button></div></div></section>
 
  <section className="content-section"><div className="section-label"><Eyebrow>HOW A FAULT IS STOPPED</Eyebrow><span>IN HARDWARE, WITHOUT FIRMWARE</span></div>
   <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)}>Inside the safety core <ArrowUpRight size={18}/></button></>}/>
@@ -122,6 +125,8 @@ export default function Home(){
   </Sec>
   <div className="dr-notclaimed"><p className="dr-kicker">WHAT THIS SITE DOES NOT CLAIM</p><ul>{notClaimed.map(n=><li key={n}>{n}</li>)}</ul></div>
  </section>}
+
+ {view==='ask'&&<AskDeepGrid go={go}/>}
 
  <nav className="section-pagination" aria-label="Section navigation">{viewIndex>0?<a href={'#'+views[viewIndex-1]} onClick={e=>{e.preventDefault();navigate(views[viewIndex-1])}}><ArrowLeft size={19}/><span><small>Previous section</small>{titles[views[viewIndex-1]]}</span></a>:<span/>}{viewIndex<views.length-1&&<a href={'#'+views[viewIndex+1]} onClick={e=>{e.preventDefault();navigate(views[viewIndex+1])}}><span><small>Next section</small>{titles[views[viewIndex+1]]}</span><ArrowRight size={19}/></a>}</nav>
  </main>
