@@ -71,7 +71,11 @@ export const quickPrompts: QuickPrompt[] = [
   { id: 'foc-headroom', label: 'FOC Control Loop Budget', query: 'What are the cycle costs of an FOC current loop and how much CPU headroom remains at 10 kHz?', category: 'architecture' },
   { id: 'sip-packaging', label: 'Organic SiP Packaging', query: 'Why organic substrate instead of silicon interposers?', category: 'safety' },
   { id: 'munger-audit', label: 'Charlie Munger Audit', query: 'What are the 14 risks and Stop Rules S1-S4?', category: 'strategy' },
-  { id: 'funds-10cr', label: '₹10 Cr Financial Model', query: 'How is the ₹10 Cr seed capital allocated across fabs and ATE?', category: 'strategy' }
+  { id: 'funds-10cr', label: '₹10 Cr Financial Model', query: 'How is the ₹10 Cr seed capital allocated across fabs and ATE?', category: 'strategy' },
+  { id: 'funnel-10x', label: '$9B Funnel & 10x Cost', query: 'How does DeepGrid achieve a 10x cost reduction across the $9B import funnel?', category: 'strategy' },
+  { id: 'boxes-not-chips', label: '"Boxes, Not Chips" Playbook', query: 'Why does DeepGrid target boxes and LRUs in PIL-5 rather than chips?', category: 'defense' },
+  { id: 'crash-stop-rules', label: 'Chinese Crash & Stop Rules', query: 'What happens in the FY31 Chinese price crash stress test and what are Stop Rules S1-S4?', category: 'strategy' },
+  { id: 'dgridriscv-spec', label: 'DGridRiscV Core Spec', query: 'What is the exact circuit-code architecture of the DGridRiscV RV32IM processor?', category: 'architecture' }
 ];
 
 export const deepGridCatalog: DeepGridItem[] = [
@@ -715,6 +719,100 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'Explore Architecture', target: 'architecture' }
     ],
     connectedNodeIds: ['dg32-lite', 'dg32-2dom-system', 'dshot-bidir-rx', 'sku-1']
+  },
+  {
+    id: 'import-funnel-10x',
+    name: 'The $9B Mature-Node Import Funnel & 10x Economics',
+    category: 'strategy',
+    tagline: 'Dismantling $2M–$5M NRE down to ₹0.6–1.2 Cr across India’s $9B mature-node import market',
+    nodeFoundry: 'Mature Nodes ≥ 130 nm · SkyWater & SCL Mohali',
+    voltageRail: '5V to 120V High Voltage & Mixed Signal',
+    standards: 'UN COMTRADE HS 8542 · Open-Source Silicon Flow',
+    summary: 'India imports $23.4B of chips annually, of which $9B is mature-node silicon (≥130 nm). DeepGrid targets 9 addressable chip classes ($0.46B) and cuts development costs by 10× using free open-source EDA and shared MPW runs.',
+    keyFacts: [
+      'The 5-Level Funnel: $23.4B total imports → $9.0B mature-node (≥130 nm) → $0.46B across 9 DeepGrid chip classes → ₹1,000 Cr FY31 target → ₹2.88 Cr live pre-ASIC orders today.',
+      '10x Cost Dismantling: Physical layout ($1–2M sent outside → in-house staff time on free kits); EDA licenses ($0.5–1M/yr → Yosys, OpenROAD, Magic, KLayout at ₹0).',
+      'MPW Economics: Shared sky130 factory run costs $14,950 (₹14.3 Lakhs) for 100 packaged chips vs $0.5–1M full mask sets. IHP SiGe radar runs cost €5,110–7,300/mm² (₹34–80 Lakhs).',
+      'All-In Development Cost: ₹0.6–1.2 Crore per finished, tested, approved chip (vs $2–5M conventional NRE), delivering 60–75% gross margins at 10,000 units/year.',
+      'Economic Boundary: Cannot compete on commodity wafers at 10M units against paid-off mega-fabs; profitably owns low-volume protected programs where imports are banned.'
+    ],
+    citation: 'DeepGrid Mature Silicon Whitepaper v3 — Section 1 & 2: What India Buys & Our Costs Line by Line',
+    actions: [
+      { label: 'View Financial Model', target: 'ask?q=10cr' },
+      { label: 'Explore 198-Day Loop', target: 'architecture' }
+    ],
+    connectedNodeIds: ['fin-funds', '198-day-loop', 'three-factory', 'dap-2020-moats']
+  },
+  {
+    id: 'boxes-not-chips',
+    name: '"Boxes, Not Chips" Statutory Defence Framework',
+    category: 'defense',
+    tagline: 'Entering one level down: providing the sovereign silicon inside PIL-5 line-replaceable units',
+    nodeFoundry: 'SCL Mohali 180 nm · Sovereign Military Fabrication',
+    voltageRail: '28V Military Avionics · High-Reliability Bus',
+    standards: 'DAP-2020 Buy(Indian-IDDM) · PIL-1..5 · SRIJAN Portal · Make-II',
+    summary: 'Auditing 346 items in the Ministry of Defence’s 5th Positive Indigenisation List (PIL-5) revealed government lists never name chips; they enumerate boxes, LRUs, and assemblies. DeepGrid sells to the box maker, embedding indigenous silicon that grants statutory procurement priority.',
+    keyFacts: [
+      'The List Reality: PIL-5 contains 346 items (bushes, pumps, valves, optical filters, and LRU boxes) with zero chip-level part numbers.',
+      'One Level Down Wedge: DeepGrid supplies the silicon inside the listed box (e.g. Chip 1 in PIL-5 anti-tank missile motor; Chip 3 in PIL-5 4A 16–40V DC-DC converter for BEL tanks; Chip 8 in BEL 17" rugged display).',
+      'The 4 Statutory Moats: DAP-2020 Buy(Indian-IDDM) beats imports before price evaluation → PIL lists ban foreign suppliers on milestone dates → SRIJAN portal lists 37,696 DPSU import targets → Make-II guarantees volume orders.',
+      'The IDDM Distinction: Silicon fabricated at SkyWater/IHP qualifies as Buy(Indian) because design and layout are 100% Indian; migrating to SCL Mohali unlocks Buy(Indian-IDDM) maximum priority.',
+      'Three Buyer Clocks: List entry (permission, 2–4 yr trickle) vs Defence filing (real order path, 15–18 mos trials) vs Tender win (fast volume clock, 6–12 mos vendor registration).'
+    ],
+    citation: 'DeepGrid Mature Silicon Whitepaper v3 — Section 11: Two Ways to Sell the Same Chip',
+    actions: [
+      { label: 'Explore Defence Moats', target: 'ask?q=dap' },
+      { label: 'View Anchor Customers', target: 'family' }
+    ],
+    connectedNodeIds: ['dap-2020-moats', 'sku-3', 'sku-8', 'sku-4', 'three-factory']
+  },
+  {
+    id: 'chinese-price-crash',
+    name: 'Chinese Price Crash Stress Test & Stop Rules S1–S4',
+    category: 'finance',
+    tagline: 'Downside resilience model (FY31 drops to ₹750 Cr) and 4 binding operational stop rules',
+    nodeFoundry: 'Capital Governance & Risk Management',
+    voltageRail: 'Downside Balance Sheet Protection',
+    standards: 'Stop Rules S1–S4 · Charlie Munger Inversion Checklist',
+    summary: 'DeepGrid applies Charlie Munger’s inversion framework to stress-test the company against a catastrophic collapse in Chinese silicon prices. Evaluates revenue resilience and enforces 4 strict, pre-committed operational Stop Rules.',
+    keyFacts: [
+      'Price Crash Stress Test: Smart meters drop -30% (₹480Cr → ₹340Cr); Motors drop -40% (₹220Cr → ₹130Cr); Vehicle gateways drop -30% (₹35Cr → ₹25Cr); Drone brains drop to ₹55Cr.',
+      'Defence Immunity: Screened defence silicon (₹200 Cr) remains exactly ₹200 Cr — statutory PIL import bans completely shield it from foreign dumping.',
+      'Downside Survival: Total FY31 revenue falls from ₹1,000 Cr to ₹750 Cr, preserving profitability (60–75% margins) and easily funding subsequent rounds.',
+      'Stop Rule S1 (Meter Gate): If Ripple has not signed by the Chip 2 factory order cutoff, Chip 2 waits 1 cycle; funds reallocate to Chips 1 and 3.',
+      'Stop Rule S2 (Screening): If Chip 6 fails military screening twice, all forward defence revenue is pushed out 12 months within 30 days.',
+      'Stop Rule S3 (Commercial Exit): In FY29, if delivered Chinese prices < manufacturing cost, exit ceiling fan drivers; keep EV motors and proprietary modules.',
+      'Stop Rule S4 (SCL Delay): If SCL Mohali slips >2 cycles, publicly disclose the delay and execute production runs exclusively at SkyWater and IHP.'
+    ],
+    citation: 'DeepGrid Mature Silicon Whitepaper v3 — Section 12 & 14: Competitor Insulation & Risk Matrix',
+    actions: [
+      { label: 'Review Risk Audit', target: 'ask?q=munger' },
+      { label: 'Use of Funds', target: 'ask?q=funds' }
+    ],
+    connectedNodeIds: ['munger-audit', 'fin-funds', 'import-funnel-10x', 'dap-2020-moats']
+  },
+  {
+    id: 'dgridriscv-core-architecture',
+    name: 'DGridRiscV Canonical Core Specification',
+    category: 'architecture',
+    tagline: 'Standardized RV32IM_Zicsr controller (misa = 0x40001100) shared across 7 of 10 chips',
+    nodeFoundry: '130 nm CMOS · Single 50 MHz Clock Domain',
+    voltageRail: '1.8V Core / 3.3V I/O',
+    standards: 'RV32IM_Zicsr Specification · Fixed-Point Bit-Exact Execution',
+    summary: 'Seven of the ten chips share an identical, parameter-locked RISC-V core generated from VexiiRiscv. Deliberately omits caches, branch prediction, and floating-point to guarantee deterministic sub-1 µs loop latency and bit-exact software verification across foundries.',
+    keyFacts: [
+      'Instruction Set & Mode: RV32IM_Zicsr (Machine mode only via PrivilegedPlugin, misa = 0x40001100).',
+      'In-Order Pipeline: Single-issue lane0, 2 fetch stages (fetch_logic_ctrls_0..1), 6 execute stages (execute_ctrl0..5).',
+      'Hardware Math: Full hardware multiplier and divider (MulPlugin + DivPlugin), single-cycle barrel shifter (BarrelShifterPlugin).',
+      'Off-Core Fabric: Cacheless 32-bit AXI4 fetch and LSU interfaces (FetchCachelessAxi4Plugin, LsuCachelessAxi4Plugin) to tightly coupled SRAM.',
+      'Architectural Omissions: No caches (avoids jitter/miss latency), no branch predictor (saves area), no FPU (fixed-point math bit-exact between commercial and screened defence parts), no compressed instructions (removes alignment stall traps).'
+    ],
+    citation: 'DeepGrid Mature Silicon Whitepaper v3 — Section 8: The Processor Every Chip Shares',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture' },
+      { label: 'View Lockstep Core', target: 'ask?q=lockstep' }
+    ],
+    connectedNodeIds: ['dg32-lite', 'sku-4', 'foc-loop-budget', '198-day-loop']
   }
 ];
 
@@ -774,7 +872,11 @@ export const graphNodes: GraphNode[] = [
 
   // Governance & Finance
   { id: 'fin-seed', name: '₹10 Cr Model', shortName: '₹10 Cr', category: 'governance', x: 62, y: 46, description: 'Seed allocation for 6 MPW runs, ATE lines, and FY31 revenue.' },
-  { id: 'fin-munger', name: 'Charlie Munger Audit', shortName: 'Munger Audit', category: 'governance', x: 74, y: 38, description: '14-Point Risk Matrix and non-negotiable Stop Rules S1-S4.' }
+  { id: 'fin-munger', name: 'Charlie Munger Audit', shortName: 'Munger Audit', category: 'governance', x: 74, y: 38, description: '14-Point Risk Matrix and non-negotiable Stop Rules S1-S4.' },
+  { id: 'import-funnel-node', name: '$9B Import Funnel', shortName: '$9B Funnel', category: 'moat', x: 58, y: 38, description: '$9B mature-node import funnel dismantled via 10x lower NRE.' },
+  { id: 'boxes-not-chips-node', name: 'Boxes, Not Chips', shortName: 'Boxes', category: 'moat', x: 72, y: 58, description: 'Entering one level down: providing sovereign silicon inside PIL-5 LRU boxes.' },
+  { id: 'stop-rules-node', name: 'Stop Rules S1–S4', shortName: 'Stop Rules', category: 'governance', x: 80, y: 42, description: 'Pre-committed governance rules guarding against Chinese price crashes and delays.' },
+  { id: 'dgridriscv-core-node', name: 'DGridRiscV Core', shortName: 'DGridRiscV', category: 'architecture', x: 40, y: 28, description: 'Canonical RV32IM_Zicsr cacheless processor shared across 7 chips.' }
 ];
 
 export const graphEdges: GraphEdge[] = [
@@ -851,7 +953,15 @@ export const graphEdges: GraphEdge[] = [
   { from: 'fin-seed', to: 'arch-198loop', label: '10x Cost Advantage' },
   { from: 'fin-seed', to: 'fin-munger', label: 'Capital Inversion' },
   { from: 'fin-munger', to: 'moat-dap2020', label: 'Stop Rules S1–S4' },
-  { from: 'moat-dap2020', to: 'moat-make2', label: 'Statutory Priority' }
+  { from: 'moat-dap2020', to: 'moat-make2', label: 'Statutory Priority' },
+  { from: 'import-funnel-node', to: 'fin-seed', label: '$9B Funnel' },
+  { from: 'import-funnel-node', to: 'fab-skywater', label: '10x Economics' },
+  { from: 'boxes-not-chips-node', to: 'moat-pil5', label: 'PIL-5 LRUs' },
+  { from: 'boxes-not-chips-node', to: 'moat-dap2020', label: 'Buy(Indian) Wedge' },
+  { from: 'stop-rules-node', to: 'fin-munger', label: 'Crash Sizing' },
+  { from: 'stop-rules-node', to: 'sku-2', label: 'S1 Ripple Gate' },
+  { from: 'dgridriscv-core-node', to: 'dg32-lite', label: 'RV32IM Base' },
+  { from: 'dgridriscv-core-node', to: 'sku-4', label: 'Lockstep Core' }
 ];
 
 export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
@@ -910,6 +1020,12 @@ export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
     if ((q.includes('attention') || q.includes('int8') || q.includes('softmax') || q.includes('40-bit') || q.includes('u15') || q.includes('restoring divider')) && item.id === 'int8-attention-engine') score += 85;
     if ((q.includes('avip') || q.includes('csa') || q.includes('bearing') || q.includes('current signature') || q.includes('no accelerometer') || q.includes('stator current')) && item.id === 'avip-bearing-diagnostics') score += 85;
     if ((q.includes('foc') || q.includes('headroom') || q.includes('budget') || q.includes('fetch-bound') || q.includes('100 khz') || q.includes('300 cycles')) && item.id === 'foc-loop-budget') score += 85;
+
+    // Master Whitepaper v3 boosts
+    if ((q.includes('funnel') || q.includes('$9b') || q.includes('10x') || q.includes('comtrade') || q.includes('economics')) && item.id === 'import-funnel-10x') score += 90;
+    if ((q.includes('boxes') || q.includes('not chips') || q.includes('lru') || q.includes('one level down') || q.includes('346 items')) && item.id === 'boxes-not-chips') score += 90;
+    if ((q.includes('crash') || q.includes('chinese price') || q.includes('stop rule') || q.includes('s1') || q.includes('s2') || q.includes('s3') || q.includes('s4') || q.includes('750 cr')) && item.id === 'chinese-price-crash') score += 90;
+    if ((q.includes('dgridriscv') || q.includes('rv32im') || q.includes('misa') || q.includes('vexii') || q.includes('cacheless') || q.includes('0x40001100') || q.includes('canonical')) && item.id === 'dgridriscv-core-architecture') score += 90;
 
     return { item, score };
   });
