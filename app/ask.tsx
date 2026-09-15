@@ -94,6 +94,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   // Node Category styling helper
   const getNodeColor = (cat: string) => {
     switch (cat) {
+      case 'ai': return '#00e5ff'; // Vibrant Electric Cyan for Edge AI
       case 'sku': return '#d4a36e'; // Copper
       case 'foundry': return '#4fc3f7'; // Cyan
       case 'moat': return '#81c784'; // Forest green
@@ -165,7 +166,15 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               role="tab"
               aria-selected={activeCategory === c.id}
               className={`dr-ask-filter-btn ${activeCategory === c.id ? 'active' : ''}`}
-              onClick={() => setActiveCategory(c.id)}
+              onClick={() => {
+                setActiveCategory(c.id);
+                if (c.id === 'ai') {
+                  setSelectedNodeId('dg32-30-usecases');
+                } else if (c.id !== 'all') {
+                  const first = deepGridCatalog.find(item => item.category === c.id);
+                  if (first) setSelectedNodeId(first.id);
+                }
+              }}
             >
               {c.label}
             </button>
@@ -207,6 +216,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         <div className="dr-graph-container">
           <div className="dr-graph-canvas-wrap">
             <div className="dr-graph-legend">
+              <span className="legend-item"><i style={{background: '#00e5ff'}}/> Edge AI (30 Tasks)</span>
               <span className="legend-item"><i style={{background: '#d4a36e'}}/> SKUs & Dies</span>
               <span className="legend-item"><i style={{background: '#4fc3f7'}}/> Foundries</span>
               <span className="legend-item"><i style={{background: '#81c784'}}/> Defense Moats</span>
@@ -241,9 +251,13 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   const pFrom = nodePositions[e.from] || { x: 50, y: 50 };
                   const pTo = nodePositions[e.to] || { x: 50, y: 50 };
                   const isHighlighted = e.from === selectedNodeId || e.to === selectedNodeId;
+                  const nodeFrom = graphNodes.find(n => n.id === e.from);
+                  const nodeTo = graphNodes.find(n => n.id === e.to);
+                  const edgeCategoryMatch = activeCategory === 'all' || (nodeFrom?.category === activeCategory || nodeTo?.category === activeCategory);
+                  const edgeOpacity = isHighlighted ? 1 : (edgeCategoryMatch ? 0.6 : 0.1);
 
                   return (
-                    <g key={idx} className={`dr-edge-group ${isHighlighted ? 'highlighted' : ''}`}>
+                    <g key={idx} className={`dr-edge-group ${isHighlighted ? 'highlighted' : ''}`} style={{ opacity: edgeOpacity, transition: 'opacity 0.25s ease' }}>
                       <line
                         x1={pFrom.x}
                         y1={pFrom.y}
@@ -273,12 +287,15 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   const isSelected = selectedNodeId === node.id;
                   const isConnected = activeConnectedNodeIds.has(node.id);
                   const color = getNodeColor(node.category);
+                  const isCategoryMatch = activeCategory === 'all' || node.category === activeCategory;
+                  const nodeOpacity = isCategoryMatch || isSelected || isConnected ? 1 : 0.22;
 
                   return (
                     <g
                       key={node.id}
                       className={`dr-graph-node-group ${isSelected ? 'selected' : ''} ${isConnected ? 'connected' : ''}`}
                       transform={`translate(${pos.x}, ${pos.y})`}
+                      style={{ opacity: nodeOpacity, transition: 'opacity 0.25s ease' }}
                     >
                       {/* Outer pulse halo for selected */}
                       {isSelected && (

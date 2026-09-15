@@ -24,7 +24,7 @@ export interface GraphNode {
   id: string;
   name: string;
   shortName: string;
-  category: 'sku' | 'foundry' | 'moat' | 'architecture' | 'anchor' | 'governance';
+  category: 'sku' | 'foundry' | 'moat' | 'architecture' | 'anchor' | 'governance' | 'ai';
   x: number; // 0-100 normalized coordinate
   y: number; // 0-100 normalized coordinate
   description: string;
@@ -86,7 +86,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'Explore Architecture', target: 'architecture?chip=lite' },
       { label: 'Control Loop Budget', target: 'control' }
     ],
-    connectedNodeIds: ['dg32-lite', 'ai-usecases', 'arch-lockstep', 'ai-trees']
+    connectedNodeIds: ['dg32-lite', 'dg32-30-usecases', 'arch-lockstep', 'dg32-tree-ensembles']
   },
   {
     id: 'dg32-30-usecases',
@@ -109,7 +109,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'Control Loop Headroom', target: 'control' },
       { label: 'Product Family Comparison', target: 'family' }
     ],
-    connectedNodeIds: ['ai-envelope', 'ai-trees', 'ai-dsp', 'ai-cwru', 'dg32-2dom']
+    connectedNodeIds: ['dg32-ai-envelope', 'dg32-tree-ensembles', 'dg32-dsp-pipeline', 'dg32-benchmark-audit', 'dg32-2dom']
   },
   {
     id: 'dg32-tree-ensembles',
@@ -128,7 +128,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       'Design rule: Spend effort on band selection and envelope demodulation before spending it on model capacity.'
     ],
     citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slides 04–05',
-    connectedNodeIds: ['ai-usecases', 'ai-envelope', 'ai-cwru']
+    connectedNodeIds: ['dg32-30-usecases', 'dg32-ai-envelope', 'dg32-benchmark-audit']
   },
   {
     id: 'dg32-dsp-pipeline',
@@ -147,7 +147,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       'Decimate before buffering: Decimating to 1–2 kS/s keeps the entire working buffer under a few kilobytes.'
     ],
     citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slide 06',
-    connectedNodeIds: ['ai-usecases', 'ai-afe', 'dg32-lite']
+    connectedNodeIds: ['dg32-30-usecases', 'dg32-afe-sensing', 'dg32-lite']
   },
   {
     id: 'dg32-afe-sensing',
@@ -166,7 +166,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       'What works today on DG32-LITE: vibration classification, sensorless EKF, plausibility, regime identification, and anomaly scoring operate on standard peripherals.'
     ],
     citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slide 11',
-    connectedNodeIds: ['ai-dsp', 'ai-usecases', 'sku-1']
+    connectedNodeIds: ['dg32-dsp-pipeline', 'dg32-30-usecases', 'sku-1']
   },
   {
     id: 'dg32-benchmark-audit',
@@ -185,7 +185,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       'Pre-silicon notice: All figures calculated from verified constants (4 cycles/int8 MAC, 82% headroom at 50 MHz).'
     ],
     citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slide 12',
-    connectedNodeIds: ['ai-usecases', 'dg32-lite', 'arch-lockstep', 'munger-audit']
+    connectedNodeIds: ['dg32-30-usecases', 'dg32-lite', 'arch-lockstep', 'munger-audit']
   },
 
   // --- Core SKUs & Platform Silicon ---
@@ -563,12 +563,12 @@ export const graphNodes: GraphNode[] = [
   { id: 'dg-sdv-platform', name: 'DG SDV', shortName: 'SDV', category: 'sku', x: 38, y: 12, description: 'End-to-end SDV reference architecture with AXI-REALM QoS.' },
 
   // Edge AI Nodes (New Grounded Cluster)
-  { id: 'ai-envelope', name: '12.5 MMAC/s Budget', shortName: '12.5 MMAC', category: 'architecture', x: 26, y: 44, description: 'Scalar AI envelope: 12.5 MMAC/s, 16.5 KB RAM, 82% free CPU cycles.' },
-  { id: 'ai-usecases', name: '30 Industrial Use Cases', shortName: '30 AI Tasks', category: 'sku', x: 18, y: 42, description: '30 native predictive maintenance and control use cases without accelerator.' },
-  { id: 'ai-trees', name: 'Tree Ensembles & Models', shortName: 'Tree ML', category: 'architecture', x: 8, y: 38, description: 'Zero-multiply tree models (RF 100xd8 in 0.06ms) and 19 lightweight architectures.' },
-  { id: 'ai-dsp', name: 'CORDIC Envelope & Goertzel', shortName: 'CORDIC DSP', category: 'architecture', x: 14, y: 48, description: 'Hardware CORDIC envelope demodulation & targeted Goertzel filters.' },
-  { id: 'ai-afe', name: 'AFE Dynamic Range', shortName: 'ISO Sensing', category: 'moat', x: 30, y: 55, description: 'ISO 13373-2 >8-bit dynamic range & ISO 13373-1 stud accelerometer mounting.' },
-  { id: 'ai-cwru', name: 'CWRU Data Leakage Audit', shortName: 'CWRU Audit', category: 'governance', x: 8, y: 48, description: 'Audit of 41 CWRU papers; strict advisory role under lockstep supervisor.' },
+  { id: 'dg32-ai-envelope', name: '12.5 MMAC/s Budget', shortName: '12.5 MMAC', category: 'ai', x: 26, y: 44, description: 'Scalar AI envelope: 12.5 MMAC/s, 16.5 KB RAM, 82% free CPU cycles.' },
+  { id: 'dg32-30-usecases', name: '30 Industrial Use Cases', shortName: '30 AI Tasks', category: 'ai', x: 18, y: 42, description: '30 native predictive maintenance and control use cases without accelerator.' },
+  { id: 'dg32-tree-ensembles', name: 'Tree Ensembles & Models', shortName: 'Tree ML', category: 'ai', x: 8, y: 38, description: 'Zero-multiply tree models (RF 100xd8 in 0.06ms) and 19 lightweight architectures.' },
+  { id: 'dg32-dsp-pipeline', name: 'CORDIC Envelope & Goertzel', shortName: 'CORDIC DSP', category: 'ai', x: 14, y: 48, description: 'Hardware CORDIC envelope demodulation & targeted Goertzel filters.' },
+  { id: 'dg32-afe-sensing', name: 'AFE Dynamic Range', shortName: 'ISO Sensing', category: 'ai', x: 30, y: 55, description: 'ISO 13373-2 >8-bit dynamic range & ISO 13373-1 stud accelerometer mounting.' },
+  { id: 'dg32-benchmark-audit', name: 'CWRU Data Leakage Audit', shortName: 'CWRU Audit', category: 'ai', x: 8, y: 48, description: 'Audit of 41 CWRU papers; strict advisory role under lockstep supervisor.' },
 
   // Foundries (Cluster Center-Right)
   { id: 'fab-skywater', name: 'SkyWater 130nm', shortName: 'SkyWater', category: 'foundry', x: 55, y: 38, description: 'USA commercial foundry, open SKY130 PDK, fast MPW runs.' },
@@ -600,13 +600,13 @@ export const graphNodes: GraphNode[] = [
 
 export const graphEdges: GraphEdge[] = [
   // Edge AI Connections
-  { from: 'dg32-lite', to: 'ai-envelope', label: '12.5 MMAC/s Budget' },
-  { from: 'ai-envelope', to: 'ai-usecases', label: '30 Native Tasks' },
-  { from: 'ai-usecases', to: 'ai-trees', label: 'Zero-Multiply Trees' },
-  { from: 'ai-usecases', to: 'ai-dsp', label: 'CORDIC Demodulation' },
-  { from: 'ai-dsp', to: 'ai-afe', label: 'ISO 13373 Dynamic Range' },
-  { from: 'ai-usecases', to: 'ai-cwru', label: 'Leakage-Free Validation' },
-  { from: 'ai-usecases', to: 'dg32-2dom', label: 'Scalar -> Attention Engine' },
+  { from: 'dg32-lite', to: 'dg32-ai-envelope', label: '12.5 MMAC/s Budget' },
+  { from: 'dg32-ai-envelope', to: 'dg32-30-usecases', label: '30 Native Tasks' },
+  { from: 'dg32-30-usecases', to: 'dg32-tree-ensembles', label: 'Zero-Multiply Trees' },
+  { from: 'dg32-30-usecases', to: 'dg32-dsp-pipeline', label: 'CORDIC Demodulation' },
+  { from: 'dg32-dsp-pipeline', to: 'dg32-afe-sensing', label: 'ISO 13373 Dynamic Range' },
+  { from: 'dg32-30-usecases', to: 'dg32-benchmark-audit', label: 'Leakage-Free Validation' },
+  { from: 'dg32-30-usecases', to: 'dg32-2dom', label: 'Scalar -> Attention Engine' },
 
   // DG32 Connections
   { from: 'dg32-lite', to: 'arch-lockstep', label: 'Safety Core' },
