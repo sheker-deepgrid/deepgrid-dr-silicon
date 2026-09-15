@@ -1,0 +1,203 @@
+<mxfile host="Electron" modified="2026-09-15T11:50:00.000Z" agent="Mozilla/5.0 DeepGrid EDA Architect" version="21.6.8" type="device">
+  <diagram id="dgrid_dshot_rx_arch" name="DG32 DShot RX & Bidirectional Telemetry Architecture">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" background="#0d1110">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title Block -->
+        <mxCell id="title_banner" value="DEEPGRID DG32 — HARDWARE DSHOT RX &amp; BIDIRECTIONAL TELEMETRY ARCHITECTURE (dgrid_dshot_rx)&#xa;In-Place Slot 0xC Extension · GCR 4b→5b Transition Encoding · Pad-Ring Direction Control · Lockstep Invariant (W1C)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#161b1a;strokeColor=#d4a36e;strokeWidth=2;fontColor=#d4a36e;fontStyle=1;fontSize=18;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="1840" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ZONE 1: BUS INTERFACE & LOCKSTEP SAFETY DOMAIN -->
+        <mxCell id="zone_bus_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#121615;strokeColor=#4fc3f7;strokeWidth=1.5;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="130" width="400" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="zone_bus_label" value="AXI-LITE &amp; DUAL-CORE LOCKSTEP COMPARATOR DOMAIN" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#4fc3f7;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="55" y="140" width="370" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_main_core" value="MAIN RV32IM CORE&#xa;(50 MHz Clock · Control Loop)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1a2421;strokeColor=#81c784;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="65" y="190" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_checker_core" value="CHECKER RV32IM CORE&#xa;(2-Cycle Skewed Mirror)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1a2421;strokeColor=#81c784;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="255" y="190" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_lockstep_check" value="dgrid_lockstep_check&#xa;Compares All Committed Stores &amp; Bus Cycles&#xa;FAULTn Triggers in 2 Cycles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2a1818;strokeColor=#e57373;strokeWidth=2;fontColor=#ffffff;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="65" y="290" width="350" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_core_to_comp1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#81c784;strokeWidth=2;" edge="1" source="node_main_core" target="node_lockstep_check" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_core_to_comp2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#81c784;strokeWidth=2;" edge="1" source="node_checker_core" target="node_lockstep_check" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_axi_master" value="AXI-Lite 32-bit Bus Matrix&#xa;Synchronous Peripheral Access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#16232b;strokeColor=#4fc3f7;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="65" y="380" width="350" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_main_to_axi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4fc3f7;strokeWidth=2;" edge="1" source="node_main_core" target="node_axi_master" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="145" y="365" />
+              <mxPoint x="145" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="node_foc_warning" value="CRITICAL ARCHITECTURAL CONFLICT:&#xa;• 5 µs FOC Loop = 250 cycles @ 50 MHz&#xa;• DShot600 Frame = 1,340 cycles (5.3× FOC!)&#xa;• Firmware bit-banging branches on async pads →&#xa;  triggers false LOCKSTEP divergence faults!&#xa;• Hardware decoding in slot 0xC is MANDATORY." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2d1e12;strokeColor=#ffb74d;strokeWidth=1.5;fontColor=#ffb74d;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="460" width="350" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_sram_box" value="SRAM FLOORPLAN LEVER (§9)&#xa;• 32 KB (16 macros): 3×7 grid → logic area 1.75 mm² (fails 2,900 µm wrapper)&#xa;• 28 KB (14 macros): 3×6 grid → logic area 3.40 mm² (doubles full-width strip)&#xa;• Codex branch empirical runs: 2dom/12 (24KB) vs 2dom/13 (keep 32KB)&#xa;• DG32-LITE base die stays 32 KB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1c1d24;strokeColor=#ba68c8;strokeWidth=1.5;fontColor=#e1bee7;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="610" width="350" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_irq_block" value="dgrid_irq (0xDF) Slot 7 Allocation&#xa;dshot_rx_irq = (IRQ_FRAME_EN &amp; |VALID) | (IRQ_ERR_EN &amp; |ERR)&#xa;W1C Level-Cleared Interrupt Flag" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1a2421;strokeColor=#4db6ac;strokeWidth=1.5;fontColor=#80cbc4;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="750" width="350" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ZONE 2: dgrid_dshot SLOT 0xC PERIPHERAL ARCHITECTURE -->
+        <mxCell id="zone_slot_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#101413;strokeColor=#d4a36e;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="470" y="130" width="940" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="zone_slot_label" value="dgrid_dshot PERIPHERAL CORE (SLOT 0xC · MEMORY MAP 0x00–0x5C)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#d4a36e;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="490" y="140" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Register Bank -->
+        <mxCell id="node_reg_bank" value="REGISTER BANK (Slot 0xC · AXI-Lite Slave)&#xa;0x00-0x20: Existing TX BITPERIOD / T0H / T1H / TELEM (Frozen)&#xa;0x24: RXCTRL [RX_EN, INVERT, TELEM_EN, TELEM_ALWAYS, IRQ_EN]&#xa;0x28: RXTHRESH [11:0] (Cycle threshold for bit 1 vs 0)&#xa;0x2C: RXTIMEOUT [11:0] (Idle boundary reset ≈ 2× BITPERIOD)&#xa;0x30-0x3C: RXFRAME0..3 [THROTTLE(11), TELEM(1), VALID(W1C), CRC_ERR, OVERRUN, TEL_ABORT]&#xa;0x40: TURNAROUND (1500 cycles / 30 µs delay to reply)&#xa;0x44: TELEMPERIOD (67 cycles / 5/4 bit rate)&#xa;0x48-0x54: TELEM0..3 [{e[2:0], m[8:0]} eRPM Period Payload]&#xa;0x58: RXSTATUS · 0x5C: RXIRQ (W1C Strict Lockstep Mirror Safe)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#18211f;strokeColor=#d4a36e;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="500" y="180" width="880" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_axi_to_regs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4fc3f7;strokeWidth=2;" edge="1" source="node_axi_master" target="node_reg_bank" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SUB-MODULE 1: RX DECODER ENGINE -->
+        <mxCell id="node_rx_engine_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#131a18;strokeColor=#00e5ff;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="500" y="360" width="420" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rx_engine_title" value="dgrid_dshot_rx (Per-Channel ×4 RX Engine)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontColor=#00e5ff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="515" y="370" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rx_sync" value="2-FF Synchronizer + 2-Sample Glitch Filter&#xa;Fixed 3-cycle (60 ns) latency on both edges" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e2825;strokeColor=#00e5ff;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="405" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rx_invert" value="INVERT Control XOR: Flips sense for Bidirectional DShot&#xa;(Idle High, Active-Low Pulses)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e2825;strokeColor=#00e5ff;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="465" width="380" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rx_width_cnt" value="12-Bit High-Time Counter vs RXTHRESH (31 cycles @ DShot600)&#xa;bit = (high_time &gt; RXTHRESH)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e2825;strokeColor=#00e5ff;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="520" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rx_shifter" value="16-Bit Shift Register + 4-Bit Bit Counter&#xa;RXTIMEOUT Idle Reset prevents lost-edge desync" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e2825;strokeColor=#00e5ff;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="580" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_rx_crc" value="CRC4 Verifier (Normal vs Inverted Bidirectional Mode)&#xa;Normal: n0^n1^n2 | Bidir: ~(n0^n1^n2)&amp;0xF&#xa;Asserts VALID, CRC_ERR, or OVERRUN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e2825;strokeColor=#00e5ff;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="640" width="380" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- SUB-MODULE 2: TELEMETRY REPLY ENGINE -->
+        <mxCell id="node_tel_engine_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#18161f;strokeColor=#ab47bc;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="960" y="360" width="420" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="node_tel_engine_title" value="dgrid_dshot_tel (Per-Channel ×4 Reply Engine)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontColor=#ab47bc;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="975" y="370" width="320" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="node_tel_arm" value="Arming Logic: TELEM_EN &amp; telem_bit OR TELEM_ALWAYS&#xa;Waits TURNAROUND (1500 cycles / 30 µs from last edge)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#231f2b;strokeColor=#ab47bc;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="405" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_tel_crc" value="eRPM Payload + Inverted CRC4 Engine&#xa;crc = ~(v ^ v&gt;&gt;4 ^ v&gt;&gt;8) &amp; 0xF over 12-bit period {e[2:0], m[8:0]}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#231f2b;strokeColor=#ab47bc;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="465" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_tel_gcr" value="GCR 4b→5b Encoder LUT (4 nibbles → 20 bits)&#xa;Hardware table: 19 1B 12 13 1D 15 16 17 1A 09 0A 0B 1E 0D 0E 0F" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#231f2b;strokeColor=#ab47bc;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="525" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_tel_trans" value="Transition Encoder: out[0]=0; out[i] = out[i-1] ^ G[i-1]&#xa;Converts 20 GCR bits into 21 level transitions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#231f2b;strokeColor=#ab47bc;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="585" width="380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="node_tel_tx" value="Inverted Shift Out @ 5/4 Bit Rate (66.7 cycles / bit @ 50 MHz)&#xa;TEL_ABORT: Immediate abort &amp; OE release within 1 cycle on FC edge" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#231f2b;strokeColor=#ab47bc;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="645" width="380" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Direction & Multiplexing Logic -->
+        <mxCell id="node_mux_box" value="DIRECTION OWNERSHIP &amp; OUTPUT ENABLE (OE) MUX (§4.3)&#xa;pad_oe[ch] = (TX_BUSY) | (dgrid_dshot_tel_driving)&#xa;PWM Mode (PINMUX[0]=0): pad_oe forced HIGH (Constant Output Drive)&#xa;DShot Role (PINMUX[0]=1): Dynamic Bidirectional Switching (Low-side pads AL/BL/CL stay PC_OUT)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1c241e;strokeColor=#81c784;strokeWidth=1.5;fontColor=#a5d6a7;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="500" y="780" width="880" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_rx_to_mux" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00e5ff;strokeWidth=1.5;" edge="1" source="node_rx_crc" target="node_mux_box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_tel_to_mux" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ab47bc;strokeWidth=1.5;" edge="1" source="node_tel_tx" target="node_mux_box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ZONE 3: OPENFRAME WRAPPER & PHYSICAL PAD-RING -->
+        <mxCell id="zone_pads_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#121617;strokeColor=#80cbc4;strokeWidth=1.5;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="130" width="440" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="zone_pads_label" value="OPENFRAME PAD-RING &amp; CHIP PINS (44/44 ZERO SPARE)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#80cbc4;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1455" y="140" width="410" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_ah" value="io[26] P_PWM_AH / DShot Ch 0&#xa;Class: PC_BIDIR (gpio_dm=110, inp_dis=0)&#xa;Dynamic oeb = ~pad_oe[0]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1c252b;strokeColor=#26c6da;strokeWidth=2;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="190" width="400" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_al" value="io[27] P_PWM_AL (Phase A Low-Side)&#xa;Class: PC_OUT (Untouched · Never Muxed)&#xa;Prevents Power Bridge Shoot-Through!" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b1b1b;strokeColor=#ef5350;strokeWidth=1.5;fontColor=#ffcdd2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="270" width="400" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_bh" value="io[28] P_PWM_BH / DShot Ch 1&#xa;Class: PC_BIDIR (gpio_dm=110, inp_dis=0)&#xa;Dynamic oeb = ~pad_oe[1]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1c252b;strokeColor=#26c6da;strokeWidth=2;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="345" width="400" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_bl" value="io[29] P_PWM_BL (Phase B Low-Side)&#xa;Class: PC_OUT (Untouched · Never Muxed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b1b1b;strokeColor=#ef5350;strokeWidth=1.5;fontColor=#ffcdd2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="425" width="400" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_ch" value="io[30] P_PWM_CH / DShot Ch 2&#xa;Class: PC_BIDIR (gpio_dm=110, inp_dis=0)&#xa;Dynamic oeb = ~pad_oe[2]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1c252b;strokeColor=#26c6da;strokeWidth=2;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="500" width="400" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_cl" value="io[31] P_PWM_CL (Phase C Low-Side)&#xa;Class: PC_OUT (Untouched · Never Muxed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b1b1b;strokeColor=#ef5350;strokeWidth=1.5;fontColor=#ffcdd2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="580" width="400" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pad_trig" value="io[32] P_PWM_TRIG / DShot Ch 3&#xa;Class: PC_BIDIR (gpio_dm=110, inp_dis=0)&#xa;Dynamic oeb = ~pad_oe[3]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1c252b;strokeColor=#26c6da;strokeWidth=2;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="655" width="400" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="node_board_pullup" value="MANDATORY BOARD INTEGRATION:&#xa;• OpenFrame PC_BIDIR has NO internal weak pull-up.&#xa;• Bidirectional DShot idles HIGH. Board must supply&#xa;  external 1kΩ–4.7kΩ pull-up to 3.3V on the line.&#xa;• Reset: pad_oe floats as input during rst_n_i low.&#xa;  SoC never drives line while flight controller talks." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#23221b;strokeColor=#ffd54f;strokeWidth=1.5;fontColor=#ffe082;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="740" width="400" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Inter-zone buses -->
+        <mxCell id="edge_mux_to_pads" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#26c6da;strokeWidth=2;" edge="1" source="node_mux_box" target="pad_ah" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1410" y="820" />
+              <mxPoint x="1410" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_pads_to_rx" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00e5ff;strokeWidth=2;" edge="1" source="pad_ah" target="node_rx_sync" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1430" y="235" />
+              <mxPoint x="1430" y="345" />
+              <mxPoint x="710" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

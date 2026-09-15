@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-15T11:15:00.000Z" agent="Antigravity" version="24.7.5">
+  <diagram name="DeepGrid Semi — Master SKU Architecture Compendium &amp; SiP Ecosystem" id="DEEPGRID_SKU_COMPENDIUM">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1450" pageHeight="980" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ZONE 1: 9-SKU MATURE SILICON FOUNDATION (130nm / 180nm BCD & CMOS) -->
+        <mxCell id="zone_skus" value="ZONE 1: NINE CORE PRODUCTION SKUS (130nm / 180nm BCD &amp; CMOS SOVEREIGN SILICON)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#F8FAFC;strokeColor=#0284C7;strokeWidth=2;dashed=1;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="460" height="880" as="geometry"/>
+        </mxCell>
+
+        <!-- SKU 1 to 3 -->
+        <mxCell id="sku_1" value="SKU-1: BLDC Motor Controller SoC&#xa;(130nm BCD · 5V–120V Pre-Drivers · DGridRiscV @ 200MHz)&#xa;[HW PID &lt;1 µs · CORDIC FOC · Replaces DRV83xx · BEE 5-Star]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#3B82F6;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="45" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sku_2" value="SKU-2: Smart-Meter Class 0.5S SoC&#xa;(130nm CMOS · DG-AFE6 6-ch 24-bit ΣΔ · &lt;2 µW PMU/RTC)&#xa;[P/Q/S + THD-15 · AES-256 · Magnetic Tamper · 250M Meter Rollout]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#3B82F6;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="115" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sku_3" value="SKU-3: Hi-Rel Avionics PMIC&#xa;(180nm BCD · 28V Mil Bus · Brokaw Bandgap 12 ppm/°C)&#xa;[4 Sequenced Rails · DICE Latches + TMR FSM · SRIJAN NSG-5962]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="185" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- SKU 4 to 6 -->
+        <mxCell id="sku_4" value="SKU-4: Dual-Core Lockstep Safety MCU&#xa;(130nm CMOS · Dual DGridRiscV with 2-Cycle Skew @ 200MHz)&#xa;[Bus+Retire Comparator Asserting FAULTn in &lt;2 Cycles · ISO 26262 ASIL-D]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="255" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sku_5" value="SKU-5: Robust Interface Transceiver&#xa;(130nm Thick-Oxide 5V LDMOS · ±15 kV HBM ESD Protection)&#xa;[RS-485 + ISO 11898-2 CAN-FD 5 Mbps · 30 mV Receiver Hysteresis]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#3B82F6;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="325" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sku_6" value="SKU-6: Quad-Rail Precision Supervisor&#xa;(180nm CMOS · Chopper Comparators · Fixed 8 µs Deglitch)&#xa;[Curvature-Corrected 10 ppm/°C · Master RESETn · MIL-883 Pathfinder]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="395" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- SKU 7 to 9 -->
+        <mxCell id="sku_7" value="SKU-7: 77 GHz 4D MIMO Radar Front-End&#xa;(IHP SG13G2 SiGe fT 350GHz HBT + 130nm CMOS Baseband)&#xa;[2TX/4RX · 4 GHz Sweep · 3.75 cm Resolution · Non-ITAR German Source]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#7E22CE;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="465" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sku_8" value="SKU-8: Rugged Cockpit Display Driver &amp; TCON&#xa;(130nm HV 0–12V Column Amps · 1280 × 10-bit DACs · ASIL-B)&#xa;[BEL 17&quot; Rugged SXGA Cockpit Line-Item · PIL-5 Import Substitution #5]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="535" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sku_9" value="SKU-9: SDV Zonal Gateway Controller&#xa;(130nm CMOS + 180nm BCD · 16x Smart Solid-State Fuses)&#xa;[IEEE 802.1Qbv Gigabit TSN Switch · EVITA-Full HSM · ASIL-D Island]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="605" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Motor AI & Condition Monitoring Extension -->
+        <mxCell id="sku_dg32_family" value="DG32 Platform Family: LITE &amp; 2DOM&#xa;(Single 50 MHz Domain · 12.5 MMAC/s · 16.5 KB Model Budget)&#xa;[30 Industrial Use Cases · Zero-Multiply Decision Forests · CORDIC DSP]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFEFF;strokeColor=#06B6D4;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="675" width="420" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Node & Arithmetic Self-Audit Banner -->
+        <mxCell id="sku_audit_box" value="SHEET 14 ARITHMETIC CHECK &amp; DISCIPLINE&#xa;• Draft Claim: 1,000 SKUs by Year 5 (Self-audited &amp; rejected as 20x error)&#xa;• Validated Ramp: ~50-SKU Focused Catalogue by Year 5 (10 SKUs/year)&#xa;• Phase 1: 130/180nm (Foundation) → Phase 2: 90/55nm (GNSS/SDR) → Phase 3: 28nm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#F59E0B;fontStyle=1;fontSize=9;" vertex="1" parent="zone_skus">
+          <mxGeometry x="20" y="750" width="420" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 2: 15x15mm MULTI-DIE ORGANIC SiP MODULE (SHEET 13) -->
+        <mxCell id="zone_sip" value="ZONE 2: SHEET 13 — MULTI-DIE ORGANIC SUBSTRATE SiP (15×15 mm 4-LAYER BGA)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#FFFFFF;strokeColor=#0D9488;strokeWidth=3;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="540" y="40" width="420" height="420" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sip_power_tree" value="Integrated Power Tree&#xa;(SKU-3 Hi-Rel PMIC 28V Pre-Buck)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sip">
+          <mxGeometry x="25" y="45" width="175" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sip_supervisor" value="Package Watchtower&#xa;(SKU-6 Precision Reset Supervisor)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sip">
+          <mxGeometry x="220" y="45" width="175" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sip_wirebonds" value="6× Wire-Bonded Mature Dies&#xa;(SKU-1 DRV, SKU-5 XCVR, SKU-4 MCU, AFE)&#xa;[Die-to-Die SPI / UART / GPIO over BT-Resin Substrate]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDFA;strokeColor=#0D9488;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sip">
+          <mxGeometry x="25" y="115" width="370" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sip_flipchip" value="Wave 2 Flip-Chip AI Compute Die&#xa;(28 nm Multi-TOPS Linux Processor)&#xa;[Joins after ₹50 Cr Round · High-Bandwidth Micro-Bumps]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#7C3AED;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sip">
+          <mxGeometry x="25" y="195" width="370" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sip_advantage" value="ARCHITECTURAL INVERSION: DELIBERATELY NOT UCIe&#xa;• Avoids $10M+ silicon interposers and fragile TSV processing&#xa;• 120V BCD power dies sit 2 mm from 1.8V digital logic&#xa;• AEC-Q100 Grade 0 and MIL-STD-883 thermal relief via design" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontStyle=1;fontSize=9;" vertex="1" parent="zone_sip">
+          <mxGeometry x="25" y="275" width="370" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 3: TRACK B — D100 TACTICAL DRONE SOC (SHEET 11) -->
+        <mxCell id="zone_d100" value="ZONE 3: SHEET 11 — D100 TACTICAL DRONE SOC (PX4 + 30Hz VIO + FAILSAFE)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#FDF4FF;strokeColor=#A21CAF;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="540" y="490" width="420" height="430" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="d100_failsafe" value="HARDWARE FAILSAFE ISLAND (THE WEDGE)&#xa;• Link Monitor + Safe-State FSM Direct to ESC&#xa;• Completely Isolated Power &amp; Clock from Linux Stack&#xa;• Bypasses FC, VIO, and AI upon OS Crash or EW Jamming" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontStyle=1;fontSize=10;" vertex="1" parent="zone_d100">
+          <mxGeometry x="25" y="45" width="370" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="d100_fc" value="Real-Time Flight Controller (PX4 / ArduPilot)&#xa;Dual DGridRiscV Cores @ 200 MHz · SECDED ECC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A21CAF;fontStyle=1;fontSize=10;" vertex="1" parent="zone_d100">
+          <mxGeometry x="25" y="135" width="370" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="d100_vio" value="Visual-Inertial Odometry Pose Engine (30 Hz)&#xa;Geometry EKF · MIPI CSI-2 · Survives GNSS-Denied Jamming" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A21CAF;fontStyle=1;fontSize=10;" vertex="1" parent="zone_d100">
+          <mxGeometry x="25" y="195" width="370" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="d100_market" value="SOVEREIGN PROCUREMENT MOAT (DAP-2020 MAKE-II)&#xa;• Indian Drone Market: $1.2B–$1.3B growing to $3.2B&#xa;• ₹1.01 Cr Pre-ASIC validation contract signed with Indian Army MCEME&#xa;• Zero domestic FC+VIO competitor exists in the defense supply chain" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF2F8;strokeColor=#BE185D;fontStyle=1;fontSize=9;" vertex="1" parent="zone_d100">
+          <mxGeometry x="25" y="260" width="370" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 4: DEEPGRID SDV PLATFORM REFERENCE (SHEET 12) -->
+        <mxCell id="zone_sdv" value="ZONE 4: SHEET 12 — DEEPGRID SDV PLATFORM MATRIX (64-BIT AXI4 + REALM QoS)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#F8FAFC;strokeColor=#4338CA;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="40" width="410" height="880" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_crossbar" value="64-bit AXI4 Crossbar Matrix&#xa;AXI-REALM QoS Bandwidth Isolation Guard&#xa;[Guarantees ASIL-D Real-Time Latency Limits]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF2FF;strokeColor=#4F46E5;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="45" width="370" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_safe" value="DG Safe Domain (Triple-Core Lockstep TMR)&#xa;3x DGCV32-RT Cores with Private ISPM/DSPM · ISO 26262 ASIL-D" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="120" width="370" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_secure" value="DG Secure Domain (EVITA-Full / EAL5+)&#xa;Dual Lockstep RV32 + Hardware Crypto Engine (AES/SHA/ECC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="190" width="370" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_linux" value="DG Host Domain (RV64GCH Linux Host)&#xa;Partitionable Hybrid LLC/SPM · HyperRAM Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="260" width="370" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_accel" value="Vector &amp; Integer Multi-Core Accelerators&#xa;Low-Latency TCDM Bus · Interleaved Bank Addressing Switch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#7C3AED;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="330" width="370" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_satellites" value="SATELLITE CHIP INTERFACE MESH&#xa;• SKU-9 Zonal Gateway (Gigabit Ethernet TSN + 16x e-fuses)&#xa;• SKU-7 77 GHz SiGe 4D Imaging Radar (Perception Edge)&#xa;• SKU-1 BLDC Motor Inverter (120V Powertrain Drive)&#xa;• SKU-3 Avionics PMIC &amp; SKU-6 Precision Voltage Supervisor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4338CA;fontStyle=1;fontSize=10;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="405" width="370" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_scope_honesty" value="SCOPE HONESTY (FROM SHEET 10 &amp; 12)&#xa;• 130 nm at 200 MHz owns the ZONAL and GATEWAY layer&#xa;• Central SDV compute (multi-GHz, GPU, LPDDR5) is sub-10 nm&#xa;• DeepGrid explicitly does NOT claim central infotainment HPC on 130nm&#xa;• Every sub-10nm central chip requires 5–10 mature satellite chips" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;fontStyle=1;fontSize=9;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="555" width="370" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sdv_procurement" value="DEFENSE &amp; STRATEGIC SOVEREIGNTY MOAT&#xa;• DAP-2020 Buy (Indian-IDDM): Top statutory priority for Indian silicon&#xa;• Make-II Scheme: Industry-funded prototype with guaranteed purchase&#xa;• PIL-5: Legal import bans on competing foreign sensor &amp; motor ICs&#xa;• SCL Mohali: 100% non-embargoable domestic fabrication backup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#16A34A;fontStyle=1;fontSize=9;" vertex="1" parent="zone_sdv">
+          <mxGeometry x="20" y="725" width="370" height="135" as="geometry"/>
+        </mxCell>
+
+        <!-- DIRECTIONAL CONNECTING BUSES -->
+        <!-- Bus 1: SKU-3/6 to SiP Power Tree -->
+        <mxCell id="bus_sip_pwr" value="[1] 28V PMIC &amp; Reset Tree" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=9;" edge="1" source="sku_3" target="sip_power_tree" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 2: SKUs to SiP Substrate -->
+        <mxCell id="bus_sip_wirebonds" value="[2] Wire-Bond Interconnect" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D9488;strokeWidth=2;fontStyle=1;fontSize=9;" edge="1" source="sku_5" target="sip_wirebonds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 3: SKU-4 Safety Core to D100 Failsafe -->
+        <mxCell id="bus_d100_failsafe" value="[3] Dual Lockstep Architecture" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=2;fontStyle=1;fontSize=9;" edge="1" source="sku_4" target="d100_failsafe" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 4: SKU-9 to SDV Crossbar -->
+        <mxCell id="bus_sdv_zonal" value="[4] Gigabit TSN Mesh (802.1Qbv)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F46E5;strokeWidth=3;fontStyle=1;fontSize=9;" edge="1" source="sku_9" target="sdv_crossbar" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 5: SKU-7 Radar to SDV Perception -->
+        <mxCell id="bus_sdv_radar" value="[5] 4D Point Cloud (DO-160G)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7E22CE;strokeWidth=2;fontStyle=1;fontSize=9;" edge="1" source="sku_7" target="sdv_satellites" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

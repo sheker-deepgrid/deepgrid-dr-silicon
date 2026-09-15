@@ -2,11 +2,12 @@
 import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,Download,Play} from 'lucide-react';
 import {packages,fmtTime} from './library-data';
+import GroundedDocumentsHub from './documents-hub';
 
 type Update=(changes:Record<string,string|undefined>)=>void;
 const groups:[string,'architecture'|'datasheet'][]=[['Architecture packages','architecture'],['Datasheet and tape-in packages','datasheet']];
 
-export default function Library({pkgId,slide,onChange}:{pkgId:string;slide:number;onChange:Update}){
+export default function Library({pkgId,slide,onChange,go}:{pkgId:string;slide:number;onChange:Update;go?:(hash:string)=>void}){
  const pkg=packages.find(p=>p.id===pkgId)||packages[0];
  const count=pkg.slides.length, n=Math.max(1,Math.min(count,slide||1));
  const video=useRef<HTMLVideoElement>(null), strip=useRef<HTMLDivElement>(null);
@@ -43,6 +44,8 @@ export default function Library({pkgId,slide,onChange}:{pkgId:string;slide:numbe
     <div className="dr-lib-links"><a className="text-link" href={pkg.diagram} target="_blank" rel="noreferrer">Open full size <ArrowUpRight size={16}/></a>{pkg.drawio&&<a className="text-link" href={pkg.drawio} download>Diagram source (.drawio) <Download size={15}/></a>}{pkg.guide&&<a className="text-link" href={pkg.guide} download>Architecture guide (.md) <Download size={15}/></a>}</div></div>
    <div className="figure-scroll"><img src={pkg.diagram} alt={`${pkg.name} system architecture diagram`} loading="lazy"/></div>
   </section>}
+
+  <GroundedDocumentsHub go={go} />
 
   <section className="dr-lib-sources"><p className="dr-lib-kicker">BUILT FROM</p><ul>{pkg.sources.map(s=><li key={s}>{s}</li>)}</ul><p className="disclaimer">Investor-level content from Deepgrid Semi’s September 2026 design documents: no register maps, memory map or board-design rules. Pre-silicon: figures are design values, process nominals or analytic estimates, labelled on each slide.</p></section>
  </div>;

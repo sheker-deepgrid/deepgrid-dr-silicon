@@ -1,0 +1,152 @@
+<mxfile host="Electron" modified="2026-09-15T07:50:00.000Z" agent="Antigravity DeepGrid Engine" version="21.6.8" type="device">
+  <diagram id="mature-silicon-architecture" name="DeepGrid Mature Silicon Architecture (71-Page Whitepaper)">
+    <mxGraphModel dx="1422" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" background="#0B0F19">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title Block -->
+        <mxCell id="title" value="&lt;b&gt;DEEPGRID SEMI — MATURE-NODE SILICON ARCHITECTURE &amp; OPERATIONAL PLAYBOOK&lt;/b&gt;&lt;br&gt;&lt;font color='#94A3B8'&gt;71-Page Master Whitepaper v3 · $9B Import Funnel · 10x Cost Cut · 198-Day Loop · 3-Factory Sovereignty · Stop Rules S1–S4&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;strokeWidth=2;fontColor=#F8FAFC;fontSize=15;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="1520" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 1: THE $9B IMPORT FUNNEL -->
+        <mxCell id="grp_funnel" value="1. THE $9B IMPORT FUNNEL (UN COMTRADE HS 8542)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="460" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="fnl_total" value="&lt;b&gt;$23.4 Billion&lt;/b&gt;&lt;br&gt;Total Indian IC Imports&lt;br&gt;&lt;font color='#94A3B8'&gt;~70% from China &amp; Taiwan&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#64748B;fontColor=#F8FAFC;fontSize=11;" vertex="1" parent="grp_funnel">
+          <mxGeometry x="30" y="45" width="400" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="fnl_mature" value="&lt;b&gt;$9.0 Billion (Mature Nodes ≥ 130 nm)&lt;/b&gt;&lt;br&gt;Power, PMIC, small MCUs, line transceivers, metrology AFE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=11;" vertex="1" parent="grp_funnel">
+          <mxGeometry x="50" y="105" width="360" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="fnl_9classes" value="&lt;b&gt;$0.46 Billion (~$460M)&lt;/b&gt;&lt;br&gt;Addressable Sockets: 9 DeepGrid Mature-Node Chip Classes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#10B981;fontColor=#10B981;fontSize=11;" vertex="1" parent="grp_funnel">
+          <mxGeometry x="70" y="165" width="320" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="fnl_fy31" value="&lt;b&gt;₹1,000 Crore (~$105M) by FY31&lt;/b&gt;&lt;br&gt;Meters ₹480Cr · Motors ₹220Cr · Defence ₹200Cr · Drones ₹100Cr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#F59E0B;fontSize=11;" vertex="1" parent="grp_funnel">
+          <mxGeometry x="90" y="225" width="280" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="fnl_live" value="&lt;b&gt;₹2.88 Crore Live Contracted Orders Today&lt;/b&gt;&lt;br&gt;MCEME (Army) ₹1.01Cr · Infinis ₹1.25Cr · Axitech ₹0.62Cr" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064E3B;strokeColor=#34D399;fontColor=#ECFDF5;fontSize=11;fontStyle=1;" vertex="1" parent="grp_funnel">
+          <mxGeometry x="110" y="280" width="240" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 2: 10X COST DISMANTLING & 198-DAY LOOP -->
+        <mxCell id="grp_loop" value="2. 10x COST DISMANTLING &amp; 198-DAY DUAL-CLOCK LOOP" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#10B981;fontColor=#10B981;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="110" width="510" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="box_cost" value="&lt;b&gt;Traditional Chip vs DeepGrid Method&lt;/b&gt;&lt;br&gt;• Physical Layout: $1–2M sent outside → &lt;font color='#34D399'&gt;Staff time on free OpenLane&lt;/font&gt;&lt;br&gt;• EDA Licences: $0.5–1M/yr → &lt;font color='#34D399'&gt;Yosys, OpenROAD, Magic, KLayout (₹0)&lt;/font&gt;&lt;br&gt;• Prototype Masks: $0.5–1M → &lt;font color='#34D399'&gt;₹14.3L ($14,950) sky130 MPW slot&lt;/font&gt;&lt;br&gt;• All-in Cost per SKU: $2–5 Million → &lt;font color='#F59E0B'&gt;&lt;b&gt;₹0.6–1.2 Crore ($70–140K)&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_loop">
+          <mxGeometry x="20" y="45" width="470" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="box_sprint" value="&lt;b&gt;30-Day Digital Sprint&lt;/b&gt;&lt;br&gt;Spec → RTL → Formal Verification → CTS → Route → DRC/LVS (Closed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=10;align=center;" vertex="1" parent="grp_loop">
+          <mxGeometry x="20" y="145" width="225" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="box_foundry" value="&lt;b&gt;168-Day Silicon Leg&lt;/b&gt;&lt;br&gt;Masks → 25-Wafer Batch → Dicing → QFN Packaging → ATE Test (Fixed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#F59E0B;fontSize=10;align=center;" vertex="1" parent="grp_loop">
+          <mxGeometry x="265" y="145" width="225" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="box_loop_total" value="&lt;b&gt;1 Full Cycle = 30d + 168d = 198 Days (CI2609 &amp; CI2612 Calendars)&lt;/b&gt;&lt;br&gt;CI2609: 16 Sep 2026 → 3 Mar 2027 | CI2612: 7 Dec 2026 → 25 May 2027" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#312E81;strokeColor=#818CF8;fontColor=#EEF2FF;fontSize=10;align=center;" vertex="1" parent="grp_loop">
+          <mxGeometry x="20" y="215" width="470" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="box_two_speeds" value="&lt;b&gt;Two-Speed Reality:&lt;/b&gt; Digital blocks finish in 30d (1 cycle). Analogue blocks (references, 120V BCD, 15kV ESD) require 2–3 silicon cycles (198d + 6–9 mos) to prove." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#EF4444;fontColor=#FCA5A5;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="grp_loop">
+          <mxGeometry x="20" y="265" width="470" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 3: THREE-FACTORY SOVEREIGNTY -->
+        <mxCell id="grp_fabs" value="3. THREE-FACTORY SOVEREIGNTY (ONE METHOD, THREE FABS)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#818CF8;fontColor=#818CF8;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="110" width="490" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="fab1" value="&lt;b&gt;FAB 1: SkyWater 130 nm (USA)&lt;/b&gt;&lt;br&gt;• Status: &lt;font color='#34D399'&gt;&lt;b&gt;PROVEN SILICON&lt;/b&gt;&lt;/font&gt; (TinyTapeout-6 + Test Die)&lt;br&gt;• Role: Rapid MPW prototyping ($14,950/slot), 130nm BCD (5–120V)&lt;br&gt;• SKUs: SKU-1, 2, 4, 5, 8, 9, DG32-LITE, DG32-2DOM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_fabs">
+          <mxGeometry x="20" y="45" width="450" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="fab2" value="&lt;b&gt;FAB 2: IHP SG13G2 130 nm SiGe (Germany)&lt;/b&gt;&lt;br&gt;• Status: &lt;font color='#FBBF24'&gt;&lt;b&gt;DIFFERENTIATED RF&lt;/b&gt;&lt;/font&gt; (Free PDK, 350 GHz fT/fmax)&lt;br&gt;• Role: 77 GHz / 24 GHz 4D Radar Front-Ends (Physics limit: CMOS stops @ 30GHz)&lt;br&gt;• SKUs: SKU-7 Radar, SKU-21 V2X RF Front-End" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_fabs">
+          <mxGeometry x="20" y="130" width="450" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="fab3" value="&lt;b&gt;FAB 3: SCL Mohali 180 nm (India)&lt;/b&gt;&lt;br&gt;• Status: &lt;font color='#A7F3D0'&gt;&lt;b&gt;SOVEREIGN DEFENCE TARGET&lt;/b&gt;&lt;/font&gt;&lt;br&gt;• Role: Buy(Indian-IDDM) compliance, MIL-STD-883 screened silicon&lt;br&gt;• SKUs: SKU-3 Hi-Rel PMIC, SKU-6 Supervisor (Pathfinder)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#10B981;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_fabs">
+          <mxGeometry x="20" y="215" width="450" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="fab_note" value="&lt;b&gt;Sovereignty Rule:&lt;/b&gt; SCL Mohali is a business necessity for 100% IDDM status, not a nice-to-have." style="text;html=1;fontColor=#94A3B8;fontSize=9;align=center;" vertex="1" parent="grp_fabs">
+          <mxGeometry x="20" y="300" width="450" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 4: CANONICAL PROCESSOR: DGridRiscV RV32IM -->
+        <mxCell id="grp_cpu" value="4. CANONICAL PROCESSOR: DGridRiscV (RV32IM_Zicsr, misa = 0x40001100)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#EC4899;fontColor=#EC4899;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="460" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="cpu_spec" value="&lt;b&gt;Circuit-Code Constants (VexiiRiscv Generator)&lt;/b&gt;&lt;br&gt;• ISA: RV32IM_Zicsr (Machine Mode Only, PrivilegedPlugin)&lt;br&gt;• Issue: Single In-Order (lane0) · Pipeline: 2 Fetch / 6 Execute stages&lt;br&gt;• Multiply/Divide: Hardware MulPlugin + DivPlugin&lt;br&gt;• Shifter: 1-Cycle Full Barrel Shifter (BarrelShifterPlugin)&lt;br&gt;• Memory Protection: PMP Regions (PmpPlugin)&lt;br&gt;• Off-Core Ports: 32-bit AXI4 FetchCacheless &amp; LsuCacheless" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_cpu">
+          <mxGeometry x="20" y="45" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="cpu_missing" value="&lt;b&gt;Deliberately Omitted Features (Every Omission is a Decision)&lt;/b&gt;&lt;br&gt;• &lt;font color='#F87171'&gt;No Caches:&lt;/font&gt; Cache miss destroys determinism. Direct tightly-coupled SRAM.&lt;br&gt;• &lt;font color='#F87171'&gt;No Branch Prediction:&lt;/font&gt; Area saving; FOC loops are data-dominated.&lt;br&gt;• &lt;font color='#F87171'&gt;No FPU:&lt;/font&gt; Fixed-point maths gives bit-exact consistency across chips.&lt;br&gt;• &lt;font color='#F87171'&gt;No RVC (Compressed):&lt;/font&gt; Eliminates instruction fetch alignment latency." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#EF4444;fontColor=#CBD5E1;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_cpu">
+          <mxGeometry x="20" y="165" width="420" height="105" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 5: DEFENCE PROCUREMENT MOATS ("BOXES, NOT CHIPS") -->
+        <mxCell id="grp_moats" value="5. DEFENCE PROCUREMENT: &quot;BOXES, NOT CHIPS&quot; (PIL-5, SRIJAN, Make-II)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#F59E0B;fontColor=#F59E0B;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="480" width="510" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="box_boxes" value="&lt;b&gt;The PIL-5 Reality Finding (346 Items Audited)&lt;/b&gt;&lt;br&gt;Government lists name Line-Replaceable Units (LRUs), boxes, and assemblies — NEVER chips. DeepGrid enters one level down: supplying the silicon inside the listed box." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FEF3C7;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_moats">
+          <mxGeometry x="20" y="45" width="470" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="moat_ladder" value="&lt;b&gt;The 4 Sequential Statutory Filters:&lt;/b&gt;&lt;br&gt;1. &lt;font color='#38BDF8'&gt;DAP-2020 Buy(Indian-IDDM):&lt;/font&gt; Indian-designed parts beat imports before price is evaluated.&lt;br&gt;2. &lt;font color='#10B981'&gt;Positive Indigenisation Lists (PIL-1..5):&lt;/font&gt; Foreign vendor disqualified on milestone date.&lt;br&gt;3. &lt;font color='#F59E0B'&gt;SRIJAN Portal:&lt;/font&gt; 37,696 imported defence items published directly by DPSUs.&lt;br&gt;4. &lt;font color='#A855F7'&gt;Make-II Procedure:&lt;/font&gt; Industry-funded development earns guaranteed procurement order." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_moats">
+          <mxGeometry x="20" y="110" width="470" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="box_anchors" value="&lt;b&gt;Named Anchor Customers (September 2026):&lt;/b&gt;&lt;br&gt;• Chip 1: Airgap Technology (EV motors) · Chip 2: Ripple Metering (LoRaWAN meters)&lt;br&gt;• Chip 4: Indian Army MCEME (₹1.01 Cr contracted) · Chip 8: BEL (17&quot; Cockpit Display)&lt;br&gt;• Chip 10: Chakravayu CPDL (Tactical Drones) · Chip 6: SCL MIL-883 Pathfinder" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#10B981;fontColor=#A7F3D0;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_moats">
+          <mxGeometry x="20" y="215" width="470" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 6: CHARLIE MUNGER AUDIT, CHINESE CRASH & STOP RULES -->
+        <mxCell id="grp_munger" value="6. CHARLIE MUNGER AUDIT, CRASH CASE &amp; STOP RULES S1–S4" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#EF4444;fontColor=#EF4444;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="480" width="490" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="crash_table" value="&lt;b&gt;FY31 Chinese Price Crash Stress Test:&lt;/b&gt;&lt;br&gt;• Smart Meters: ₹480 Cr → &lt;b&gt;₹340 Cr&lt;/b&gt; (-30% tender squeeze)&lt;br&gt;• Motor Controllers: ₹220 Cr → &lt;b&gt;₹130 Cr&lt;/b&gt; (-40% exposed)&lt;br&gt;• Defence (Screened): ₹200 Cr → &lt;b&gt;₹200 Cr&lt;/b&gt; (&lt;font color='#34D399'&gt;Untouchable by Import Ban&lt;/font&gt;)&lt;br&gt;• Drone Brain: ₹65 Cr → &lt;b&gt;₹55 Cr&lt;/b&gt; | Zonal Gateway: ₹35 Cr → &lt;b&gt;₹25 Cr&lt;/b&gt;&lt;br&gt;• &lt;font color='#F59E0B'&gt;Total: ₹1,000 Cr Plan → ₹750 Cr Crash Case (Plan survives, Series A triggers)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#EF4444;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_munger">
+          <mxGeometry x="20" y="45" width="450" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="stop_rules" value="&lt;b&gt;Pre-Committed Stop Rules (S1–S4):&lt;/b&gt;&lt;br&gt;• &lt;b&gt;S1:&lt;/b&gt; If Ripple hasn't signed by fab-order date, Chip 2 waits 1 cycle; money moves to 1 &amp; 3.&lt;br&gt;• &lt;b&gt;S2:&lt;/b&gt; If Chip 6 fails military screening twice, slip defence revenue 12 months in 30 days.&lt;br&gt;• &lt;b&gt;S3:&lt;/b&gt; In FY29, if Chinese prices &lt; manufacturing cost, exit fan market; keep EV &amp; internal.&lt;br&gt;• &lt;b&gt;S4:&lt;/b&gt; If SCL Mohali runs &gt;2 cycles late, publicly state it and lean on SkyWater / IHP." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FEF3C7;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_munger">
+          <mxGeometry x="20" y="155" width="450" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION 7: ₹10 CRORE USE OF FUNDS ALLOCATION -->
+        <mxCell id="grp_funds" value="7. ₹10 CRORE SEED ROUND CAPITAL WATERFALL" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#34D399;fontColor=#34D399;fontSize=13;fontStyle=1;startSize=30;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="800" width="1520" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="fund_fab" value="&lt;b&gt;₹3.60 Cr (36%)&lt;/b&gt;&lt;br&gt;Factory Runs &amp; Masks&lt;br&gt;&lt;font color='#94A3B8'&gt;6 SkyWater MPWs + 1 IHP SiGe + 2 Production Mask Sets (Chips 1 &amp; 2)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=11;align=center;" vertex="1" parent="grp_funds">
+          <mxGeometry x="30" y="45" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="fund_eng" value="&lt;b&gt;₹2.40 Cr (24%)&lt;/b&gt;&lt;br&gt;Engineering Team&lt;br&gt;&lt;font color='#94A3B8'&gt;5–7 Engineers over 24 mos (1 Sr, 3 Mid, 2 Jr, 2 Analogue) in Hyderabad&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#10B981;fontColor=#10B981;fontSize=11;align=center;" vertex="1" parent="grp_funds">
+          <mxGeometry x="335" y="45" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="fund_qual" value="&lt;b&gt;₹1.80 Cr (18%)&lt;/b&gt;&lt;br&gt;Qualification &amp; Approval&lt;br&gt;&lt;font color='#94A3B8'&gt;4 Product Approvals (MIL-883, JSS, CEMILAC, Chip 6 Pathfinder)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#F59E0B;fontSize=11;align=center;" vertex="1" parent="grp_funds">
+          <mxGeometry x="640" y="45" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="fund_ate" value="&lt;b&gt;₹1.20 Cr (12%)&lt;/b&gt;&lt;br&gt;Test &amp; ATE Line&lt;br&gt;&lt;font color='#94A3B8'&gt;Automated Test Equipment, load boards, machine time (Previously Missing)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#EC4899;fontColor=#EC4899;fontSize=11;align=center;" vertex="1" parent="grp_funds">
+          <mxGeometry x="945" y="45" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="fund_sales" value="&lt;b&gt;₹1.00 Cr (10%)&lt;/b&gt;&lt;br&gt;Sales &amp; Working Capital&lt;br&gt;&lt;font color='#94A3B8'&gt;Eval kits, datasheets, distributor onboarding, customer support line&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#818CF8;fontColor=#818CF8;fontSize=11;align=center;" vertex="1" parent="grp_funds">
+          <mxGeometry x="1230" y="45" width="260" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTIONS -->
+        <mxCell id="e1" edge="1" source="fnl_9classes" target="box_cost" parent="1" style="strokeColor=#38BDF8;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;rounded=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" source="box_loop_total" target="fab1" parent="1" style="strokeColor=#10B981;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;rounded=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" source="fab1" target="fab2" parent="grp_fabs" style="strokeColor=#64748B;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" source="fab2" target="fab3" parent="grp_fabs" style="strokeColor=#64748B;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" source="cpu_spec" target="box_anchors" parent="1" style="strokeColor=#EC4899;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;rounded=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" source="box_boxes" target="crash_table" parent="1" style="strokeColor=#F59E0B;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;rounded=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" source="grp_loop" target="fund_fab" parent="1" style="strokeColor=#34D399;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;rounded=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

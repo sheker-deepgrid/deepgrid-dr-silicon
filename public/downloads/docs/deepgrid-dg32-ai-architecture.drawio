@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-15T11:00:00.000Z" agent="Antigravity" version="24.7.5">
+  <diagram name="DG32-LITE Edge AI &amp; Diagnostics Architecture" id="DG32_LITE_AI_ARCH">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="950" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ZONE 1: ANALOG FRONT-END & PHYSICAL SENSING DOMAIN -->
+        <mxCell id="zone_afe" value="ZONE 1: ANALOG FRONT-END &amp; PHYSICAL TRANSDUCERS (ISO 13373 / ISO 20958)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#F0FDF4;strokeColor=#16A34A;strokeWidth=2;dashed=1;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="360" height="850" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_accel" value="Stud-Mounted Piezo / MEMS Accel&#xa;(≥5 kHz Flat Bandwidth · ISO 13373-1)&#xa;[44% Motor Failure Root Cause]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="50" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_shunts" value="3-Phase Motor Shunts + CSAs&#xa;(12–16 bit Synchronized ADC · 42+ dB DR)&#xa;[MCSA Rotor Bar &amp; Eccentricity Detection]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="145" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_notch" value="Analog Fundamental Suppressor&#xa;(Active 50/60 Hz Fundamental Notch Filter)&#xa;[Exposes Sidebands -40 to -60 dBc]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9C3;strokeColor=#CA8A04;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="240" width="310" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_cordic" value="Hardware CORDIC Math Unit (130nm)&#xa;(Park/Clarke Transform + Polar Magnitude)&#xa;[120 Cycles / 20 Iterations · Free in FOC Loop]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="335" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_decimator" value="Decimator &amp; Band-Pass IIR Biquad&#xa;(Decimates to 1–2 kS/s Ahead of Buffer)&#xa;[4,000 Cycles · 0.08 ms · Working RAM &lt; 4 KB]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="435" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_goertzel" value="Goertzel Filter Recurrence Bank (8 Bins)&#xa;(Calculates Discrete Sidebands at 2·s·f1)&#xa;[6,144 Cycles · 0.12 ms · Replaces 8 MB FFT]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="535" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_envelope" value="Envelope Demodulation Unit&#xa;(Hilbert-Huang / Rectify + LPF + FFT-256)&#xa;[5,000 Cycles · 0.10 ms · 4x-5x Feature Gain]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="635" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="afe_moments" value="Dual Statistical Estimator&#xa;(Monotonic RMS + Non-Monotonic Kurtosis)&#xa;[ISO 20816 Zones A/B/C/D · 7,000 Cycles]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_afe">
+          <mxGeometry x="25" y="735" width="310" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 2: 50 MHz RV32IM SCALAR INFERENCE CORE -->
+        <mxCell id="zone_core" value="ZONE 2: DG32-LITE 50 MHz SCALAR COMPUTE ENGINE (12.5 MMAC/s BUDGET)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=3;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="440" y="40" width="530" height="850" as="geometry"/>
+        </mxCell>
+
+        <!-- SUB-TIER 1: ZERO-MULTIPLY DECISION FORESTS -->
+        <mxCell id="tier_trees" value="TIER 1 (FIRST CHOICE): ZERO-MULTIPLY TREE ENSEMBLES &amp; DISCRIMINANTS" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=11;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontStyle=1;spacingTop=8;" vertex="1" parent="zone_core">
+          <mxGeometry x="25" y="50" width="480" height="220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_rf" value="Random Forest (100 Trees × Depth 8)&#xa;800 Comparisons · 0 Multiplies · 3,200 Cycles&#xa;Latency: 0.06 ms · RAM: 20 KB · Max Rate: &gt;1 kHz&#xa;[Bearing Faults, Gear-Mesh, Valve Flutter, Cavitation]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_trees">
+          <mxGeometry x="20" y="35" width="440" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_gbdt" value="Gradient Boosted Trees (200 Trees × Depth 4)&#xa;Cycle Cost: 3,200 · Latency: 0.06 ms · RAM: 12 KB&#xa;[Pump Cavitation / Dry Run, Sudden Stall &amp; Kickback]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_trees">
+          <mxGeometry x="20" y="95" width="440" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_lda" value="Linear Discriminant Analysis (LDA) / Logistic Regression&#xa;Cycle Cost: 128 Cycles · Latency: &lt;0.01 ms · RAM: 0.7 KB&#xa;[Broken Rotor Bars, Severity Trending, Airgap Eccentricity]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_trees">
+          <mxGeometry x="20" y="150" width="440" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- SUB-TIER 2: ANOMALY & REGIME DETECTORS -->
+        <mxCell id="tier_anomaly" value="TIER 2: DENSE REGIME CLASSIFIERS &amp; DISTANCE METRICS" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=11;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontStyle=1;spacingTop=8;" vertex="1" parent="zone_core">
+          <mxGeometry x="25" y="290" width="480" height="250" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_mahalanobis" value="Mahalanobis Single Scalar Distance&#xa;Cycle Cost: 4,096 · Latency: 0.08 ms · RAM: 2 KB&#xa;[Stator Inter-Turn Short, Real-Time Hardware IRQ]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_anomaly">
+          <mxGeometry x="20" y="35" width="440" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_svm" value="One-Class SVM (Kernel Support Vector Machine)&#xa;Cycle Cost: 12,800 · Latency: 0.26 ms · RAM: 6.9 KB&#xa;[Arc-Fault &amp; High-Frequency Partial Discharge]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_anomaly">
+          <mxGeometry x="20" y="90" width="440" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_ekf" value="Extended Kalman Filter (EKF Observer)&#xa;Cycle Cost: 2,400 · Latency: 0.05 ms · RAM: 2 KB&#xa;[Sensorless Rotor Position Flux Observer &amp; Winding Thermal]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_anomaly">
+          <mxGeometry x="20" y="145" width="440" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_gmm" value="Gaussian Mixture Model (GMM) + 8-State HMM&#xa;Cycle Cost: 3,072 · Latency: 0.06 ms · RAM: 2 KB&#xa;[Operating Mode Identification, Duty-Cycle &amp; State Tracking]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_anomaly">
+          <mxGeometry x="20" y="200" width="440" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- SUB-TIER 3: NEURAL NETWORKS & SEQUENCES -->
+        <mxCell id="tier_nn" value="TIER 3 (CEILING): DENSE NETWORKS, AUTOENCODERS &amp; 1D-CNN" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=11;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontStyle=1;spacingTop=8;" vertex="1" parent="zone_core">
+          <mxGeometry x="25" y="560" width="480" height="260" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_mlp" value="MLP 32-16-8-4 Classifier / Friction Compensator&#xa;Cycle Cost: 2,688 · Latency: 0.05 ms · RAM: 0.7 KB&#xa;[Adaptive Cogging Feedforward &amp; Battery State-of-Health]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_nn">
+          <mxGeometry x="20" y="30" width="440" height="48" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_ae" value="MLP Autoencoder (Unsupervised Drift Detection)&#xa;Cycle Cost: 22,016 · Latency: 0.44 ms · RAM: 5.5 KB&#xa;[Healthy Manifold Reconstruction Error on Fused Sensors]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_nn">
+          <mxGeometry x="20" y="83" width="440" height="48" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_gru" value="GRU Sequence Model (16 Recurrent Units)&#xa;Cycle Cost: 147,456 · Latency: 2.95 ms · RAM: 1.6 KB · Max Rate: 270 Hz&#xa;[Short-Horizon Process Variable Forecasting]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="tier_nn">
+          <mxGeometry x="20" y="136" width="440" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="model_cnn" value="1D-CNN (8/16/32 Filter Ceiling) — Raw Waveform Input&#xa;Cycle Cost: 512,000 · Latency: 10.24 ms · RAM: 14 KB · Max Rate: 80 Hz&#xa;[End-to-End Raw Vibration Waveform Classification Without Hand Features]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=10;" vertex="1" parent="tier_nn">
+          <mxGeometry x="20" y="191" width="440" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 3: DETERMINISTIC LOCKSTEP SAFETY & ACTUATION -->
+        <mxCell id="zone_safety" value="ZONE 3: HARDWARE SAFETY &amp; LOCKSTEP INTERLOCKS (ISO 26262 ASIL-D)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#FEF2F2;strokeColor=#DC2626;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="40" width="350" height="850" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_checker" value="Secondary Redundant Checking Core&#xa;(2-Cycle Temporal Delay Skew)&#xa;[Cycle-by-Cycle Store Retirement Comparator]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="50" width="300" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_advisory" value="Advisory ML Decision Bridge&#xa;(Strict Advisory Boundary Protocol)&#xa;[ML Never Directly Overrides Safe Hardware Trips]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="150" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_cwru_gate" value="Leakage-Free Validation Filter&#xa;(Bearing-Wise Partitioning Enforcement)&#xa;[Rejects 99% Academic Claims; Retains 65–80% Floor]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="260" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_trip" value="Hardwired Fault Trip Registers&#xa;(Overcurrent, Overtemp, Phase Loss, Stall)&#xa;[Asserts FAULTn Within &lt;2 Clock Cycles]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="370" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_pwm" value="Isolated 7-Channel PWM Gate Drivers&#xa;(Shoot-Through Lockout &amp; Dead-Time Hardware)&#xa;[Direct 120V Inverter Pre-Driver Disconnect]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="480" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_telemetry" value="CAN-FD / LIN Diagnostics Transceiver&#xa;(Periodic ISO 20816 Health Telemetry &amp; Alerts)&#xa;[Predictive Maintenance Warning Packets]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#3B82F6;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="590" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="safe_upgrade_path" value="DG32-2DOM Pin-Compatible Upgrade&#xa;(Isolated 114 MHz INT8 Attention Engine)&#xa;[Zero Board Respin · Same Frozen Control Core]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#7C3AED;fontStyle=1;fontSize=11;" vertex="1" parent="zone_safety">
+          <mxGeometry x="25" y="700" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- DIRECTIONAL CONNECTING BUSES -->
+        <!-- Bus 1: AFE Accel to Envelope Demodulator -->
+        <mxCell id="bus1" value="[1] Decimated Vibration Band (1–2 kS/s)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="afe_accel" target="afe_envelope" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 2: Shunts to Notch and Goertzel -->
+        <mxCell id="bus2" value="[2] Phase Current (16-bit)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="afe_shunts" target="afe_notch" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 3: Notch to Goertzel Filter -->
+        <mxCell id="bus3" value="[3] Fundamental Suppressed Signal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CA8A04;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="afe_notch" target="afe_goertzel" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 4: Envelope Features to Random Forest -->
+        <mxCell id="bus4" value="[4] Demodulated Peaks &amp; Moments (0.92 ms)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=3;fontStyle=1;fontSize=10;" edge="1" source="afe_envelope" target="model_rf" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 5: Goertzel Bins to LDA -->
+        <mxCell id="bus5" value="[5] 2·s·f1 Sideband Magnitudes (0.13 ms)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=3;fontStyle=1;fontSize=10;" edge="1" source="afe_goertzel" target="model_lda" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 6: CORDIC to Mahalanobis & EKF -->
+        <mxCell id="bus6" value="[6] Park &amp; Clarke Coordinates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="afe_cordic" target="model_mahalanobis" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 7: AI Models to Advisory Bridge -->
+        <mxCell id="bus7" value="[7] ML Advisory Health Indices" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=3;fontStyle=1;fontSize=10;" edge="1" source="tier_trees" target="safe_advisory" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 8: Advisory to Safety Trip Interlock -->
+        <mxCell id="bus8" value="[8] Gated Advisory Trip Request" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=2;fontStyle=1;fontSize=10;" edge="1" source="safe_advisory" target="safe_trip" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Bus 9: Safe Trip to PWM Disconnect -->
+        <mxCell id="bus9" value="[9] Instant PWM Inverter Disconnect (&lt;2 Cycles)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=3;fontStyle=1;fontSize=10;" edge="1" source="safe_trip" target="safe_pwm" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-14T20:48:00.000Z" agent="Antigravity" version="24.7.5">
+  <diagram name="Three-Factory Sovereignty Roadmap Architecture" id="THREE_FACTORY_ARCH">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="950" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ZONE 1: FACTORY 1 - PROVEN (SKYWATER 130nm) -->
+        <mxCell id="zone_skywater" value="FACTORY 1: PROVEN · SKYWATER TECHNOLOGY (USA) · SKY130 (130nm CMOS)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=12;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="400" height="420" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sky_status" value="STATUS: VALIDATED SILICON ON MPW SHUTTLES&#xa;(Physical Silicon Proved via OpenLane / Yosys / OpenROAD)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skywater">
+          <mxGeometry x="20" y="40" width="360" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sky_digital" value="Portable Digital RTL Core&#xa;(DGridRiscV RV32IM @ 200 MHz)&#xa;100% Scriptable Port via OpenROAD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=11;" vertex="1" parent="zone_skywater">
+          <mxGeometry x="20" y="105" width="360" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sky_cost" value="Rapid Low-Cost Commercial Prototyping&#xa;($14,300 per MPW Slot vs $1M Proprietary EDA)&#xa;Anchor Products: Commercial BLDC, Supervisor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skywater">
+          <mxGeometry x="20" y="185" width="360" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sky_legal" value="Procurement Classification: DAP-2020 Buy (Indian)&#xa;Indian RTL Ownership Overcomes Pure Foreign Imports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#1D4ED8;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skywater">
+          <mxGeometry x="20" y="260" width="360" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sky_handoff" value="Digital Netlist &amp; Testbench Suite (Verilog GDSII)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#1E40AF;fontStyle=1;fontSize=10;" vertex="1" parent="zone_skywater">
+          <mxGeometry x="20" y="340" width="360" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 2: FACTORY 2 - DIFFERENTIATED (IHP LEIBNIZ SG13G2) -->
+        <mxCell id="zone_ihp" value="FACTORY 2: DIFFERENTIATED · IHP LEIBNIZ (GERMANY) · SG13G2 (130nm SiGe BiCMOS)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=12;fillColor=#F0FDF4;strokeColor=#16A34A;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="40" width="420" height="420" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ihp_status" value="STATUS: PLANNED RADAR TAPEOUT&#xa;(Ultra-High Frequency Physics Boundary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontStyle=1;fontSize=10;" vertex="1" parent="zone_ihp">
+          <mxGeometry x="20" y="40" width="380" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ihp_physics" value="SiGe:C HBT Heterojunction Transistors&#xa;(fT = 350 GHz, fmax = 450 GHz)&#xa;Delivers Physics Needed for 77 GHz mmWave" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;fontStyle=1;fontSize=11;" vertex="1" parent="zone_ihp">
+          <mxGeometry x="20" y="105" width="380" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ihp_socket" value="SKU-7: 77 GHz 4D Imaging MIMO Radar Front-End&#xa;3.75 cm Distance Resolution, DO-160G Airborne Profile&#xa;Fuses with D100 UAV Collision Avoidance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;fontStyle=1;fontSize=10;" vertex="1" parent="zone_ihp">
+          <mxGeometry x="20" y="185" width="380" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ihp_legal" value="Specialized Aerospace Export Agreement&#xa;High-Speed RF Front-End Wire-Bonded into Organic SiP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#15803D;fontStyle=1;fontSize=10;" vertex="1" parent="zone_ihp">
+          <mxGeometry x="20" y="260" width="380" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ihp_handoff" value="Validated RF / mmWave Front-End Die (Known Good Die)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBF7D0;strokeColor=#15803D;fontStyle=1;fontSize=10;" vertex="1" parent="zone_ihp">
+          <mxGeometry x="20" y="340" width="380" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 3: FACTORY 3 - SOVEREIGN (SCL MOHALI 180nm) -->
+        <mxCell id="zone_scl" value="FACTORY 3: SOVEREIGN · SCL MOHALI (PUNJAB, INDIA) · 180nm CMOS / BCD" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=12;fillColor=#FEF2F2;strokeColor=#DC2626;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="40" width="400" height="420" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="scl_status" value="STATUS: STRATEGIC SOVEREIGN COMPLIANCE&#xa;(100% Domestic Fabrication &amp; Packaging)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontStyle=1;fontSize=10;" vertex="1" parent="zone_scl">
+          <mxGeometry x="20" y="40" width="360" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="scl_digital" value="Retargeted DGridRiscV Core (SCL 180nm Lib)&#xa;Private ECC Scratchpad Memory &amp; Timers&#xa;Scripted Retargeting via OpenROAD (.lib Swap)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DC2626;fontStyle=1;fontSize=11;" vertex="1" parent="zone_scl">
+          <mxGeometry x="20" y="105" width="360" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="scl_analog" value="Re-Engineered High-Voltage BCD Modules&#xa;SKU-3 PMIC (28V/5V), SKU-6 Voltage Supervisor&#xa;Manual Custom Layout for SCL Process Physics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DC2626;fontStyle=1;fontSize=10;" vertex="1" parent="zone_scl">
+          <mxGeometry x="20" y="185" width="360" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="scl_legal" value="DAP-2020 Buy (Indian-IDDM) Monopoly Priority&#xa;100% Sovereign Defense Procurement Immunity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#B91C1C;fontStyle=1;fontSize=10;" vertex="1" parent="zone_scl">
+          <mxGeometry x="20" y="260" width="360" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="scl_handoff" value="Sovereign Qualified Military Silicon (MIL-STD-883)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCA5A5;strokeColor=#B91C1C;fontStyle=1;fontSize=10;" vertex="1" parent="zone_scl">
+          <mxGeometry x="20" y="340" width="360" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 4: PORTING RULES & SILICON ARBITRATION MATRIX -->
+        <mxCell id="zone_porting" value="ZONE 4: THE HONEST PHYSICS BOUNDARY (WHAT MOVES AUTOMATICALLY VS WHAT MUST BE RE-ENGINEERED)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#F8FAFC;strokeColor=#0E7490;strokeWidth=2;spacingTop=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="490" width="1320" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="port_digital" value="PORTABLE VIA SCRIPTING (AUTOMATED):&#xa;• Verilog / SystemVerilog RTL Codebases&#xa;• Testbenches &amp; Verification Coverage Matrices&#xa;• DGridRiscV Core (RV32IM_Safety Architecture)&#xa;• OpenROAD Scripted Synthesis via Liberty (.lib) Swap" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#3B82F6;fontStyle=1;fontSize=11;align=left;spacingLeft=15;" vertex="1" parent="zone_porting">
+          <mxGeometry x="30" y="45" width="600" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="port_analog" value="REQUIRES MANUAL RE-ENGINEERING (PHYSICS-BOUND):&#xa;• Bandgap Voltage References &amp; Current Mirrors (Tempco 12 ppm/°C)&#xa;• High-Voltage LDMOS Power Output Stages &amp; Gate Drivers&#xa;• Non-Volatile Memory (NVM / EEPROM) Foundry Hard Macros&#xa;• ESD / EOS Protection Pad Rings &amp; Guard Rings (1–2 Shuttles Required)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#EF4444;fontStyle=1;fontSize=11;align=left;spacingLeft=15;" vertex="1" parent="zone_porting">
+          <mxGeometry x="690" y="45" width="600" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 5: PACKAGING & SYSTEM SYNTHESIS -->
+        <mxCell id="zone_packaging" value="ZONE 5: HETEROGENEOUS MULTI-DIE ORGANIC PACKAGING (HYDERABAD ATMP)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=13;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="720" width="1320" height="180" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pack_sip" value="4-Layer Organic Substrate (FR4 / BT Core) BGA Packaging&#xa;Composes Mature Silicon from SkyWater/IHP/SCL into a Unified Defence Module" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontStyle=1;fontSize=12;" vertex="1" parent="zone_packaging">
+          <mxGeometry x="30" y="45" width="1260" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pack_ate" value="Dedicated ₹1.2 Cr Automated Test Equipment (ATE) Line&#xa;(Production Screening in Hyderabad)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_packaging">
+          <mxGeometry x="30" y="105" width="400" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pack_qual" value="MIL-STD-883 / JSS-55555 / CEMILAC Screening&#xa;(High Temp, Vibration, Shock Thermal Qualification)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_packaging">
+          <mxGeometry x="460" y="105" width="400" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pack_customer" value="Live Sovereign Indian Procurement&#xa;(Indian Army MCEME ₹1.01 Cr, BEL, ideaForge)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;fontSize=10;" vertex="1" parent="zone_packaging">
+          <mxGeometry x="890" y="105" width="400" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- NUMBERED EDGES -->
+        <mxCell id="edge_f1" value="[1] OpenROAD Scripted Port" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2563EB;strokeWidth=2;fontSize=10;" edge="1" source="sky_handoff" target="port_digital" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge_f2" value="[2] SiGe RF Integration" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#16A34A;strokeWidth=2;fontSize=10;" edge="1" source="ihp_handoff" target="pack_sip" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="470"/>
+              <mxPoint x="700" y="730"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_f3" value="[3] Sovereign IDDM Path" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#DC2626;strokeWidth=2;fontSize=10;" edge="1" source="scl_handoff" target="pack_sip" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1160" y="470"/>
+              <mxPoint x="1160" y="730"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
