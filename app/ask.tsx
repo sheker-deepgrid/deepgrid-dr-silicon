@@ -10,7 +10,8 @@ import {SectionHead} from './detail';
 import {
   deepGridCatalog, searchDeepGridKnowledge, quickPrompts, 
   documentSources, DocumentSource,
-  graphNodes, graphEdges, DeepGridItem
+  graphNodes, graphEdges, DeepGridItem,
+  nodeToCatalogMap, catalogToNodeMap
 } from './data/deepgrid-knowledge';
 
 export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
@@ -31,16 +32,10 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [dragNode, setDragNode] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // Filter catalog items
-  const results = useMemo(() => {
-    const raw = searchDeepGridKnowledge(query);
-    if (activeCategory === 'all') return raw;
-    return raw.filter(item => item.category === activeCategory);
-  }, [query, activeCategory]);
-
-  // Active selected item details (either from clicked node or directly selected)
+  // Active selected item details with bidirectional mapping
   const activeDetailItem = useMemo(() => {
-    return deepGridCatalog.find(item => item.id === selectedNodeId) || deepGridCatalog[0];
+    const catalogId = nodeToCatalogMap[selectedNodeId] || selectedNodeId;
+    return deepGridCatalog.find(item => item.id === catalogId) || deepGridCatalog[0];
   }, [selectedNodeId]);
 
   // Connected nodes and edges to active node
@@ -53,6 +48,13 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     return set;
   }, [selectedNodeId]);
 
+  // Filter catalog items
+  const results = useMemo(() => {
+    const raw = searchDeepGridKnowledge(query);
+    if (activeCategory === 'all') return raw;
+    return raw.filter(item => item.category === activeCategory);
+  }, [query, activeCategory]);
+
   // Document filter for quick queries
   const filteredPrompts = useMemo(() => {
     if (selectedDocId === 'all') return quickPrompts;
@@ -62,6 +64,32 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const activeDoc = useMemo(() => {
     return documentSources.find(d => d.id === selectedDocId) || documentSources[0];
   }, [selectedDocId]);
+
+  // Handle Query Selection with Category Auto-Selection & Graph Binding
+  const handleQuerySelect = (promptQuery: string) => {
+    setQuery(promptQuery);
+    const matches = searchDeepGridKnowledge(promptQuery);
+    if (matches.length > 0) {
+      const matchedItem = matches[0];
+      const targetNodeId = catalogToNodeMap[matchedItem.id] || matchedItem.id;
+      setSelectedNodeId(targetNodeId);
+
+      // Category auto-selection: if category filter would hide the matched node, clear restriction
+      if (activeCategory !== 'all' && activeCategory !== matchedItem.category) {
+        setActiveCategory('all');
+      }
+    }
+  };
+
+  // Handle Node Click with Category Auto-Selection
+  const handleNodeSelect = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    const catalogId = nodeToCatalogMap[nodeId] || nodeId;
+    const item = deepGridCatalog.find(i => i.id === catalogId);
+    if (item && activeCategory !== 'all' && activeCategory !== item.category) {
+      setActiveCategory('all');
+    }
+  };
 
   const categories = [
     { id: 'all', label: 'All Intelligence' },
@@ -137,8 +165,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             onChange={e => {
               setQuery(e.target.value);
               if (activeView === 'graph' && e.target.value) {
-                const matches = searchDeepGridKnowledge(e.target.value);
-                if (matches.length > 0) setSelectedNodeId(matches[0].id);
+                handleQuerySelect(e.target.value);
               }
             }}
             placeholder="Ask about SKUs (1–10), D100, lockstep latency, 198-day loop, 3-factory sovereignty, DAP-2020..."
@@ -196,11 +223,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               <button
                 key={p.id}
                 className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
-                onClick={() => {
-                  setQuery(p.query);
-                  const matches = searchDeepGridKnowledge(p.query);
-                  if (matches.length > 0) setSelectedNodeId(matches[0].id);
-                }}
+                onClick={() => handleQuerySelect(p.query)}
                 title={p.query}
               >
                 <span className="dr-ask-chip-doc">{p.docBadge}</span>
@@ -305,10 +328,8 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   const pFrom = nodePositions[e.from] || { x: 50, y: 50 };
                   const pTo = nodePositions[e.to] || { x: 50, y: 50 };
                   const isHighlighted = e.from === selectedNodeId || e.to === selectedNodeId;
-                  const nodeFrom = graphNodes.find(n => n.id === e.from);
-                  const nodeTo = graphNodes.find(n => n.id === e.to);
-                  const edgeCategoryMatch = activeCategory === 'all' || (nodeFrom?.category === activeCategory || nodeTo?.category === activeCategory);
-                  const edgeOpacity = isHighlighted ? 1 : (edgeCategoryMatch ? 0.6 : 0.1);
+                  const isNeighborConnection = activeConnectedNodeIds.has(e.from) && activeConnectedNodeIds.has(e.to);
+                  const edgeOpacity = isHighlighted ? 1 : (isNeighborConnection ? 0.35 : 0.08);
 
                   return (
                     <g key={idx} className={`dr-edge-group ${isHighlighted ? 'highlighted' : ''}`} style={{ opacity: edgeOpacity, transition: 'opacity 0.25s ease' }}>
@@ -318,23 +339,41 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                         x2={pTo.x}
                         y2={pTo.y}
                         className="dr-graph-edge-line"
+                        stroke={isHighlighted ? "#d4a36e" : "#51625a"}
+                        strokeWidth={isHighlighted ? "0.6" : "0.22"}
                       />
                       {isHighlighted && (
-                        <text
-                          x={(pFrom.x + pTo.x) / 2}
-                          y={(pFrom.y + pTo.y) / 2 - 1}
-                          className="dr-graph-edge-text"
-                          textAnchor="middle"
-                        >
-                          {e.label}
-                        </text>
+                        <g>
+                          <rect
+                            x={(pFrom.x + pTo.x) / 2 - 9}
+                            y={(pFrom.y + pTo.y) / 2 - 2.6}
+                            width="18"
+                            height="3.2"
+                            rx="0.6"
+                            fill="#0c0f0e"
+                            stroke="#d4a36e66"
+                            strokeWidth="0.15"
+                          />
+                          <text
+                            x={(pFrom.x + pTo.x) / 2}
+                            y={(pFrom.y + pTo.y) / 2 - 0.5}
+                            className="dr-graph-edge-text"
+                            textAnchor="middle"
+                            fill="#eee6d4"
+                            fontSize="1.5"
+                            fontFamily="monospace"
+                            fontWeight="600"
+                          >
+                            {e.label}
+                          </text>
+                        </g>
                       )}
                     </g>
                   );
                 })}
               </g>
 
-              {/* Nodes */}
+              {/* Nodes with True Subgraph Dimming */}
               <g className="dr-graph-nodes">
                 {graphNodes.map(node => {
                   const pos = nodePositions[node.id] || { x: node.x, y: node.y };
@@ -342,7 +381,17 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   const isConnected = activeConnectedNodeIds.has(node.id);
                   const color = getNodeColor(node.category);
                   const isCategoryMatch = activeCategory === 'all' || node.category === activeCategory;
-                  const nodeOpacity = isCategoryMatch || isSelected || isConnected ? 1 : 0.22;
+
+                  // True Subgraph Dimming:
+                  // Selected: 1.0, 1st-degree connected: 0.88, non-connected: 0.20 (or 0.12 if category filter)
+                  let nodeOpacity = 0.20;
+                  if (isSelected) {
+                    nodeOpacity = 1.0;
+                  } else if (isConnected) {
+                    nodeOpacity = 0.88;
+                  } else if (activeCategory !== 'all') {
+                    nodeOpacity = isCategoryMatch ? 0.45 : 0.12;
+                  }
 
                   return (
                     <g
@@ -354,26 +403,39 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                       {/* Outer pulse halo for selected */}
                       {isSelected && (
                         <circle
-                          r="3.8"
+                          r="4.0"
                           className="dr-node-halo"
                           stroke={color}
                         />
                       )}
+                      {/* Outer ring for 1st-degree connected neighbors */}
+                      {isConnected && !isSelected && (
+                        <circle
+                          r="2.8"
+                          fill="none"
+                          stroke={color}
+                          strokeWidth="0.3"
+                          strokeDasharray="0.8 0.4"
+                          opacity="0.8"
+                        />
+                      )}
                       {/* Center Node Dot */}
                       <circle
-                        r={isSelected ? "2.6" : "1.9"}
+                        r={isSelected ? "2.6" : (isConnected ? "2.1" : "1.7")}
                         fill={color}
                         className="dr-node-dot"
                         onMouseDown={(e) => handleMouseDown(node.id, e)}
-                        onClick={() => setSelectedNodeId(node.id)}
+                        onClick={() => handleNodeSelect(node.id)}
                       />
                       {/* Node Label */}
                       <text
                         y="4.2"
                         className="dr-node-label"
                         textAnchor="middle"
-                        fill={isSelected ? '#ffffff' : color}
-                        onClick={() => setSelectedNodeId(node.id)}
+                        fill={isSelected ? '#ffffff' : (isConnected ? color : '#7a8880')}
+                        fontWeight={isSelected || isConnected ? "600" : "400"}
+                        fontSize={isSelected ? "2.6" : (isConnected ? "2.2" : "1.8")}
+                        onClick={() => handleNodeSelect(node.id)}
                       >
                         {node.shortName}
                       </text>
