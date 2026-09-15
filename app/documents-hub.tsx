@@ -3,7 +3,7 @@
 import {useState, useEffect, useMemo} from 'react';
 import {
   FileText, Download, ArrowUpRight, Search, X, Check,
-  BookOpen, Sparkles, Layers, Cpu, Compass, ExternalLink,
+  BookOpen, Sparkles, Compass,
   Copy, ShieldCheck
 } from 'lucide-react';
 import {groundedDocuments, GroundedDoc} from './documents-data';
@@ -58,15 +58,15 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
           `# ${readingDoc.title}\n\n` +
           `**Document Identifier:** ${readingDoc.badge}\n` +
           `**Subsystem:** ${readingDoc.subsystem}\n` +
-          `**Primary Specification File:** \`${readingDoc.specFileName}\` (${readingDoc.fileSizeMd})\n` +
-          `**Vector Diagram Source:** \`${readingDoc.diagramFileName}\` (${readingDoc.fileSizeDrawio})\n\n` +
+          `**Official Source Document:** \`${readingDoc.pdfFileName}\` (${readingDoc.fileSizePdf} · ${readingDoc.pdfPageCount})\n` +
+          `**Markdown Architecture Spec:** \`${readingDoc.specFileName}\` (${readingDoc.fileSizeMd})\n\n` +
           `---\n\n` +
           `## Executive Summary\n\n${readingDoc.summary}\n\n` +
           `## Key Technical Parameters\n\n` +
           readingDoc.stats.map(s => `- **${s.label}:** ${s.value}`).join('\n') +
           `\n\n## Core Engineering Takeaways\n\n` +
           readingDoc.highlights.map(h => `- ${h}`).join('\n') +
-          `\n\n---\n*Click "Download Spec (.md)" in the header to view or edit the full raw repository source.*`
+          `\n\n---\n*Click "Download PDF" in the header to view the complete authoritative publication PDF.*`
         );
         setLoadingContent(false);
       });
@@ -92,17 +92,37 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
   };
 
   return (
-    <section className="dr-docs-hub" aria-label="Grounded Architecture Documents Registry">
+    <section className="dr-docs-hub" aria-label="Authoritative Design Documents & Specs">
       <header className="dr-docs-hub-header">
         <div>
-          <p className="dr-lib-kicker">GROUNDED ARCHITECTURE REPOSITORY · 6 CORE SPECS & PLATFORMS</p>
-          <h2>Authoritative Design Documents & Specs</h2>
+          <p className="dr-lib-kicker">GROUNDED ARCHITECTURE REPOSITORY · 6 CORE DESIGN DOCUMENTS & SPECS</p>
+          <h2>Authoritative Design Documents &amp; Specs</h2>
           <p className="dr-docs-lead">
             Every simulation benchmark, timing envelope, clock partition, and pin configuration on this platform is
-            grounded in these design authority documents. Download raw source files, inspect editable Draw.io component-flow
-            models, or read the complete specifications online.
+            grounded in these design authority documents. Download the original authoritative PDFs, read full markdown specifications,
+            or cross-reference technical claims directly in the{' '}
+            {go ? (
+              <button className="dr-inline-link" onClick={() => go('ask')}>
+                Ask DeepGrid <ArrowUpRight size={14} />
+              </button>
+            ) : (
+              <a href="#ask" className="dr-inline-link">
+                Ask DeepGrid <ArrowUpRight size={14} />
+              </a>
+            )}{' '}
+            intelligence section.
           </p>
         </div>
+
+        {go && (
+          <div className="dr-docs-ask-cta">
+            <button className="dr-doc-btn dr-doc-btn-primary" onClick={() => go('ask')}>
+              <Sparkles size={15} />
+              <span>Explore in Ask DeepGrid</span>
+              <ArrowUpRight size={15} />
+            </button>
+          </div>
+        )}
       </header>
 
       {/* Filter and Search Bar */}
@@ -130,7 +150,7 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
             className={filterGroup === 'platform' ? 'active' : ''}
             onClick={() => setFilterGroup('platform')}
           >
-            Platform & System Architectures <span className="dr-count-badge">3</span>
+            Platform &amp; System Architectures <span className="dr-count-badge">3</span>
           </button>
         </div>
 
@@ -192,45 +212,45 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
 
             {/* Direct Clickable Links & Actions */}
             <div className="dr-doc-actions">
+              <a
+                className="dr-doc-btn dr-doc-btn-pdf"
+                href={doc.pdfFile}
+                download
+                title={`Download official PDF: ${doc.pdfFileName}`}
+              >
+                <FileText size={15} />
+                <span>Download PDF</span>
+                <small className="dr-btn-size">{doc.fileSizePdf}</small>
+              </a>
+
               <button
-                className="dr-doc-btn dr-doc-btn-primary"
+                className="dr-doc-btn"
                 onClick={() => setReadingDoc(doc)}
-                title="Read full formatted markdown document in browser"
+                title="Read formatted markdown document online"
               >
                 <BookOpen size={15} />
-                <span>Read Full Spec</span>
+                <span>Read Spec</span>
               </button>
 
               <a
                 className="dr-doc-btn"
                 href={doc.specFile}
                 download
-                title={`Download ${doc.specFileName} markdown specification`}
+                title={`Download raw ${doc.specFileName} markdown specification`}
               >
                 <Download size={14} />
                 <span>Spec (.md)</span>
                 <small className="dr-btn-size">{doc.fileSizeMd}</small>
               </a>
 
-              <a
-                className="dr-doc-btn"
-                href={doc.diagramFile}
-                download
-                title={`Download ${doc.diagramFileName} Draw.io vector diagram`}
-              >
-                <Layers size={14} />
-                <span>Diagram (.drawio)</span>
-                <small className="dr-btn-size">{doc.fileSizeDrawio}</small>
-              </a>
-
               {go && (
                 <button
                   className="dr-doc-btn dr-doc-btn-ghost"
                   onClick={() => go('ask')}
-                  title="Query this document in Ask DeepGrid Knowledge Console"
+                  title="Query this document in the Ask DeepGrid intelligence section"
                 >
                   <Sparkles size={14} />
-                  <span>Ask Console</span>
+                  <span>Ask DeepGrid</span>
                 </button>
               )}
             </div>
@@ -265,10 +285,22 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
                   <code>{readingDoc.specFileName}</code>
                   <span>·</span>
                   <span>{readingDoc.fileSizeMd}</span>
+                  <span>·</span>
+                  <span>PDF: {readingDoc.fileSizePdf} ({readingDoc.pdfPageCount})</span>
                 </div>
               </div>
 
               <div className="dr-reader-header-actions">
+                <a
+                  className="dr-doc-btn dr-doc-btn-pdf"
+                  href={readingDoc.pdfFile}
+                  download
+                  title="Download official PDF publication"
+                >
+                  <FileText size={15} />
+                  <span>Download PDF</span>
+                </a>
+
                 <button
                   className="dr-doc-btn dr-reader-copy-btn"
                   onClick={handleCopy}
@@ -288,16 +320,6 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
                   <span>.md</span>
                 </a>
 
-                <a
-                  className="dr-doc-btn"
-                  href={readingDoc.diagramFile}
-                  download
-                  title="Download editable Draw.io diagram"
-                >
-                  <Layers size={15} />
-                  <span>.drawio</span>
-                </a>
-
                 {go && (
                   <button
                     className="dr-doc-btn dr-doc-btn-ghost"
@@ -305,7 +327,7 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
                       setReadingDoc(null);
                       go('ask');
                     }}
-                    title="Deep dive in Ask DeepGrid console"
+                    title="Deep dive into this deliverable in Ask DeepGrid"
                   >
                     <Sparkles size={15} />
                     <span>Ask DeepGrid</span>
@@ -337,8 +359,8 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
 
             <footer className="dr-reader-footer">
               <div>
-                <span className="mono">FILE SOURCE:</span>{' '}
-                <code>scratch/deepgrid-dr-silicon/public/downloads/docs/{readingDoc.specFileName}</code>
+                <span className="mono">PDF SOURCE:</span>{' '}
+                <code>scratch/deepgrid-dr-silicon/public/downloads/docs/{readingDoc.pdfFileName}</code>
               </div>
               <button className="text-link" onClick={() => setReadingDoc(null)}>
                 Close reader (Esc)

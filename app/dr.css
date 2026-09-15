@@ -929,6 +929,45 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
   border-color: #435450;
 }
 
+.dr-doc-btn-pdf {
+  background: #1f1813;
+  border-color: #5c381c;
+  color: #f7a95e;
+  font-weight: 500;
+}
+
+.dr-doc-btn-pdf:hover {
+  background: var(--copper);
+  border-color: var(--copper);
+  color: #0c0f0e;
+}
+
+.dr-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  color: var(--copper);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+
+.dr-inline-link:hover {
+  color: #fff;
+}
+
+.dr-docs-ask-cta {
+  display: flex;
+  align-items: center;
+}
+
 .dr-btn-size {
   color: #7b8e78;
   font-size: .72rem;

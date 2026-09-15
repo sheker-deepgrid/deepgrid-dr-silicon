@@ -1,5 +1,5 @@
 // DeepGrid Grounded Architecture Documents & Specifications Data Registry
-// All 6 Core Deliverables (Docs #1..#6) + 3 Platform Deliverables
+// All 6 Core Authoritative Design Documents (Docs #1..#6) + 3 Platform Deliverables
 
 export interface GroundedDoc {
   id: string;
@@ -11,15 +11,16 @@ export interface GroundedDoc {
   subsystem: string;
   specFile: string;
   specFileName: string;
-  diagramFile: string;
-  diagramFileName: string;
+  pdfFile: string;
+  pdfFileName: string;
   fileSizeMd: string;
-  fileSizeDrawio: string;
+  fileSizePdf: string;
+  pdfPageCount: string;
   stats: { label: string; value: string }[];
   summary: string;
   highlights: string[];
   defaultQuery: string;
-  queryDocId?: 'doc1' | 'doc2' | 'doc3' | 'doc4' | 'doc5' | 'doc6';
+  queryDocId: 'doc1' | 'doc2' | 'doc3' | 'doc4' | 'doc5' | 'doc6';
 }
 
 export const groundedDocuments: GroundedDoc[] = [
@@ -33,10 +34,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Edge AI & Diagnostics',
     specFile: './downloads/docs/deepgrid-dg32-ai-architecture.md',
     specFileName: 'deepgrid-dg32-ai-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-dg32-ai-architecture.drawio',
-    diagramFileName: 'deepgrid-dg32-ai-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf',
+    pdfFileName: 'deepgrid-dg32-ai-30-use-cases.pdf',
     fileSizeMd: '7.3 KB',
-    fileSizeDrawio: '17.8 KB',
+    fileSizePdf: '414 KB',
+    pdfPageCount: '12 pages',
     stats: [
       { label: 'Compute Engine', value: '50 MHz RV32IM (Zero NPU)' },
       { label: 'Scalar Ceiling', value: '12.5 MMAC/s (int8)' },
@@ -63,10 +65,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Portfolio & System Platforms',
     specFile: './downloads/docs/deepgrid-sku-compendium-architecture.md',
     specFileName: 'deepgrid-sku-compendium-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-sku-compendium-architecture.drawio',
-    diagramFileName: 'deepgrid-sku-compendium-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-sku-compendium-technical-annex-v3.pdf',
+    pdfFileName: 'deepgrid-sku-compendium-technical-annex-v3.pdf',
     fileSizeMd: '7.5 KB',
-    fileSizeDrawio: '17.1 KB',
+    fileSizePdf: '4.95 MB',
+    pdfPageCount: '14 pages',
     stats: [
       { label: 'Silicon Portfolio', value: '10 SKUs (180nm BCD to 130nm SiGe)' },
       { label: 'Tactical Drone', value: 'D100 Drone SoC with failsafe island' },
@@ -93,10 +96,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'High-Speed Motor Telemetry',
     specFile: './downloads/docs/deepgrid-dshot-rx-architecture.md',
     specFileName: 'deepgrid-dshot-rx-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-dshot-rx-architecture.drawio',
-    diagramFileName: 'deepgrid-dshot-rx-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-dshot-rx-block-spec.pdf',
+    pdfFileName: 'deepgrid-dshot-rx-block-spec.pdf',
     fileSizeMd: '11.3 KB',
-    fileSizeDrawio: '19.2 KB',
+    fileSizePdf: '353 KB',
+    pdfPageCount: '8 pages',
     stats: [
       { label: 'Data Rates', value: 'DShot150 / 300 / 600 / 1200' },
       { label: 'Telemetry Engine', value: 'Hardware GCR 4b→5b eRPM reply' },
@@ -123,10 +127,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Condition Monitoring & Attention',
     specFile: './downloads/docs/deepgrid-2dom-architecture.md',
     specFileName: 'deepgrid-2dom-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-2dom-architecture.drawio',
-    diagramFileName: 'deepgrid-2dom-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf',
+    pdfFileName: 'deepgrid-dg32-2dom-system-architecture.pdf',
     fileSizeMd: '9.3 KB',
-    fileSizeDrawio: '19.9 KB',
+    fileSizePdf: '79 KB',
+    pdfPageCount: '24 pages',
     stats: [
       { label: 'Clock Partition', value: '50 MHz Control · 114 MHz Attention' },
       { label: 'CDC Mechanism', value: '4-Phase Asynchronous Handshake' },
@@ -153,10 +158,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Geopolitics & Strategic Moats',
     specFile: './downloads/docs/deepgrid-mature-silicon-architecture.md',
     specFileName: 'deepgrid-mature-silicon-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-mature-silicon-architecture.drawio',
-    diagramFileName: 'deepgrid-mature-silicon-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf',
+    pdfFileName: 'deepgrid-mature-node-silicon-master-whitepaper-v3.pdf',
     fileSizeMd: '10.7 KB',
-    fileSizeDrawio: '20.6 KB',
+    fileSizePdf: '5.62 MB',
+    pdfPageCount: '71 pages',
     stats: [
       { label: 'Import Funnel', value: '$9B Mature-Node Defence Market' },
       { label: 'Tapeout Cadence', value: '198-Day Shuttle Loop' },
@@ -183,10 +189,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Packaging, Clocks & Electrical Rules',
     specFile: './downloads/docs/deepgrid-datasheets-engineering-spec.md',
     specFileName: 'deepgrid-datasheets-engineering-spec.md',
-    diagramFile: './downloads/docs/deepgrid-qfn64-pinout-architecture.drawio',
-    diagramFileName: 'deepgrid-qfn64-pinout-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-datasheets-qfn64.pdf',
+    pdfFileName: 'deepgrid-datasheets-qfn64.pdf',
     fileSizeMd: '13.6 KB',
-    fileSizeDrawio: '16.8 KB',
+    fileSizePdf: '78 KB',
+    pdfPageCount: '24 pages',
     stats: [
       { label: 'Package Spec', value: 'QFN-64 (9×9 mm, 0.5 mm pitch)' },
       { label: 'Signal Pins', value: '44 Signal Pins across 11 groups' },
@@ -213,10 +220,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Tactical Drone Flight Systems',
     specFile: './downloads/docs/deepgrid-d100-architecture.md',
     specFileName: 'deepgrid-d100-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-d100-architecture.drawio',
-    diagramFileName: 'deepgrid-d100-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-sku-compendium-technical-annex-v3.pdf',
+    pdfFileName: 'deepgrid-sku-compendium-technical-annex-v3.pdf',
     fileSizeMd: '12.1 KB',
-    fileSizeDrawio: '17.1 KB',
+    fileSizePdf: '4.95 MB',
+    pdfPageCount: 'Sheet 09',
     stats: [
       { label: 'Core Topology', value: 'Quad RV64 (App) + Quad RV32 (Real-Time)' },
       { label: 'Failsafe Domain', value: 'Isolated Hardware Failsafe Island' },
@@ -243,10 +251,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Automotive Zonal Controllers',
     specFile: './downloads/docs/deepgrid-sdv-architecture.md',
     specFileName: 'deepgrid-sdv-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-sdv-architecture.drawio',
-    diagramFileName: 'deepgrid-sdv-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-sku-compendium-technical-annex-v3.pdf',
+    pdfFileName: 'deepgrid-sku-compendium-technical-annex-v3.pdf',
     fileSizeMd: '8.0 KB',
-    fileSizeDrawio: '14.0 KB',
+    fileSizePdf: '4.95 MB',
+    pdfPageCount: 'Sheet 10',
     stats: [
       { label: 'Weight Saved', value: '38 kg wiring harness reduction' },
       { label: 'Network Latency', value: '<50 µs deterministic CAN-XL' },
@@ -273,10 +282,11 @@ export const groundedDocuments: GroundedDoc[] = [
     subsystem: 'Manufacturing & Fab Strategy',
     specFile: './downloads/docs/deepgrid-three-factory-architecture.md',
     specFileName: 'deepgrid-three-factory-architecture.md',
-    diagramFile: './downloads/docs/deepgrid-three-factory-architecture.drawio',
-    diagramFileName: 'deepgrid-three-factory-architecture.drawio',
+    pdfFile: './downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf',
+    pdfFileName: 'deepgrid-mature-node-silicon-master-whitepaper-v3.pdf',
     fileSizeMd: '9.6 KB',
-    fileSizeDrawio: '12.4 KB',
+    fileSizePdf: '5.62 MB',
+    pdfPageCount: 'Section 4',
     stats: [
       { label: 'Foundry Network', value: 'SkyWater · SCL Mohali · Dholera 28nm' },
       { label: 'Node Distribution', value: '180nm BCD · 130nm CMOS · 28nm Planar' },

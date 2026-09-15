@@ -34,7 +34,7 @@ for(const [,ref] of html.matchAll(/(?:src|href)="([^"?#]+)"/g)){
 const appSource=fs.readdirSync(path.join(root,'app')).filter(f=>/\.(tsx?|css)$/.test(f)).map(f=>fs.readFileSync(path.join(root,'app',f),'utf8')).join('\n');
 // Every literal ./images|decks|media|downloads|diagrams path in the app must exist in the artifact,
 // plus one slide image per film segment, since slide paths are built at runtime.
-const images=[...new Set([...appSource.matchAll(/\.\/((?:images|decks|media|downloads|diagrams)\/[\w./-]+\.(?:webp|png|svg|jpg|mp4|vtt|pptx|drawio|md))/g)].map(m=>m[1]))];
+const images=[...new Set([...appSource.matchAll(/\.\/((?:images|decks|media|downloads|diagrams)\/[\w./-]+\.(?:webp|png|svg|jpg|mp4|vtt|pptx|drawio|md|pdf))/g)].map(m=>m[1]))];
 for(const rel of images)if(!fs.existsSync(path.join(output,rel)))throw Error('Missing asset: '+rel);
 for(const film of fs.readdirSync(path.join(root,'app/data')).filter(f=>f.endsWith('-film.json'))){
  const dir=film.replace(/-film\.json$/,'');
