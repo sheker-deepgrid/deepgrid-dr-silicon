@@ -3,16 +3,19 @@
 import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
-  BookOpen, X, Check, Network, LayoutGrid, RotateCcw
+  BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
+  FileText
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
   deepGridCatalog, searchDeepGridKnowledge, quickPrompts, 
+  documentSources, DocumentSource,
   graphNodes, graphEdges, DeepGridItem
 } from './data/deepgrid-knowledge';
 
 export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [query, setQuery] = useState('');
+  const [selectedDocId, setSelectedDocId] = useState<string>('all');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [activeView, setActiveView] = useState<'graph' | 'cards'>('graph');
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
@@ -49,6 +52,16 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     });
     return set;
   }, [selectedNodeId]);
+
+  // Document filter for quick queries
+  const filteredPrompts = useMemo(() => {
+    if (selectedDocId === 'all') return quickPrompts;
+    return quickPrompts.filter(p => p.docId === selectedDocId);
+  }, [selectedDocId]);
+
+  const activeDoc = useMemo(() => {
+    return documentSources.find(d => d.id === selectedDocId) || documentSources[0];
+  }, [selectedDocId]);
 
   const categories = [
     { id: 'all', label: 'All Intelligence' },
@@ -138,22 +151,63 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           )}
         </div>
 
-        {/* Quick prompt chips */}
-        <div className="dr-ask-prompts" aria-label="Quick queries">
-          <span className="dr-ask-prompts-label">QUICK QUERIES:</span>
-          {quickPrompts.map(p => (
-            <button
-              key={p.id}
-              className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
-              onClick={() => {
-                setQuery(p.query);
-                const matches = searchDeepGridKnowledge(p.query);
-                if (matches.length > 0) setSelectedNodeId(matches[0].id);
-              }}
-            >
-              {p.label}
-            </button>
-          ))}
+        {/* Document-Aware Quick Queries Explorer */}
+        <div className="dr-doc-selector-container">
+          <div className="dr-doc-selector-header">
+            <div className="dr-doc-selector-title">
+              <FileText size={15} className="dr-doc-icon" />
+              <span>FILTER BY SOURCE DOCUMENT:</span>
+            </div>
+            <div className="dr-doc-badges-strip" role="tablist" aria-label="Filter queries by document">
+              {documentSources.map(doc => (
+                <button
+                  key={doc.id}
+                  role="tab"
+                  aria-selected={selectedDocId === doc.id}
+                  className={`dr-doc-pill ${selectedDocId === doc.id ? 'active' : ''}`}
+                  onClick={() => setSelectedDocId(doc.id)}
+                  title={doc.title}
+                >
+                  <span className="dr-doc-pill-badge">{doc.badge}</span>
+                  <span className="dr-doc-pill-label">{doc.id === 'all' ? 'All (34 Queries)' : doc.title.split('(')[0].trim()}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active document context banner */}
+          <div className="dr-doc-active-banner">
+            <div className="dr-doc-active-left">
+              <span className="dr-doc-active-badge">{activeDoc.badge}</span>
+              <div className="dr-doc-active-info">
+                <span className="dr-doc-active-title">{activeDoc.title}</span>
+                <span className="dr-doc-active-sub">{activeDoc.subtitle}</span>
+              </div>
+            </div>
+            <div className="dr-doc-active-right">
+              <span className="dr-doc-active-file">REF: {activeDoc.fileReference}</span>
+            </div>
+          </div>
+
+          {/* Filtered Quick Prompts */}
+          <div className="dr-ask-prompts" aria-label="Quick queries">
+            <span className="dr-ask-prompts-label">HIGH-YIELD QUERIES ({filteredPrompts.length}):</span>
+            {filteredPrompts.map(p => (
+              <button
+                key={p.id}
+                className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
+                onClick={() => {
+                  setQuery(p.query);
+                  const matches = searchDeepGridKnowledge(p.query);
+                  if (matches.length > 0) setSelectedNodeId(matches[0].id);
+                }}
+                title={p.query}
+              >
+                <span className="dr-ask-chip-doc">{p.docBadge}</span>
+                <span className="dr-ask-chip-text">{p.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

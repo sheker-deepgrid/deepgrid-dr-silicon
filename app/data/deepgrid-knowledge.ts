@@ -37,48 +37,122 @@ export interface GraphEdge {
   category?: string;
 }
 
+export interface DocumentSource {
+  id: 'all' | 'doc1' | 'doc2' | 'doc3' | 'doc4' | 'doc5' | 'doc6';
+  badge: string;
+  title: string;
+  subtitle: string;
+  fileReference: string;
+}
+
+export const documentSources: DocumentSource[] = [
+  {
+    id: 'all',
+    badge: 'ALL DOCS',
+    title: 'All Grounded Documents',
+    subtitle: 'Cross-document intelligence spanning all 6 DeepGrid engineering deliverables',
+    fileReference: 'Full Grounded Vector Catalog (50 Nodes, 70 Edges, 39 Cards)'
+  },
+  {
+    id: 'doc1',
+    badge: 'Doc #1',
+    title: 'Thirty Use Cases (No Accelerator)',
+    subtitle: '50 MHz RV32IM edge AI compute envelope, 19 model types, DSP pipelines, and CWRU data audit',
+    fileReference: 'deepgrid-dg32-lite-ai · 30-Use-Cases-No-Accelerator.pdf'
+  },
+  {
+    id: 'doc2',
+    badge: 'Doc #2',
+    title: 'Technical Annex v3 (10 SKUs & SDV)',
+    subtitle: '10-chip SKU compendium, D100 tactical drone SoC, DG SDV reference architecture, 3-phase roadmap',
+    fileReference: 'deepgrid-sku-compendium · Technical-Annex-v3.pdf'
+  },
+  {
+    id: 'doc3',
+    badge: 'Doc #3',
+    title: 'dgrid_dshot_rx RTL Specification',
+    subtitle: 'Hardware DShot receive, bidirectional GCR 4b→5b eRPM telemetry reply, 28KB vs 32KB SRAM floorplan lever',
+    fileReference: 'deepgrid-dshot-bidir · dgrid_dshot_rx.pdf'
+  },
+  {
+    id: 'doc4',
+    badge: 'Doc #4',
+    title: 'DG32-2DOM Dual-Domain Architecture',
+    subtitle: 'Dual 50/114 MHz clocks, 4-phase CDC bridges, INT8 attention engine, AVIP bearing fault diagnostics',
+    fileReference: 'deepgrid-dg32-2dom · DG32-2DOM-Architecture.pdf'
+  },
+  {
+    id: 'doc5',
+    badge: 'Doc #5',
+    title: 'Master Whitepaper v3 (Defence Silicon)',
+    subtitle: '$9B mature import funnel, 10x NRE dismantling, "Boxes, Not Chips" statutory moats, Chinese crash stress test',
+    fileReference: 'deepgrid-mature-silicon · Master-Whitepaper-v3.pdf'
+  },
+  {
+    id: 'doc6',
+    badge: 'Doc #6',
+    title: 'Preliminary Datasheets (QFN-64)',
+    subtitle: '64-pin QFN pinout, 100% LITE/2DOM compatibility, strict power supply sequencing, 64 KB standalone boot ROM',
+    fileReference: 'deepgrid-datasheet-qfn64 · DG32-LITE-and-2DOM-Datasheets.pdf'
+  }
+];
+
 export interface QuickPrompt {
   id: string;
   label: string;
   query: string;
   category: 'sku' | 'ai' | 'defense' | 'loop' | 'safety' | 'strategy' | 'architecture';
+  docId: 'doc1' | 'doc2' | 'doc3' | 'doc4' | 'doc5' | 'doc6';
+  docBadge: string;
+  docName: string;
 }
 
 export const quickPrompts: QuickPrompt[] = [
-  { id: 'sku-compare', label: 'DG32 vs STM32G0', query: 'Compare DG32 with STM32G0', category: 'sku' },
-  { id: 'sku-roadmap', label: '3-Phase SKU Roadmap', query: 'What is the 3-phase node roadmap and arithmetic check?', category: 'strategy' },
-  { id: 'd100-failsafe', label: 'D100 Failsafe Island', query: 'How does the D100 drone hardware failsafe island work?', category: 'sku' },
-  { id: 'bel-display', label: 'SKU-8 BEL 17" Display', query: 'What is the PIL-5 mandate for the SKU-8 BEL display driver?', category: 'sku' },
-  { id: 'radar-sige', label: 'SKU-7 SiGe 350GHz Radar', query: 'Why does SKU-7 use IHP SiGe 350GHz instead of pure CMOS?', category: 'sku' },
-  { id: 'ai-envelope', label: 'AI Without Accelerator', query: 'How does DG32-LITE run AI without a hardware accelerator?', category: 'ai' },
-  { id: 'usecases-30', label: '30 Edge AI Use Cases', query: 'What are the 30 industrial use cases supported on DG32-LITE?', category: 'ai' },
-  { id: 'kurtosis-trap', label: 'Kurtosis vs RMS Trap', query: 'Why is kurtosis non-monotonic and why can you not alarm on it alone?', category: 'ai' },
-  { id: 'goertzel-fft', label: 'Goertzel vs 8MB FFT', query: 'Why does broken rotor bar detection use Goertzel instead of FFT?', category: 'ai' },
-  { id: 'cwru-leakage', label: 'CWRU Benchmark Audit', query: 'What did the audit reveal about CWRU bearing dataset leakage?', category: 'ai' },
-  { id: 'shuttle-198', label: '198-Day Silicon Loop', query: 'How does the 198-day shuttle loop work?', category: 'loop' },
-  { id: 'lockstep-safety', label: 'Lockstep 2-Cycle Skew', query: 'How does the 2-cycle lockstep core prevent bridge burn?', category: 'safety' },
-  { id: 'three-factory', label: '3-Factory Sovereignty', query: 'What is the Three-Factory Sovereignty Roadmap?', category: 'strategy' },
-  { id: 'd100-drone', label: 'D100 Drone SoC', query: 'Tell me about the D100 tactical drone SoC', category: 'sku' },
-  { id: 'dap-2020', label: 'DAP-2020 Defense Moats', query: 'What are the DAP-2020 Make-II and Buy Indian IDDM requirements?', category: 'defense' },
-  { id: 'radar-77ghz', label: 'SKU-7 77GHz Radar', query: 'What are the specs for SKU-7 77GHz SiGe Radar?', category: 'sku' },
-  { id: 'bldc-sku1', label: 'SKU-1 BLDC Motor', query: 'What is SKU-1 BLDC motor controller rail and latency?', category: 'sku' },
-  { id: 'dshot-bidir', label: 'Bidirectional DShot RX', query: 'Why is DShot receive and bidirectional telemetry implemented in hardware rather than firmware?', category: 'architecture' },
-  { id: 'sram-floorplan', label: '28KB vs 32KB SRAM Floorplan', query: 'What is the 28 KB vs 32 KB SRAM floorplan lever for 2DOM?', category: 'architecture' },
-  { id: 'gcr-erpm', label: 'GCR 4b→5b eRPM Reply', query: 'How does the hardware telemetry reply engine encode eRPM period and handle early abort?', category: 'architecture' },
-  { id: 'dg32-2dom-clock', label: 'DG32-2DOM Dual Clock', query: 'How do the 50 MHz core and 114 MHz attention clock domains communicate via CDC bridges?', category: 'architecture' },
-  { id: 'int8-attn-math', label: 'INT8 Attention Engine', query: 'Why does the INT8 attention engine require a 40-bit numerator and u15 EXP instead of INT4?', category: 'ai' },
-  { id: 'avip-csa', label: 'AVIP Bearing Fault CSA', query: 'How does AVIP detect bearing faults from stator current without an accelerometer?', category: 'ai' },
-  { id: 'foc-headroom', label: 'FOC Control Loop Budget', query: 'What are the cycle costs of an FOC current loop and how much CPU headroom remains at 10 kHz?', category: 'architecture' },
-  { id: 'sip-packaging', label: 'Organic SiP Packaging', query: 'Why organic substrate instead of silicon interposers?', category: 'safety' },
-  { id: 'munger-audit', label: 'Charlie Munger Audit', query: 'What are the 14 risks and Stop Rules S1-S4?', category: 'strategy' },
-  { id: 'funds-10cr', label: '₹10 Cr Financial Model', query: 'How is the ₹10 Cr seed capital allocated across fabs and ATE?', category: 'strategy' },
-  { id: 'funnel-10x', label: '$9B Funnel & 10x Cost', query: 'How does DeepGrid achieve a 10x cost reduction across the $9B import funnel?', category: 'strategy' },
-  { id: 'boxes-not-chips', label: '"Boxes, Not Chips" Playbook', query: 'Why does DeepGrid target boxes and LRUs in PIL-5 rather than chips?', category: 'defense' },
-  { id: 'crash-stop-rules', label: 'Chinese Crash & Stop Rules', query: 'What happens in the FY31 Chinese price crash stress test and what are Stop Rules S1-S4?', category: 'strategy' },
-  { id: 'dgridriscv-spec', label: 'DGridRiscV Core Spec', query: 'What is the exact circuit-code architecture of the DGridRiscV RV32IM processor?', category: 'architecture' },
-  { id: 'qfn64-pinout', label: 'QFN-64 Pinout & Packaging', query: 'What is the complete 64-pin QFN pin assignment and packaging specification for DG32?', category: 'architecture' },
-  { id: 'power-pcb-rules', label: 'Power Sequencing & PCB Rules', query: 'What are the power supply sequencing rules and PCB layout constraints for DG32-LITE and 2DOM?', category: 'safety' },
-  { id: 'boot-rom-flow', label: 'Boot ROM & QSPI-XIP Flow', query: 'How does the standalone 64 KB boot ROM execute QSPI NOR flash boot without an external management core?', category: 'architecture' }
+  // --- Document #1: Thirty Use Cases (No Accelerator) ---
+  { id: 'ai-envelope', label: 'AI Without Accelerator', query: 'How does DG32-LITE run AI without a hardware accelerator?', category: 'ai', docId: 'doc1', docBadge: 'Doc #1', docName: 'Thirty Use Cases' },
+  { id: 'usecases-30', label: '30 Edge AI Use Cases', query: 'What are the 30 industrial use cases supported on DG32-LITE?', category: 'ai', docId: 'doc1', docBadge: 'Doc #1', docName: 'Thirty Use Cases' },
+  { id: 'kurtosis-trap', label: 'Kurtosis vs RMS Trap', query: 'Why is kurtosis non-monotonic and why can you not alarm on it alone?', category: 'ai', docId: 'doc1', docBadge: 'Doc #1', docName: 'Thirty Use Cases' },
+  { id: 'goertzel-fft', label: 'Goertzel vs 8MB FFT', query: 'Why does broken rotor bar detection use Goertzel instead of FFT?', category: 'ai', docId: 'doc1', docBadge: 'Doc #1', docName: 'Thirty Use Cases' },
+  { id: 'cwru-leakage', label: 'CWRU Benchmark Audit', query: 'What did the audit reveal about CWRU bearing dataset leakage?', category: 'ai', docId: 'doc1', docBadge: 'Doc #1', docName: 'Thirty Use Cases' },
+  { id: 'dsp-pipeline', label: 'DSP Feature Pipeline', query: 'How does the fixed-point DSP pipeline extract Kurtosis and FFT features in <100 µs?', category: 'ai', docId: 'doc1', docBadge: 'Doc #1', docName: 'Thirty Use Cases' },
+
+  // --- Document #2: Technical Annex v3 (10 SKUs & Roadmap) ---
+  { id: 'sku-compare', label: 'DG32 vs STM32G0', query: 'Compare DG32 with STM32G0 in pinout, cost, and latency', category: 'sku', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+  { id: 'sku-roadmap', label: '3-Phase SKU Roadmap', query: 'What is the 3-phase node roadmap and arithmetic check?', category: 'strategy', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+  { id: 'd100-failsafe', label: 'D100 Failsafe Island', query: 'How does the D100 drone hardware failsafe island work?', category: 'sku', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+  { id: 'bel-display', label: 'SKU-8 BEL 17" Display', query: 'What is the PIL-5 mandate for the SKU-8 BEL display driver?', category: 'sku', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+  { id: 'radar-sige', label: 'SKU-7 SiGe 350GHz Radar', query: 'Why does SKU-7 use IHP SiGe 350GHz instead of pure CMOS?', category: 'sku', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+  { id: 'sip-packaging', label: 'Organic SiP Packaging', query: 'Why organic substrate instead of silicon interposers?', category: 'safety', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+  { id: 'sdv-zonal', label: 'DG SDV Reference Zonal', query: 'How does the DG SDV architecture eliminate wire harnesses via zonal controllers?', category: 'architecture', docId: 'doc2', docBadge: 'Doc #2', docName: 'Technical Annex v3' },
+
+  // --- Document #3: dgrid_dshot_rx RTL Specification ---
+  { id: 'dshot-bidir', label: 'Hardware DShot RX RTL', query: 'Why is DShot receive and bidirectional telemetry implemented in hardware rather than firmware?', category: 'architecture', docId: 'doc3', docBadge: 'Doc #3', docName: 'dgrid_dshot_rx' },
+  { id: 'gcr-erpm', label: 'GCR 4b→5b eRPM Reply', query: 'How does the hardware telemetry reply engine encode eRPM period and handle early abort?', category: 'architecture', docId: 'doc3', docBadge: 'Doc #3', docName: 'dgrid_dshot_rx' },
+  { id: 'sram-floorplan', label: '28KB vs 32KB SRAM Lever', query: 'What is the 28 KB vs 32 KB SRAM floorplan lever for 2DOM?', category: 'architecture', docId: 'doc3', docBadge: 'Doc #3', docName: 'dgrid_dshot_rx' },
+  { id: 'pad-ring-reuse', label: 'Pad-Ring Bidirectional Reuse', query: 'How does dgrid_dshot_rx reuse the bidirectional pad ring without external analog switches?', category: 'architecture', docId: 'doc3', docBadge: 'Doc #3', docName: 'dgrid_dshot_rx' },
+
+  // --- Document #4: DG32-2DOM System Architecture ---
+  { id: 'dg32-2dom-clock', label: 'DG32-2DOM Dual Clock & CDC', query: 'How do the 50 MHz core and 114 MHz attention clock domains communicate via CDC bridges?', category: 'architecture', docId: 'doc4', docBadge: 'Doc #4', docName: 'DG32-2DOM System' },
+  { id: 'int8-attn-math', label: 'INT8 Attention Math (40-bit)', query: 'Why does the INT8 attention engine require a 40-bit numerator and u15 EXP instead of INT4?', category: 'ai', docId: 'doc4', docBadge: 'Doc #4', docName: 'DG32-2DOM System' },
+  { id: 'avip-csa', label: 'AVIP Bearing Fault CSA', query: 'How does AVIP detect bearing faults from stator current without an accelerometer?', category: 'ai', docId: 'doc4', docBadge: 'Doc #4', docName: 'DG32-2DOM System' },
+  { id: 'foc-headroom', label: 'FOC Control Loop Budget', query: 'What are the cycle costs of an FOC current loop and how much CPU headroom remains at 10 kHz?', category: 'architecture', docId: 'doc4', docBadge: 'Doc #4', docName: 'DG32-2DOM System' },
+  { id: 'sram-macros-2dom', label: '18 On-Die SRAM Macros (86%)', query: 'Why do the 18 sky130 SRAM macros consume 86% of the 2DOM die area?', category: 'architecture', docId: 'doc4', docBadge: 'Doc #4', docName: 'DG32-2DOM System' },
+
+  // --- Document #5: Master Whitepaper v3 (India Defence Silicon) ---
+  { id: 'funnel-10x', label: '$9B Funnel & 10x Cost', query: 'How does DeepGrid achieve a 10x cost reduction across the $9B import funnel?', category: 'strategy', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+  { id: 'boxes-not-chips', label: '"Boxes, Not Chips" Playbook', query: 'Why does DeepGrid target boxes and LRUs in PIL-5 rather than chips?', category: 'defense', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+  { id: 'crash-stop-rules', label: 'Chinese Crash & Stop Rules', query: 'What happens in the FY31 Chinese price crash stress test and what are Stop Rules S1-S4?', category: 'strategy', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+  { id: 'dgridriscv-spec', label: 'DGridRiscV Core Spec', query: 'What is the exact circuit-code architecture of the DGridRiscV RV32IM processor?', category: 'architecture', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+  { id: 'funds-10cr', label: '₹10 Cr Capital Waterfall', query: 'How is the ₹10 Cr seed capital allocated across fabs and ATE?', category: 'strategy', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+  { id: 'dap-2020', label: 'DAP-2020 Defense Moats', query: 'What are the DAP-2020 Make-II and Buy Indian IDDM requirements?', category: 'defense', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+  { id: 'three-factory', label: '3-Factory Sovereignty', query: 'What is the Three-Factory Sovereignty Roadmap across SkyWater, IHP, and SCL?', category: 'strategy', docId: 'doc5', docBadge: 'Doc #5', docName: 'Master Whitepaper v3' },
+
+  // --- Document #6: Preliminary Datasheets (DG32-LITE & 2DOM) ---
+  { id: 'qfn64-pinout', label: '64-Pin QFN Pin Assignment', query: 'What is the complete 64-pin QFN pin assignment and packaging specification for DG32?', category: 'architecture', docId: 'doc6', docBadge: 'Doc #6', docName: 'QFN-64 Datasheet' },
+  { id: 'power-pcb-rules', label: 'Power Supply Sequencing', query: 'What are the power supply sequencing rules and PCB layout constraints for DG32-LITE and 2DOM?', category: 'safety', docId: 'doc6', docBadge: 'Doc #6', docName: 'QFN-64 Datasheet' },
+  { id: 'esd-biasing-rails', label: 'ESD Diode Rail Biasing', query: 'Why must unused power rails (vdda1/2, vccd2) be tied to nominal voltages on the carrier board?', category: 'safety', docId: 'doc6', docBadge: 'Doc #6', docName: 'QFN-64 Datasheet' },
+  { id: 'boot-rom-flow', label: '64 KB Boot ROM & QSPI Fast Read', query: 'How does the standalone 64 KB boot ROM execute QSPI NOR flash boot without an external management core?', category: 'architecture', docId: 'doc6', docBadge: 'Doc #6', docName: 'QFN-64 Datasheet' },
+  { id: 'pcb-diff-pairs', label: 'PCB High-Speed Routing', query: 'What are the PCB layout guidelines for high-speed differential pairs and grounding?', category: 'architecture', docId: 'doc6', docBadge: 'Doc #6', docName: 'QFN-64 Datasheet' }
 ];
 
 export const deepGridCatalog: DeepGridItem[] = [
