@@ -1,10 +1,10 @@
 // DeepGrid Grounded Knowledge Graph
-// Compiled from deepgrid-sku-compendium, deepgrid-mature-silicon, and deepgrid-architecture
+// Compiled from deepgrid-sku-compendium, deepgrid-mature-silicon, deepgrid-architecture, and deepgrid-dg32-lite-ai
 
 export interface DeepGridItem {
   id: string;
   name: string;
-  category: 'sku' | 'strategy' | 'architecture' | 'defense' | 'loop' | 'finance';
+  category: 'sku' | 'ai' | 'strategy' | 'architecture' | 'defense' | 'loop' | 'finance';
   tagline: string;
   nodeFoundry?: string;
   voltageRail?: string;
@@ -41,11 +41,16 @@ export interface QuickPrompt {
   id: string;
   label: string;
   query: string;
-  category: 'sku' | 'defense' | 'loop' | 'safety' | 'strategy';
+  category: 'sku' | 'ai' | 'defense' | 'loop' | 'safety' | 'strategy';
 }
 
 export const quickPrompts: QuickPrompt[] = [
   { id: 'sku-compare', label: 'DG32 vs STM32G0', query: 'Compare DG32 with STM32G0', category: 'sku' },
+  { id: 'ai-envelope', label: 'AI Without Accelerator', query: 'How does DG32-LITE run AI without a hardware accelerator?', category: 'ai' },
+  { id: 'usecases-30', label: '30 Edge AI Use Cases', query: 'What are the 30 industrial use cases supported on DG32-LITE?', category: 'ai' },
+  { id: 'kurtosis-trap', label: 'Kurtosis vs RMS Trap', query: 'Why is kurtosis non-monotonic and why can you not alarm on it alone?', category: 'ai' },
+  { id: 'goertzel-fft', label: 'Goertzel vs 8MB FFT', query: 'Why does broken rotor bar detection use Goertzel instead of FFT?', category: 'ai' },
+  { id: 'cwru-leakage', label: 'CWRU Benchmark Audit', query: 'What did the audit reveal about CWRU bearing dataset leakage?', category: 'ai' },
   { id: 'shuttle-198', label: '198-Day Silicon Loop', query: 'How does the 198-day shuttle loop work?', category: 'loop' },
   { id: 'lockstep-safety', label: 'Lockstep 2-Cycle Skew', query: 'How does the 2-cycle lockstep core prevent bridge burn?', category: 'safety' },
   { id: 'three-factory', label: '3-Factory Sovereignty', query: 'What is the Three-Factory Sovereignty Roadmap?', category: 'strategy' },
@@ -59,6 +64,131 @@ export const quickPrompts: QuickPrompt[] = [
 ];
 
 export const deepGridCatalog: DeepGridItem[] = [
+  // --- Edge AI & Predictive Maintenance (Thirty Use Cases, No Accelerator) ---
+  {
+    id: 'dg32-ai-envelope',
+    name: 'DG32-LITE AI Compute Envelope (No Accelerator)',
+    category: 'ai',
+    tagline: 'Physical execution envelope for lightweight edge AI on a 50 MHz RV32IM scalar core',
+    nodeFoundry: '130 nm CMOS · 50 MHz Clock Domain',
+    voltageRail: '1.8V Core / 3.3V I/O',
+    standards: 'AEC-Q100 Grade 1 Target · ISO 26262 ASIL-D Advisory Role',
+    summary: 'DG32-LITE executes machine learning tasks without an attention engine using a proven scalar hierarchy: 12.5 MMAC/s throughput, 16.5 KB model budget, 82% free CPU cycles, and CORDIC hardware math.',
+    keyFacts: [
+      '12.5 MMAC/s scalar throughput back-solved from 50 MHz RV32IM core at 4 cycles per int8 multiply-accumulate.',
+      '16.5 KB SRAM budget for model weights plus working state (expands to 29.5 KB with runtime in mask ROM).',
+      'At 10 kHz FOC current loop rate, dedicated hardware blocks use only ~300 cycles (~6 µs), leaving 82% of core cycles free for diagnostics.',
+      'Algorithms suited for a scalar core (Random Forest, LDA, Mahalanobis) are 30–300× cheaper than a transformer at identical accuracy.',
+      '24 of 30 industrial use cases run comfortably above 1 kHz sample rates.'
+    ],
+    citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator (Sept 2026) — Slide 01 & 03',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture?chip=lite' },
+      { label: 'Control Loop Budget', target: 'control' }
+    ],
+    connectedNodeIds: ['dg32-lite', 'ai-usecases', 'arch-lockstep', 'ai-trees']
+  },
+  {
+    id: 'dg32-30-usecases',
+    name: 'Thirty Industrial Use Cases on Scalar Core',
+    category: 'ai',
+    tagline: 'Comprehensive catalogue of 30 predictive diagnostics and control tasks running on DG32-LITE',
+    nodeFoundry: '130 nm CMOS · Single 50 MHz Core',
+    voltageRail: 'Integrated Motor Control Subsystem',
+    standards: 'ISO 13373 (Vibration) · ISO 20816 (Severity) · ISO 20958 (MCSA)',
+    summary: 'Four groups of industrial AI workloads that run natively on DG32-LITE without an attention engine, spanning rotating machinery, electrical motor current signature analysis, real-time control, and long-term degradation.',
+    keyFacts: [
+      'Group 1: Rotating Machinery (8 tasks) — Bearing fault classification (890 Hz), severity trending, gearbox mesh faults, cavitation, unbalance, valve flutter, belt slip, looseness.',
+      'Group 2: Electrical & Power (8 tasks) — Broken rotor bars (Goertzel), air-gap eccentricity, stator inter-turn shorts, phase loss, arc-fault discharge, power quality, battery SoH, thermal estimation.',
+      'Group 3: Control, Motion & Sensing (8 tasks) — Sensorless EKF position (0.05 ms), learned sensor plausibility (0.02 ms), regime classification, duty tracking, friction feedforward, stall detection, torque ripple.',
+      'Group 4: Slower-Rate & Sequence (6 tasks) — Remaining useful life regression, autoencoder drift detection, GRU forecasting (270 Hz), 1D-CNN raw waveform (79 Hz), isolation forest novelty, k-NN baselining.',
+      'Absolute worst-case execution across all 30 use cases is 10.3 ms and 20 KB.'
+    ],
+    citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slides 05–10',
+    actions: [
+      { label: 'Control Loop Headroom', target: 'control' },
+      { label: 'Product Family Comparison', target: 'family' }
+    ],
+    connectedNodeIds: ['ai-envelope', 'ai-trees', 'ai-dsp', 'ai-cwru', 'dg32-2dom']
+  },
+  {
+    id: 'dg32-tree-ensembles',
+    name: 'Tree Ensembles & The 19-Model Hierarchy',
+    category: 'ai',
+    tagline: 'Why zero-multiply decision trees and linear models outperform deep neural networks on microcontrollers',
+    nodeFoundry: 'Scalar Core Instruction Optimization',
+    voltageRail: 'Pure Integer ALU Execution',
+    standards: 'Deterministic Cycle Bounds · Zero-Divide Instruction Sets',
+    summary: 'On a scalar CPU without a MAC array, comparisons and table lookups cost almost nothing. A 100-tree random forest at depth 8 requires roughly 800 comparisons and zero multiplications, running in 0.06 ms at >1 kHz.',
+    keyFacts: [
+      'Random Forest (100×d8): 3,200 cycles, 0.06 ms, 20 KB RAM, runs >1 kHz. 50–500× cheaper than an equivalent neural net.',
+      'On CWRU bearing benchmark, Random Forest over 5 time-domain features reaches 95.6% accuracy (cutting from 9 to 5 features costs only 0.1%).',
+      'Meta-review of 42 academic papers showed SVM/RF (95–100%) statistically indistinguishable from deep learning (97–100%).',
+      'Hierarchy rule: 1st Tree Ensembles/LDA/Mahalanobis (sub-ms, >1 kHz) → 2nd Small MLPs/Autoencoders → Last GRU (2.95 ms) / 1D-CNN (10.2 ms).',
+      'Design rule: Spend effort on band selection and envelope demodulation before spending it on model capacity.'
+    ],
+    citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slides 04–05',
+    connectedNodeIds: ['ai-usecases', 'ai-envelope', 'ai-cwru']
+  },
+  {
+    id: 'dg32-dsp-pipeline',
+    name: 'Feature Extraction & CORDIC Demodulation',
+    category: 'ai',
+    tagline: 'Costed signal-processing front-end: envelope demodulation, Goertzel filters, and kurtosis rules',
+    nodeFoundry: 'Hardware CORDIC Unit + RV32IM Core',
+    voltageRail: 'DSP Math Acceleration',
+    standards: 'ISO 20816 Severity Zones · ISO 13373-1 Procedures',
+    summary: 'The diagnostic front-end reuses CORDIC hardware already present for motor control (Park/Clarke/magnitude/atan2 in <20 cycles). Demodulated features evaluated at known physical fault frequencies outrank raw moments by 4–5×.',
+    keyFacts: [
+      'Envelope Demodulation: 5,000 cycles (0.10 ms) using CORDIC magnitude (20 iterations) — the bearing defect front end.',
+      'Goertzel Filter (8 bins): 6,144 cycles (0.12 ms) — computes discrete narrowband tones at exact fault frequencies, replacing 8 MB FFTs.',
+      'Feature Importance: Hilbert-Huang amplitude at outer-race frequency scored 225.9 vs. 51.8 for raw peak-to-peak.',
+      'Kurtosis Trap Warning: Kurtosis is non-monotonic (spikes on incipient spalls, then falls back to Gaussian 3.0 as damage spreads). RMS velocity is monotonic but blind to early faults. Trend both; never alarm on kurtosis alone.',
+      'Decimate before buffering: Decimating to 1–2 kS/s keeps the entire working buffer under a few kilobytes.'
+    ],
+    citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slide 06',
+    connectedNodeIds: ['ai-usecases', 'ai-afe', 'dg32-lite']
+  },
+  {
+    id: 'dg32-afe-sensing',
+    name: 'AFE Sensing Constraints & ISO Standards',
+    category: 'ai',
+    tagline: 'Why the analog front end, not compute or RAM, is the true binding constraint in motor diagnostics',
+    nodeFoundry: 'Analog Front End (AFE) Signal Conditioning',
+    voltageRail: 'ADC Dynamic Range & Bandwidth Limits',
+    standards: 'ISO 13373-2:2016 · ISO 20958:2013 · ISO 13373-1:2002',
+    summary: 'ISO 13373-2 defines usable dynamic range as D = 6(N-1) dB. For an 8-bit ADC, dynamic range is only 42 dB, while broken rotor bar sidebands sit -40 to -60 dBc below the fundamental, disappearing under the quantization floor.',
+    keyFacts: [
+      'Current-based MCSA diagnostics need more than 8 bits: requires either active analog fundamental notch filtering or 12–16 bit converters.',
+      'Sideband separation is 2·s·f1 (0.5 to 3 Hz). A direct 2^20-point FFT requires 8 MB RAM. DG32-LITE solves this by evaluating Goertzel filters at predicted sideband frequencies.',
+      'Tier 1 Sensor: Single accelerometer (≥5 kHz flat bandwidth, stud mounted per ISO 13373-1). Bearings account for 44% of motor failures.',
+      'Tier 2 Sensor: 3-phase current and voltage for negative-sequence detection and Park vector signature per ISO 20958 Annex A.',
+      'What works today on DG32-LITE: vibration classification, sensorless EKF, plausibility, regime identification, and anomaly scoring operate on standard peripherals.'
+    ],
+    citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slide 11',
+    connectedNodeIds: ['ai-dsp', 'ai-usecases', 'sku-1']
+  },
+  {
+    id: 'dg32-benchmark-audit',
+    name: 'CWRU Benchmark Audit & Advisory ML Boundary',
+    category: 'ai',
+    tagline: 'Academic data leakage audit and the strict advisory role of machine learning under hardware lockstep',
+    nodeFoundry: 'Deterministic Safety Isolation Boundary',
+    voltageRail: 'Hardware Interlock Dominance',
+    standards: 'ISO 26262 ASIL-D Trip Limit Retention · Independent Hardware Monitor',
+    summary: 'A critical audit of academic bearing benchmarks reveals widespread data leakage: 40 of 41 published CWRU studies used leaky splits. Furthermore, ML inference on DG32-LITE operates in an advisory role only, subservient to the lockstep safety core.',
+    keyFacts: [
+      '40 of 41 reviewed CWRU studies used splits vulnerable to data leakage; on a leakage-free bearing-wise split, classifier accuracy dropped from 85.8% to 69.5%.',
+      'Realistic production accuracy on unseen physical industrial bearings is 65%–80%, not 99%.',
+      'Smith & Randall showed a meaningful fraction of CWRU records are not diagnosable by correct physics due to load slip and speed fluctuations.',
+      'No inference result carries a safety integrity claim: the ML classifier advises; the dual-core lockstep monitor holds the absolute hardwired trip limits.',
+      'Pre-silicon notice: All figures calculated from verified constants (4 cycles/int8 MAC, 82% headroom at 50 MHz).'
+    ],
+    citation: 'DG32-LITE Base Variant: Thirty Use Cases, No Accelerator — Slide 12',
+    connectedNodeIds: ['ai-usecases', 'dg32-lite', 'arch-lockstep', 'munger-audit']
+  },
+
+  // --- Core SKUs & Platform Silicon ---
   {
     id: 'dg32-lite',
     name: 'DG32-LITE Lockstep RISC-V MCU',
@@ -81,7 +211,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'Control Loop Budget', target: 'control' },
       { label: 'View Pinout', target: 'pinout' }
     ],
-    connectedNodeIds: ['arch-lockstep', 'fab-skywater', 'arch-198loop', 'sku-1']
+    connectedNodeIds: ['arch-lockstep', 'fab-skywater', 'arch-198loop', 'sku-1', 'dg32-ai-envelope']
   },
   {
     id: 'dg32-2dom',
@@ -103,7 +233,7 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'Explore 2DOM Engine', target: 'architecture?chip=2dom' },
       { label: 'Product Family Comparison', target: 'family' }
     ],
-    connectedNodeIds: ['dg32-lite', 'arch-lockstep', 'fab-skywater']
+    connectedNodeIds: ['dg32-lite', 'arch-lockstep', 'fab-skywater', 'dg32-30-usecases']
   },
   {
     id: 'sku-1',
@@ -432,6 +562,14 @@ export const graphNodes: GraphNode[] = [
   { id: 'track-b-d100', name: 'D100 Drone', shortName: 'D100', category: 'sku', x: 16, y: 15, description: 'Heterogeneous tactical drone SoC on organic multi-die SiP.' },
   { id: 'dg-sdv-platform', name: 'DG SDV', shortName: 'SDV', category: 'sku', x: 38, y: 12, description: 'End-to-end SDV reference architecture with AXI-REALM QoS.' },
 
+  // Edge AI Nodes (New Grounded Cluster)
+  { id: 'ai-envelope', name: '12.5 MMAC/s Budget', shortName: '12.5 MMAC', category: 'architecture', x: 26, y: 44, description: 'Scalar AI envelope: 12.5 MMAC/s, 16.5 KB RAM, 82% free CPU cycles.' },
+  { id: 'ai-usecases', name: '30 Industrial Use Cases', shortName: '30 AI Tasks', category: 'sku', x: 18, y: 42, description: '30 native predictive maintenance and control use cases without accelerator.' },
+  { id: 'ai-trees', name: 'Tree Ensembles & Models', shortName: 'Tree ML', category: 'architecture', x: 8, y: 38, description: 'Zero-multiply tree models (RF 100xd8 in 0.06ms) and 19 lightweight architectures.' },
+  { id: 'ai-dsp', name: 'CORDIC Envelope & Goertzel', shortName: 'CORDIC DSP', category: 'architecture', x: 14, y: 48, description: 'Hardware CORDIC envelope demodulation & targeted Goertzel filters.' },
+  { id: 'ai-afe', name: 'AFE Dynamic Range', shortName: 'ISO Sensing', category: 'moat', x: 30, y: 55, description: 'ISO 13373-2 >8-bit dynamic range & ISO 13373-1 stud accelerometer mounting.' },
+  { id: 'ai-cwru', name: 'CWRU Data Leakage Audit', shortName: 'CWRU Audit', category: 'governance', x: 8, y: 48, description: 'Audit of 41 CWRU papers; strict advisory role under lockstep supervisor.' },
+
   // Foundries (Cluster Center-Right)
   { id: 'fab-skywater', name: 'SkyWater 130nm', shortName: 'SkyWater', category: 'foundry', x: 55, y: 38, description: 'USA commercial foundry, open SKY130 PDK, fast MPW runs.' },
   { id: 'fab-ihp', name: 'IHP SG13G2', shortName: 'IHP SiGe', category: 'foundry', x: 66, y: 24, description: 'German research fab, 0.13µm SiGe BiCMOS with 350 GHz fT for 77GHz radar.' },
@@ -451,7 +589,7 @@ export const graphNodes: GraphNode[] = [
 
   // Anchor Customers
   { id: 'anchor-mceme', name: 'MCEME Army', shortName: 'MCEME', category: 'anchor', x: 12, y: 75, description: 'Indian Army MCEME: ₹1.01 Cr contracted pre-ASIC validation.' },
-  { id: 'anchor-airgap', name: 'Airgap EV', shortName: 'Airgap', category: 'anchor', x: 10, y: 44, description: 'Commercial anchor for 15M units/year BLDC motor silicon.' },
+  { id: 'anchor-airgap', name: 'Airgap EV', shortName: 'Airgap', category: 'anchor', x: 10, y: 32, description: 'Commercial anchor for 15M units/year BLDC motor silicon.' },
   { id: 'anchor-ripple', name: 'Ripple Metering', shortName: 'Ripple', category: 'anchor', x: 48, y: 88, description: 'National rollout partner for 250M smart meter front-ends.' },
   { id: 'anchor-bel', name: 'BEL Avionics', shortName: 'BEL', category: 'anchor', x: 8, y: 62, description: 'Bharat Electronics Limited 17" cockpit tactical display program.' },
 
@@ -461,6 +599,15 @@ export const graphNodes: GraphNode[] = [
 ];
 
 export const graphEdges: GraphEdge[] = [
+  // Edge AI Connections
+  { from: 'dg32-lite', to: 'ai-envelope', label: '12.5 MMAC/s Budget' },
+  { from: 'ai-envelope', to: 'ai-usecases', label: '30 Native Tasks' },
+  { from: 'ai-usecases', to: 'ai-trees', label: 'Zero-Multiply Trees' },
+  { from: 'ai-usecases', to: 'ai-dsp', label: 'CORDIC Demodulation' },
+  { from: 'ai-dsp', to: 'ai-afe', label: 'ISO 13373 Dynamic Range' },
+  { from: 'ai-usecases', to: 'ai-cwru', label: 'Leakage-Free Validation' },
+  { from: 'ai-usecases', to: 'dg32-2dom', label: 'Scalar -> Attention Engine' },
+
   // DG32 Connections
   { from: 'dg32-lite', to: 'arch-lockstep', label: 'Safety Core' },
   { from: 'dg32-lite', to: 'fab-skywater', label: 'Primary Shuttle' },
@@ -543,6 +690,13 @@ export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
     });
 
     // Special match boosts for core concepts
+    if ((q.includes('use case') || q.includes('30') || q.includes('accelerator')) && item.id === 'dg32-30-usecases') score += 70;
+    if ((q.includes('envelope') || q.includes('mmac') || q.includes('scalar ai')) && item.id === 'dg32-ai-envelope') score += 70;
+    if ((q.includes('tree') || q.includes('forest') || q.includes('boosting') || q.includes('19 model')) && item.id === 'dg32-tree-ensembles') score += 70;
+    if ((q.includes('dsp') || q.includes('kurtosis') || q.includes('goertzel') || q.includes('envelope demod')) && item.id === 'dg32-dsp-pipeline') score += 70;
+    if ((q.includes('afe') || q.includes('iso 13373') || q.includes('iso 20958') || q.includes('dynamic range')) && item.id === 'dg32-afe-sensing') score += 70;
+    if ((q.includes('cwru') || q.includes('leakage') || q.includes('advisory')) && item.id === 'dg32-benchmark-audit') score += 70;
+
     if (q.includes('198') && item.id === '198-day-loop') score += 60;
     if ((q.includes('stm32') || q.includes('compare')) && (item.id === 'dg32-lite' || item.id === 'sku-4')) score += 45;
     if ((q.includes('drone') || q.includes('d100')) && item.id === 'track-b-d100') score += 60;

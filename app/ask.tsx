@@ -52,6 +52,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
   const categories = [
     { id: 'all', label: 'All Intelligence' },
+    { id: 'ai', label: 'Edge AI (30 Tasks)' },
     { id: 'sku', label: 'SKUs (10 Chips)' },
     { id: 'strategy', label: 'Three-Factory Roadmap' },
     { id: 'loop', label: '198-Day Loop & EDA' },
@@ -193,7 +194,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
       <div className="dr-ask-meta-strip">
         <span className="mono">
           {activeView === 'graph' 
-            ? 'INTERACTIVE KNOWLEDGE GRAPH · 26 GROUNDED NODES & 32 RELATIONSHIPS · DRAG TO EXPLORE'
+            ? `INTERACTIVE KNOWLEDGE GRAPH · ${graphNodes.length} GROUNDED NODES & ${graphEdges.length} RELATIONSHIPS · DRAG TO EXPLORE`
             : `SHOWING ${results.length} VERIFIED INTEL ARTIFACTS ${query ? `FOR "${query.toUpperCase()}"` : ''}`}
         </span>
         <span className="dr-ask-badge-verified">
