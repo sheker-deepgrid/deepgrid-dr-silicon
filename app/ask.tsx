@@ -149,8 +149,8 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   return (
     <section className="page-wrap dr-ask-section">
       <SectionHead 
-        tag="07 / ASK DEEPGRID" 
-        title="Grounded Silicon Intelligence & Knowledge Graph" 
+        tag="08 / ASK DEEPGRID" 
+        title="Vector-Grounded Silicon Intelligence & Knowledge Graph" 
         copy="Query the full vector knowledge matrix of DeepGrid Semi: 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 350GHz), the 198-day loop, and sovereign defense moats. Zero hallucination: every parameter is grounded in the Master Whitepaper and Technical Annex v3."
       />
 
@@ -676,6 +676,30 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           </section>
         </dialog>
       )}
+
+      <div className="dr-links dr-sec-gap" style={{marginTop: '2.5rem'}}>
+        <button className="text-link" onClick={() => go('overview')}>
+          01 / Overview &amp; safety thesis <ArrowUpRight size={16} />
+        </button>
+        <button className="text-link" onClick={() => go('family')}>
+          02 / Product family comparison <ArrowUpRight size={16} />
+        </button>
+        <button className="text-link" onClick={() => go('architecture')}>
+          03 / Block architecture &amp; 3D die <ArrowUpRight size={16} />
+        </button>
+        <button className="text-link" onClick={() => go('control')}>
+          04 / 100 kHz control-loop budget <ArrowUpRight size={16} />
+        </button>
+        <button className="text-link" onClick={() => go('pinout')}>
+          05 / QFN-64 pinout &amp; package <ArrowUpRight size={16} />
+        </button>
+        <button className="text-link" onClick={() => go('roadmap')}>
+          06 / Multi-spin roadmap <ArrowUpRight size={16} />
+        </button>
+        <button className="text-link" onClick={() => go('library')}>
+          07 / Authoritative documents &amp; official PDFs <ArrowUpRight size={16} />
+        </button>
+      </div>
     </section>
   );
 }

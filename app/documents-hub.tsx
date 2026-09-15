@@ -95,8 +95,8 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
     <section className="dr-docs-hub" aria-label="Authoritative Design Documents & Specs">
       <header className="dr-docs-hub-header">
         <div>
-          <p className="dr-lib-kicker">GROUNDED ARCHITECTURE REPOSITORY · 6 CORE DESIGN DOCUMENTS & SPECS</p>
-          <h2>Authoritative Design Documents &amp; Specs</h2>
+          <p className="dr-lib-kicker">AUTHORITATIVE DESIGN ARCHIVE · 6 CORE DESIGN DOCUMENTS & SPECS</p>
+          <h2>Where are DeepGrid&apos;s silicon benchmarks and architecture claims grounded?</h2>
           <p className="dr-docs-lead">
             Every simulation benchmark, timing envelope, clock partition, and pin configuration on this platform is
             grounded in these design authority documents. Download the original authoritative PDFs, read full markdown specifications,

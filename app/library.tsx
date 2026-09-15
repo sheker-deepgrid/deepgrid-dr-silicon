@@ -48,5 +48,17 @@ export default function Library({pkgId,slide,onChange,go}:{pkgId:string;slide:nu
   <GroundedDocumentsHub go={go} />
 
   <section className="dr-lib-sources"><p className="dr-lib-kicker">BUILT FROM</p><ul>{pkg.sources.map(s=><li key={s}>{s}</li>)}</ul><p className="disclaimer">Investor-level content from Deepgrid Semi’s September 2026 design documents: no register maps, memory map or board-design rules. Pre-silicon: figures are design values, process nominals or analytic estimates, labelled on each slide.</p></section>
+
+  {go && (
+    <div className="dr-links dr-sec-gap">
+      <button className="text-link" onClick={()=>go('overview')}>01 / Overview &amp; safety thesis <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('family')}>02 / Product family comparison <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('architecture')}>03 / Block architecture &amp; 3D die <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('control')}>04 / 100 kHz control-loop budget <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('pinout')}>05 / QFN-64 pinout &amp; package <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('roadmap')}>06 / Multi-spin roadmap <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('ask')}>08 / Vector Q&amp;A in Ask DeepGrid <ArrowUpRight size={16}/></button>
+    </div>
+  )}
  </div>;
 }
