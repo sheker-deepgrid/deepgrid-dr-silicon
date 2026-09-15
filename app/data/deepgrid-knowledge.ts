@@ -41,7 +41,7 @@ export interface QuickPrompt {
   id: string;
   label: string;
   query: string;
-  category: 'sku' | 'ai' | 'defense' | 'loop' | 'safety' | 'strategy';
+  category: 'sku' | 'ai' | 'defense' | 'loop' | 'safety' | 'strategy' | 'architecture';
 }
 
 export const quickPrompts: QuickPrompt[] = [
@@ -62,6 +62,9 @@ export const quickPrompts: QuickPrompt[] = [
   { id: 'dap-2020', label: 'DAP-2020 Defense Moats', query: 'What are the DAP-2020 Make-II and Buy Indian IDDM requirements?', category: 'defense' },
   { id: 'radar-77ghz', label: 'SKU-7 77GHz Radar', query: 'What are the specs for SKU-7 77GHz SiGe Radar?', category: 'sku' },
   { id: 'bldc-sku1', label: 'SKU-1 BLDC Motor', query: 'What is SKU-1 BLDC motor controller rail and latency?', category: 'sku' },
+  { id: 'dshot-bidir', label: 'Bidirectional DShot RX', query: 'Why is DShot receive and bidirectional telemetry implemented in hardware rather than firmware?', category: 'architecture' },
+  { id: 'sram-floorplan', label: '28KB vs 32KB SRAM Floorplan', query: 'What is the 28 KB vs 32 KB SRAM floorplan lever for 2DOM?', category: 'architecture' },
+  { id: 'gcr-erpm', label: 'GCR 4b→5b eRPM Reply', query: 'How does the hardware telemetry reply engine encode eRPM period and handle early abort?', category: 'architecture' },
   { id: 'sip-packaging', label: 'Organic SiP Packaging', query: 'Why organic substrate instead of silicon interposers?', category: 'safety' },
   { id: 'munger-audit', label: 'Charlie Munger Audit', query: 'What are the 14 risks and Stop Rules S1-S4?', category: 'strategy' },
   { id: 'funds-10cr', label: '₹10 Cr Financial Model', query: 'How is the ₹10 Cr seed capital allocated across fabs and ATE?', category: 'strategy' }
@@ -570,6 +573,52 @@ export const deepGridCatalog: DeepGridItem[] = [
     ],
     citation: 'DeepGrid Mature Silicon — Chapter 13: What ₹10 Cr Buys and What It Proves',
     connectedNodeIds: ['198-day-loop', 'munger-audit', 'three-factory']
+  },
+  {
+    id: 'dshot-bidir-rx',
+    name: 'Hardware DShot RX & Bidirectional Telemetry (dgrid_dshot_rx)',
+    category: 'architecture',
+    tagline: 'Hardware DShot receiver + bidirectional telemetry reply engine (slot 0xC in-place extension)',
+    nodeFoundry: 'Slot 0xC · 50 MHz AXI-Lite Peripheral Extension',
+    voltageRail: '1.8V Core / 3.3V Pad-Ring (PC_BIDIR)',
+    standards: 'Betaflight / Bluejay / AM32 Inverted GCR Protocol · ISO 26262 ASIL-D Safe',
+    summary: 'Extends slot 0xC in-place with dgrid_dshot_rx and dgrid_dshot_tel, enabling DG32 to operate as a high-performance ESC. Replaces impossible firmware bit-banging that violently collides with the 5 µs FOC loop and eliminates false lockstep divergence trips.',
+    keyFacts: [
+      'Why hardware is mandatory: DShot600 polling in firmware requires ~1,340 cycles with interrupts off — 5.3× longer than the entire 5 µs (250 cycle) FOC control period.',
+      'Lockstep safety: Firmware branching on asynchronous pad reads produces branch-timing jitter between MAIN and CHECKER cores, falsely tripping the 2-cycle lockstep comparator (FAULTn). Hardware decoding eliminates this completely.',
+      'GCR 4b→5b & transition encoding: Hardware automatically calculates inverted CRC4, maps the 12-bit eRPM period payload {e[2:0], m[8:0]} to 20 GCR bits, and creates 21 level transitions transmitted inverted at 5/4 bit rate (750 kbit/s @ 50 MHz).',
+      'Pad-ring reuse & shoot-through safety: Reuses 4 PWM high-side pads io[26, 28, 30, 32] as PC_BIDIR (gpio_dm=110, dynamic oeb). Low-side pads io[27, 29, 31] remain untouched PC_OUT, strictly preventing power bridge shoot-through.',
+      'Early abort & W1C invariance: If an incoming FC edge arrives while driving a reply, OE releases within 1 cycle (TEL_ABORT). All status flags use Write-1-to-Clear (W1C) to preserve 2-cycle lockstep bus mirror safety.'
+    ],
+    citation: 'DG32 Block Spec for Review — dgrid_dshot_rx: DShot receive + bidirectional telemetry reply (13 Sep 2026)',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture' },
+      { label: 'Control Loop Timing', target: 'control' }
+    ],
+    connectedNodeIds: ['dg32-lite', 'arch-lockstep', 'sku-1', 'sram-floorplan-lever']
+  },
+  {
+    id: 'sram-floorplan-lever',
+    name: 'SRAM Architecture: 28 KB vs 32 KB Floorplan Lever',
+    category: 'architecture',
+    tagline: 'OpenFrame 2,900 µm wrapper geometric floorplan trade-off: 3×6 vs 3×7 SRAM macro array',
+    nodeFoundry: 'SkyWater SKY130 OpenFrame Wrapper (2,900 µm Slot)',
+    voltageRail: '1.8V SRAM Core Domain',
+    standards: 'OpenFrame Place-and-Route · 50 MHz Timing Closure',
+    summary: 'Separates the firmware memory footprint question from the physical floorplan question. Moving from 16 to 14 macros in dual-domain 2DOM reduces the grid from 3×7 to 3×6, deleting an entire macro row and expanding the full-width logic strip from 1.75 mm² to 3.40 mm².',
+    keyFacts: [
+      'Firmware footprint: 28 KB is bare minimum, 32 KB provides safety margin; reusable buffer optimization recovers 2 KB.',
+      'Floorplan reality: 17 macros in a 3×7 array compresses the central logic strip to 1.75 mm², causing severe routing congestion and timing closure failure.',
+      'Area doubling: Deleting one macro row (3×6 array) grows the full-width logic strip from 1.75 mm² to 3.40 mm², enabling dual-domain 2DOM to fit the 2,900 µm wrapper slot.',
+      'Empirical resolution: The codex branch runs automated tests on keep-32 KB (2dom/13) and 24 KB (2dom/12) configurations to decide strictly with physical routing data.',
+      'Base die invariance: DG32-LITE base variant does not have dual-domain congestion and remains permanently at 32 KB SRAM.'
+    ],
+    citation: 'DG32 Block Spec for Review — §9: SRAM: 28 KB vs 32 KB — separating the two questions',
+    actions: [
+      { label: 'Explore Architecture', target: 'architecture' },
+      { label: 'View Roadmap', target: 'roadmap' }
+    ],
+    connectedNodeIds: ['dg32-2dom', 'dg32-lite', 'arch-198loop', 'dshot-bidir-rx']
   }
 ];
 
@@ -614,6 +663,8 @@ export const graphNodes: GraphNode[] = [
   { id: 'arch-lockstep', name: '2-Cycle Lockstep', shortName: 'Lockstep', category: 'architecture', x: 42, y: 34, description: 'Dual temporally skewed RV32IM cores latching faults in <=2 cycles.' },
   { id: 'arch-sip', name: 'Organic SiP', shortName: 'SiP', category: 'architecture', x: 26, y: 8, description: 'Multi-die organic BT-resin packaging without expensive UCIe interposers.' },
   { id: 'arch-dgridriscv', name: 'DGridRiscV', shortName: 'RV32IM', category: 'architecture', x: 44, y: 44, description: 'Cacheless, non-speculative, deterministic latency processor.' },
+  { id: 'dshot-bidir-rx', name: 'DShot RX & Telemetry', shortName: 'DShot RX', category: 'architecture', x: 35, y: 38, description: 'Slot 0xC hardware DShot receiver and bidirectional GCR telemetry reply engine.' },
+  { id: 'sram-floorplan-lever', name: 'SRAM Floorplan Lever', shortName: 'SRAM Lever', category: 'architecture', x: 22, y: 24, description: '28 KB vs 32 KB macro placement lever doubling logic strip from 1.75 to 3.40 mm².' },
 
   // Anchor Customers
   { id: 'anchor-mceme', name: 'MCEME Army', shortName: 'MCEME', category: 'anchor', x: 12, y: 75, description: 'Indian Army MCEME: ₹1.01 Cr contracted pre-ASIC validation.' },
@@ -636,10 +687,15 @@ export const graphEdges: GraphEdge[] = [
   { from: 'dg32-30-usecases', to: 'dg32-benchmark-audit', label: 'Leakage-Free Validation' },
   { from: 'dg32-30-usecases', to: 'dg32-2dom', label: 'Scalar -> Attention Engine' },
 
-  // DG32 Connections
+  // DG32 & DShot Connections
   { from: 'dg32-lite', to: 'arch-lockstep', label: 'Safety Core' },
   { from: 'dg32-lite', to: 'fab-skywater', label: 'Primary Shuttle' },
   { from: 'dg32-lite', to: 'arch-198loop', label: 'Sep 2026 Shuttle' },
+  { from: 'dg32-lite', to: 'dshot-bidir-rx', label: 'Slot 0xC Extension' },
+  { from: 'dshot-bidir-rx', to: 'arch-lockstep', label: 'W1C Invariant' },
+  { from: 'dshot-bidir-rx', to: 'sku-1', label: 'ESC Comms' },
+  { from: 'dg32-2dom', to: 'sram-floorplan-lever', label: 'Floorplan Congestion' },
+  { from: 'sram-floorplan-lever', to: 'arch-198loop', label: '2dom/12 vs 2dom/13' },
   { from: 'dg32-2dom', to: 'dg32-lite', label: 'Drop-In Compatible' },
   { from: 'dg32-2dom', to: 'arch-lockstep', label: 'Frozen Core' },
 
@@ -743,6 +799,8 @@ export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
     if ((q.includes('roadmap') || q.includes('50-sku') || q.includes('arithmetic') || q.includes('phase 2') || q.includes('phase 3')) && item.id === 'sku-node-roadmap') score += 70;
     if ((q.includes('bel') || q.includes('display') || q.includes('sxga') || q.includes('tcon')) && item.id === 'sku-8') score += 60;
     if (q.includes('failsafe') && item.id === 'track-b-d100') score += 60;
+    if ((q.includes('dshot') || q.includes('erpm') || q.includes('gcr') || q.includes('telemetry') || q.includes('bidirectional') || q.includes('esc') || q.includes('slot 0xc')) && item.id === 'dshot-bidir-rx') score += 80;
+    if ((q.includes('sram') || q.includes('floorplan') || q.includes('28kb') || q.includes('32kb') || q.includes('macro') || q.includes('2dom/13') || q.includes('2dom/12') || q.includes('ayaz')) && item.id === 'sram-floorplan-lever') score += 80;
 
     return { item, score };
   });

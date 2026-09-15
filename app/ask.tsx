@@ -57,7 +57,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     { id: 'strategy', label: 'Three-Factory Roadmap' },
     { id: 'loop', label: '198-Day Loop & EDA' },
     { id: 'defense', label: 'DAP-2020 & Defense Moats' },
-    { id: 'architecture', label: 'Multi-Die Packaging & Cores' },
+    { id: 'architecture', label: 'Silicon Architecture & RTL' },
     { id: 'finance', label: 'Finance & Risk Audits' }
   ];
 
