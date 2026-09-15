@@ -46,6 +46,10 @@ export interface QuickPrompt {
 
 export const quickPrompts: QuickPrompt[] = [
   { id: 'sku-compare', label: 'DG32 vs STM32G0', query: 'Compare DG32 with STM32G0', category: 'sku' },
+  { id: 'sku-roadmap', label: '3-Phase SKU Roadmap', query: 'What is the 3-phase node roadmap and arithmetic check?', category: 'strategy' },
+  { id: 'd100-failsafe', label: 'D100 Failsafe Island', query: 'How does the D100 drone hardware failsafe island work?', category: 'sku' },
+  { id: 'bel-display', label: 'SKU-8 BEL 17" Display', query: 'What is the PIL-5 mandate for the SKU-8 BEL display driver?', category: 'sku' },
+  { id: 'radar-sige', label: 'SKU-7 SiGe 350GHz Radar', query: 'Why does SKU-7 use IHP SiGe 350GHz instead of pure CMOS?', category: 'sku' },
   { id: 'ai-envelope', label: 'AI Without Accelerator', query: 'How does DG32-LITE run AI without a hardware accelerator?', category: 'ai' },
   { id: 'usecases-30', label: '30 Edge AI Use Cases', query: 'What are the 30 industrial use cases supported on DG32-LITE?', category: 'ai' },
   { id: 'kurtosis-trap', label: 'Kurtosis vs RMS Trap', query: 'Why is kurtosis non-monotonic and why can you not alarm on it alone?', category: 'ai' },
@@ -504,7 +508,30 @@ export const deepGridCatalog: DeepGridItem[] = [
       'Dramatically reduces unit cost while offering modular silicon upgrades.'
     ],
     citation: 'DeepGrid Mature Silicon — Chapter 6: Block-Level IP Reuse & SiP',
-    connectedNodeIds: ['track-b-d100', 'dg-sdv-platform', 'sku-9']
+    connectedNodeIds: ['track-b-d100', 'dg-sdv-platform', 'sku-9', 'sku-node-roadmap']
+  },
+  {
+    id: 'sku-node-roadmap',
+    name: '3-Phase Node Roadmap & Arithmetic Check',
+    category: 'strategy',
+    tagline: 'Technology scaling roadmap from 130/180nm to 28nm with honest ~50-SKU self-audit',
+    nodeFoundry: '130/180nm (Phase 1) → 90/55/45nm (Phase 2) → 28nm (Phase 3)',
+    voltageRail: 'Mature I/O Anchor + Logic Shrinks',
+    standards: 'DPSU & Investor Diligence Canon · Tata Dholera / SCL Alignment',
+    summary: 'DeepGrid’s 3-phase roadmap ships the foundational catalogue on 130/180nm, shrinks logic-bound parts (GNSS baseband, SDR) to 90/55/45nm for channel count, and introduces 28nm for compute in 2030, self-correcting early drafts to a disciplined ~50-SKU Year 5 catalogue.',
+    keyFacts: [
+      'Phase 1 (2026–2027, 130/180nm): Ships the 9-SKU core catalogue (motors, PMICs, smart meters, transceivers, supervisors).',
+      'Phase 2 (2028–2029, 90/55/45nm): Shrink for channel count and DSP throughput (GNSS baseband, SDR), NOT speed vanity. Analog I/O rings stay 130nm.',
+      'Phase 3 (2030+, 28nm and below): Multi-TOPS AI NPUs and central compute. "Everything above is a sub-10 nm problem. 28 nm buys some of it. None of it is claimable on 130 nm, at any clock."',
+      'The Arithmetic Check: Self-audits early drafts claiming 1,000 SKUs by Year 5 down to an honest, disciplined ~50-SKU catalogue (10 SKUs/yr × 5 yrs).',
+      'Matches India domestic manufacturing timeline: SCL 180nm today and Tata Electronics 28nm fab in Dholera.'
+    ],
+    citation: 'DeepGrid Semi SKU Compendium — Chapter 14: Node & SKU Roadmap (Sheet 14)',
+    actions: [
+      { label: 'Explore Roadmap', target: 'roadmap' },
+      { label: 'View Product Family', target: 'family' }
+    ],
+    connectedNodeIds: ['sip-packaging', 'three-factory', 'track-b-d100', 'dg-sdv-platform']
   },
   {
     id: 'munger-audit',
@@ -561,6 +588,7 @@ export const graphNodes: GraphNode[] = [
   { id: 'sku-9', name: 'SKU-9 Zonal', shortName: 'SKU-9', category: 'sku', x: 32, y: 20, description: 'SDV zonal gateway with 16x e-fuses & Gigabit Ethernet TSN.' },
   { id: 'track-b-d100', name: 'D100 Drone', shortName: 'D100', category: 'sku', x: 16, y: 15, description: 'Heterogeneous tactical drone SoC on organic multi-die SiP.' },
   { id: 'dg-sdv-platform', name: 'DG SDV', shortName: 'SDV', category: 'sku', x: 38, y: 12, description: 'End-to-end SDV reference architecture with AXI-REALM QoS.' },
+  { id: 'sku-node-roadmap', name: '3-Phase Roadmap', shortName: 'Roadmap', category: 'sku', x: 26, y: 16, description: '130nm -> 90/55nm -> 28nm scaling roadmap with ~50-SKU arithmetic check.' },
 
   // Edge AI Nodes (New Grounded Cluster)
   { id: 'dg32-ai-envelope', name: '12.5 MMAC/s Budget', shortName: '12.5 MMAC', category: 'ai', x: 26, y: 44, description: 'Scalar AI envelope: 12.5 MMAC/s, 16.5 KB RAM, 82% free CPU cycles.' },
@@ -646,6 +674,10 @@ export const graphEdges: GraphEdge[] = [
 
   { from: 'dg-sdv-platform', to: 'sku-7', label: 'Perception Radar' },
   { from: 'dg-sdv-platform', to: 'sku-9', label: 'TSN Mesh' },
+  { from: 'sku-node-roadmap', to: 'track-b-d100', label: 'Phase 2 Drone Shrink' },
+  { from: 'sku-node-roadmap', to: 'dg-sdv-platform', label: 'Phase 3 Compute' },
+  { from: 'sku-node-roadmap', to: 'arch-sip', label: 'Heterogeneous SiP' },
+  { from: 'sku-node-roadmap', to: 'fab-skywater', label: 'Phase 1 130/180nm' },
 
   // Foundry Sovereignty Chain
   { from: 'fab-skywater', to: 'fab-ihp', label: 'Phase 1 → Phase 2' },
@@ -708,6 +740,9 @@ export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
     if ((q.includes('munger') || q.includes('audit') || q.includes('stop rule')) && item.id === 'munger-audit') score += 60;
     if ((q.includes('seed') || q.includes('10 cr') || q.includes('financial') || q.includes('funds')) && item.id === 'fin-funds') score += 60;
     if ((q.includes('sip') || q.includes('organic') || q.includes('packaging')) && item.id === 'sip-packaging') score += 60;
+    if ((q.includes('roadmap') || q.includes('50-sku') || q.includes('arithmetic') || q.includes('phase 2') || q.includes('phase 3')) && item.id === 'sku-node-roadmap') score += 70;
+    if ((q.includes('bel') || q.includes('display') || q.includes('sxga') || q.includes('tcon')) && item.id === 'sku-8') score += 60;
+    if (q.includes('failsafe') && item.id === 'track-b-d100') score += 60;
 
     return { item, score };
   });
