@@ -75,7 +75,10 @@ export const quickPrompts: QuickPrompt[] = [
   { id: 'funnel-10x', label: '$9B Funnel & 10x Cost', query: 'How does DeepGrid achieve a 10x cost reduction across the $9B import funnel?', category: 'strategy' },
   { id: 'boxes-not-chips', label: '"Boxes, Not Chips" Playbook', query: 'Why does DeepGrid target boxes and LRUs in PIL-5 rather than chips?', category: 'defense' },
   { id: 'crash-stop-rules', label: 'Chinese Crash & Stop Rules', query: 'What happens in the FY31 Chinese price crash stress test and what are Stop Rules S1-S4?', category: 'strategy' },
-  { id: 'dgridriscv-spec', label: 'DGridRiscV Core Spec', query: 'What is the exact circuit-code architecture of the DGridRiscV RV32IM processor?', category: 'architecture' }
+  { id: 'dgridriscv-spec', label: 'DGridRiscV Core Spec', query: 'What is the exact circuit-code architecture of the DGridRiscV RV32IM processor?', category: 'architecture' },
+  { id: 'qfn64-pinout', label: 'QFN-64 Pinout & Packaging', query: 'What is the complete 64-pin QFN pin assignment and packaging specification for DG32?', category: 'architecture' },
+  { id: 'power-pcb-rules', label: 'Power Sequencing & PCB Rules', query: 'What are the power supply sequencing rules and PCB layout constraints for DG32-LITE and 2DOM?', category: 'safety' },
+  { id: 'boot-rom-flow', label: 'Boot ROM & QSPI-XIP Flow', query: 'How does the standalone 64 KB boot ROM execute QSPI NOR flash boot without an external management core?', category: 'architecture' }
 ];
 
 export const deepGridCatalog: DeepGridItem[] = [
@@ -813,6 +816,75 @@ export const deepGridCatalog: DeepGridItem[] = [
       { label: 'View Lockstep Core', target: 'ask?q=lockstep' }
     ],
     connectedNodeIds: ['dg32-lite', 'sku-4', 'foc-loop-budget', '198-day-loop']
+  },
+  {
+    id: 'dg32-qfn64-pinout',
+    name: 'DG32 64-Pin QFN Physical Pin Map & Packaging',
+    category: 'architecture',
+    tagline: 'Standardized 9x9mm 0.5mm-pitch QFN package unifying DG32-LITE (CI2609) and DG32-2DOM (CI2612)',
+    nodeFoundry: 'SkyWater sky130A · OpenFrame CI2609 & CI2612 Shuttles',
+    voltageRail: '3.3V I/O (vddio) / 1.8V Core (vccd1)',
+    standards: 'JEDEC MO-220 QFN-64 · OpenFrame Harness Pinout',
+    summary: 'Authoritative 64-pin QFN package definition with exact pin assignments across all 4 sides. Guarantees 100% pin-compatible drop-in board replacement between DG32-LITE and DG32-2DOM.',
+    keyFacts: [
+      'West Side (Pins 1–16): Analog SAR ADC negative input (pin 2), 3-phase gate drive PWM_AH..CL (pins 3–8), PWM_TRIG (pin 11), Quadrature ENC_A/B/Z (pins 12–14), Hall A/B (pins 15–16).',
+      'South Side (Pins 17–32): vddio 3.3V (pin 17), vccd 1.8V (pin 18), resetb 3.3V (pin 21), Hall C (pin 22), JTAG TCK/TMS/TDI/TDO (pins 24–27), RST_N (pin 28), vdda 3.3V (pin 30), CLK 50 MHz (pin 31), QSPI_SCLK 25 MHz (pin 32).',
+      'East Side (Pins 33–48): QSPI NOR flash CSN0, IO0–IO3 (pins 33–37), QSPI_CSN1 (pin 41), UART0 TX/RX console (pins 42–43), UART1 TX/RX telemetry (pins 44–45), SPI Master SCLK/MOSI (pins 46, 48), vccd1 1.8V core (pin 49).',
+      'North Side (Pins 49–64): SPI MISO/CSN (pins 50–51), I2C open-drain SCL/SDA (pins 53–54), GPIO0–2 (pins 55, 57, 58), FAULT_N active-low trip (pin 59), RAIL_OK0/1 (pins 60–61), ADC_VINP positive input (pin 62), vddio 3.3V (pin 64).',
+      'Exposed Die Paddle (EP): Center paddle is VSS ground; must be soldered directly to the PCB ground plane for low-inductance return and thermal dissipation.'
+    ],
+    citation: 'DG32-LITE & DG32-2DOM Preliminary Datasheets — Section 2 & 3: Pinout & Pin Description',
+    actions: [
+      { label: 'View Pinout Specs', target: 'pinout' },
+      { label: 'Explore Architecture', target: 'architecture' }
+    ],
+    connectedNodeIds: ['dg32-lite', 'dg32-2dom-system', 'dshot-bidir-rx', 'foc-loop-budget']
+  },
+  {
+    id: 'dg32-power-sequencing-pcb',
+    name: 'DG32 Power Sequencing, Electrical Limits & PCB Layout',
+    category: 'architecture',
+    tagline: 'Board design rules: 3.3V-before-1.8V ramp, unused rail ESD biasing, and differential ADC routing',
+    nodeFoundry: 'SkyWater sky130A Standard Operating Limits',
+    voltageRail: '3.3V vddio / 1.8V vccd1 / 0–1.8V Diff Analog',
+    standards: 'AEC-Q100 Grade 1 · MIL-STD-883 Environmental · OpenROAD Signoff',
+    summary: 'Hardware electrical and PCB layout specifications for DG32 carrier boards. Mandates 3.3V-before-1.8V power sequencing to protect pad rings, unused rail biasing (vdda1/2, vccd2) for ESD steering, and differential microstrip shielding for current sensing.',
+    keyFacts: [
+      'Power Sequencing Rule: 3.3V pad-ring supply (vddio, vdda) must ramp up before or coincident with 1.8V core supply (vccd, vccd1). At no time may vccd1 exceed vddio by >0.3V.',
+      'Unused Rail Biasing: Unused user rails (vdda1 pins 40/47, vdda2 pin 9 to 3.3V; vccd2 pin 63 to 1.8V) must be tied to nominal voltages to keep pad-ring domain-order ESD diodes properly biased.',
+      'Differential Analog Routing: SAR ADC inputs ADC_VINP (pin 62) and ADC_VINN (pin 2) operate 0 to 1.8V differential; route as a length-matched 100-ohm differential pair shielded from PWM switching traces.',
+      'Power Budget: Estimated total power is ~0.43 W at 50 MHz (tt 25 °C, 1.8 V vccd1). Dynamic and leakage current is drawn entirely from vccd1 (pin 49).',
+      'JTAG Invariance: Internal weak pull-ups on TMS (pin 25) and TDI (pin 26), and weak pull-down on TCK (pin 24) ensure an unconnected JTAG header idles safely without floating toggles.'
+    ],
+    citation: 'DG32-LITE & DG32-2DOM Preliminary Datasheets — Section 4, 5 & 9: Electrical Characteristics & Board Guidance',
+    actions: [
+      { label: 'Explore Hardware Rules', target: 'architecture' },
+      { label: 'View Pinout', target: 'pinout' }
+    ],
+    connectedNodeIds: ['dg32-qfn64-pinout', 'dg32-lite', 'dg32-2dom-system']
+  },
+  {
+    id: 'dg32-boot-rom-qspi',
+    name: 'DG32 Standalone Boot ROM & QSPI-XIP Flow',
+    category: 'architecture',
+    tagline: 'Autonomous multi-stage bootloader: 115200 8N1 banner, 0xD632_B007 flash detection, and SRAM copy',
+    nodeFoundry: '64 KB Baked Std-Cell ROM · SkyWater sky130A',
+    voltageRail: '1.8V Core Logic',
+    standards: 'QSPI Quad-Output-Fast-Read (0x6B) · PMA Hardwired Whitelist',
+    summary: 'The DG32 architecture operates without an external management core. At power-on, the baked 64 KB std-cell boot ROM executes autonomously, emits console telemetry, verifies flash header magic 0xD632_B007, copies executable code to SRAM, and jumps to application code.',
+    keyFacts: [
+      'ROM-Only Fetch Invariant: The CPU instruction fetch bus is hardwired to the private boot ROM alone. Code does NOT execute in place from external NOR flash; it must be copied to SRAM before execution.',
+      'Flash Magic Validation: Boot ROM reads QSPI NOR header at 0x1000_0000; validates 32-bit magic word 0xD632_B007 followed by 32-bit binary length before initiating copy.',
+      'Quad-Output Fast-Read: Transfers image using QSPI opcode 0x6B (1-1-4 mode, 8 dummy cycles, SCLK = 25 MHz) directly into 32 KB SRAM (0x9000_0000).',
+      'UART Console & Fallback: Emits "DG32" boot banner on UART0 (pin 42) at 115,200 baud 8N1 (divider=434 @ 50 MHz). If flash is blank, ROM falls back to interactive UART monitor (r/w/j/i commands).',
+      'PMA Bus Protection: Hardwired VexiiRiscv PMA whitelist: !(addr[31] | addr[31:28]==0x1). Unmapped bus accesses complete with SLVERR; bus never hangs.'
+    ],
+    citation: 'DG32-LITE & DG32-2DOM Preliminary Datasheets — Section 6 & 7: Clock, Reset, Boot & Memory Map',
+    actions: [
+      { label: 'Explore Boot Architecture', target: 'architecture' },
+      { label: 'View Register Map', target: 'ask?q=register' }
+    ],
+    connectedNodeIds: ['dgridriscv-core-architecture', 'dg32-lite', 'dg32-qfn64-pinout']
   }
 ];
 
@@ -876,7 +948,10 @@ export const graphNodes: GraphNode[] = [
   { id: 'import-funnel-node', name: '$9B Import Funnel', shortName: '$9B Funnel', category: 'moat', x: 58, y: 38, description: '$9B mature-node import funnel dismantled via 10x lower NRE.' },
   { id: 'boxes-not-chips-node', name: 'Boxes, Not Chips', shortName: 'Boxes', category: 'moat', x: 72, y: 58, description: 'Entering one level down: providing sovereign silicon inside PIL-5 LRU boxes.' },
   { id: 'stop-rules-node', name: 'Stop Rules S1–S4', shortName: 'Stop Rules', category: 'governance', x: 80, y: 42, description: 'Pre-committed governance rules guarding against Chinese price crashes and delays.' },
-  { id: 'dgridriscv-core-node', name: 'DGridRiscV Core', shortName: 'DGridRiscV', category: 'architecture', x: 40, y: 28, description: 'Canonical RV32IM_Zicsr cacheless processor shared across 7 chips.' }
+  { id: 'dgridriscv-core-node', name: 'DGridRiscV Core', shortName: 'DGridRiscV', category: 'architecture', x: 40, y: 28, description: 'Canonical RV32IM_Zicsr cacheless processor shared across 7 chips.' },
+  { id: 'qfn64-package-node', name: 'QFN-64 Package', shortName: 'QFN-64', category: 'architecture', x: 30, y: 48, description: '64-pin 9x9mm 0.5mm pitch unified package for DG32-LITE & 2DOM.' },
+  { id: 'power-seq-node', name: 'Power Sequencing', shortName: 'Power Seq', category: 'governance', x: 46, y: 60, description: '3.3V-before-1.8V ramp order and unused rail ESD biasing rules.' },
+  { id: 'boot-rom-node', name: '64KB Boot ROM', shortName: 'Boot ROM', category: 'architecture', x: 50, y: 44, description: 'Baked std-cell ROM executing standalone boot & 0xD632_B007 flash copy.' }
 ];
 
 export const graphEdges: GraphEdge[] = [
@@ -961,7 +1036,12 @@ export const graphEdges: GraphEdge[] = [
   { from: 'stop-rules-node', to: 'fin-munger', label: 'Crash Sizing' },
   { from: 'stop-rules-node', to: 'sku-2', label: 'S1 Ripple Gate' },
   { from: 'dgridriscv-core-node', to: 'dg32-lite', label: 'RV32IM Base' },
-  { from: 'dgridriscv-core-node', to: 'sku-4', label: 'Lockstep Core' }
+  { from: 'dgridriscv-core-node', to: 'sku-4', label: 'Lockstep Core' },
+  { from: 'qfn64-package-node', to: 'dg32-lite', label: 'CI2609 Socket' },
+  { from: 'qfn64-package-node', to: 'dg32-2dom-system', label: 'CI2612 Socket' },
+  { from: 'power-seq-node', to: 'qfn64-package-node', label: 'Rail Tie Rules' },
+  { from: 'boot-rom-node', to: 'dg32-lite', label: 'ROM-Only Fetch' },
+  { from: 'boot-rom-node', to: 'dgridriscv-core-node', label: 'PMA Whitelist' }
 ];
 
 export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
@@ -1026,6 +1106,11 @@ export function searchDeepGridKnowledge(query: string): DeepGridItem[] {
     if ((q.includes('boxes') || q.includes('not chips') || q.includes('lru') || q.includes('one level down') || q.includes('346 items')) && item.id === 'boxes-not-chips') score += 90;
     if ((q.includes('crash') || q.includes('chinese price') || q.includes('stop rule') || q.includes('s1') || q.includes('s2') || q.includes('s3') || q.includes('s4') || q.includes('750 cr')) && item.id === 'chinese-price-crash') score += 90;
     if ((q.includes('dgridriscv') || q.includes('rv32im') || q.includes('misa') || q.includes('vexii') || q.includes('cacheless') || q.includes('0x40001100') || q.includes('canonical')) && item.id === 'dgridriscv-core-architecture') score += 90;
+
+    // Datasheet QFN-64 & Board Design boosts
+    if ((q.includes('qfn') || q.includes('qfn-64') || q.includes('pinout') || q.includes('pin map') || q.includes('package') || q.includes('ci2609') || q.includes('ci2612')) && item.id === 'dg32-qfn64-pinout') score += 95;
+    if ((q.includes('power sequencing') || q.includes('vddio') || q.includes('vccd1') || q.includes('pcb') || q.includes('layout') || q.includes('diff pair') || q.includes('differential') || q.includes('esd')) && item.id === 'dg32-power-sequencing-pcb') score += 95;
+    if ((q.includes('boot rom') || q.includes('qspi-xip') || q.includes('0xd632_b007') || q.includes('0x6b') || q.includes('standalone boot') || q.includes('copy to sram') || q.includes('banner')) && item.id === 'dg32-boot-rom-qspi') score += 95;
 
     return { item, score };
   });
