@@ -6,6 +6,7 @@ export interface DeepGridItem {
   name: string;
   category: 'sku' | 'ai' | 'strategy' | 'architecture' | 'defense' | 'loop' | 'finance';
   tagline: string;
+  docId?: 'doc1' | 'doc2' | 'doc3' | 'doc4' | 'doc5' | 'doc6' | 'doc-d100' | 'doc-sdv';
   nodeFoundry?: string;
   voltageRail?: string;
   standards?: string;
@@ -530,6 +531,7 @@ export const deepGridCatalog: DeepGridItem[] = [
     id: '198-day-loop',
     name: 'The 198-Day Silicon Shuttle Loop',
     category: 'loop',
+    docId: 'doc5',
     tagline: 'Lean silicon development sprint replacing $1M legacy EDA with open-source toolchains',
     nodeFoundry: 'OpenLane / Yosys / OpenROAD → SkyWater MPW',
     voltageRail: 'Process-Agnostic Methodology',

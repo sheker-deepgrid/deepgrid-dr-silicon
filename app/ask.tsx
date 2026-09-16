@@ -4,7 +4,7 @@ import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText, Compass, HelpCircle
+  FileText, Compass, HelpCircle, Download, Copy
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
@@ -13,6 +13,110 @@ import {
   graphNodes, graphEdges, DeepGridItem,
   nodeToCatalogMap, catalogToNodeMap
 } from './data/deepgrid-knowledge';
+import {groundedDocuments, GroundedDoc} from './documents-data';
+
+// Helper to resolve the authoritative grounded document for any DeepGrid catalog item
+export function resolveItemDocument(item?: DeepGridItem | null): GroundedDoc {
+  if (!item) return groundedDocuments[4]; // Default to Doc 5 (Mature Silicon Whitepaper)
+
+  if (item.docId) {
+    const found = groundedDocuments.find(d => d.id === item.docId);
+    if (found) return found;
+  }
+
+  // 1. Doc 5: Mature-Node Silicon Master Whitepaper (198-Day Loop, Strategy, Moats, Three-Factory, Finance, Capital)
+  if (
+    item.id === '198-day-loop' || 
+    item.category === 'loop' || 
+    item.citation.includes('Mature Silicon') || 
+    item.citation.includes('Whitepaper v3') ||
+    item.id === 'three-factory' ||
+    item.id === 'dap-2020-moats' ||
+    item.id === 'munger-audit' ||
+    item.id === 'fin-funds' ||
+    item.id === 'import-funnel-10x' ||
+    item.id === 'boxes-not-chips' ||
+    item.id === 'chinese-price-crash' ||
+    item.id === 'dgridriscv-core-architecture'
+  ) {
+    return groundedDocuments.find(d => d.id === 'doc5') || groundedDocuments[4];
+  }
+
+  // 2. Doc S1: D100 Tactical Drone Platform
+  if (item.id === 'track-b-d100' || item.name.includes('D100')) {
+    return groundedDocuments.find(d => d.id === 'doc-d100') || groundedDocuments[1];
+  }
+
+  // 3. Doc S2: DG SDV Software-Defined Vehicle Zonal Architecture
+  if (item.id === 'dg-sdv-platform' || item.name.includes('SDV')) {
+    return groundedDocuments.find(d => d.id === 'doc-sdv') || groundedDocuments[1];
+  }
+
+  // 4. Doc 1: Thirty Use Cases, No Accelerator (Edge AI & Diagnostics)
+  if (
+    item.citation.includes('Thirty Use Cases') || 
+    item.id.startsWith('dg32-ai') || 
+    item.id.startsWith('dg32-30') || 
+    item.id.startsWith('dg32-tree') || 
+    item.id.startsWith('dg32-dsp') || 
+    item.id.startsWith('dg32-afe') || 
+    item.id.startsWith('dg32-benchmark')
+  ) {
+    return groundedDocuments.find(d => d.id === 'doc1') || groundedDocuments[0];
+  }
+
+  // 5. Doc 3: dgrid_dshot_rx RTL Specification (Motor Telemetry & Floorplan)
+  if (
+    item.citation.includes('dshot_rx') || 
+    item.citation.includes('DShot receive') ||
+    item.id === 'dshot-bidir-rx' || 
+    item.id === 'sram-floorplan-lever'
+  ) {
+    return groundedDocuments.find(d => d.id === 'doc3') || groundedDocuments[2];
+  }
+
+  // 6. Doc 4: DG32-2DOM Dual-Domain Architecture (Clocks, Bridges, Attention, AVIP)
+  if (
+    item.citation.includes('2DOM') || 
+    item.id.startsWith('dg32-2dom') || 
+    item.id === 'int8-attention-engine' || 
+    item.id === 'avip-bearing-diagnostics' || 
+    item.id === 'foc-loop-budget'
+  ) {
+    return groundedDocuments.find(d => d.id === 'doc4') || groundedDocuments[3];
+  }
+
+  // 7. Doc 6: Preliminary Datasheets (QFN-64, Supply Sequencing, Pinout, Boot ROM)
+  if (
+    item.citation.includes('Datasheet') || 
+    item.id === 'dg32-lite' || 
+    item.id.startsWith('dg32-qfn64') || 
+    item.id.startsWith('dg32-power') || 
+    item.id.startsWith('dg32-boot')
+  ) {
+    return groundedDocuments.find(d => d.id === 'doc6') || groundedDocuments[5];
+  }
+
+  // 8. Doc 2: Technical Annex v3 (10 SKUs, Roadmap, SiP Packaging)
+  if (
+    item.citation.includes('SKU Compendium') || 
+    item.id.startsWith('sku-') || 
+    item.id === 'sip-packaging' ||
+    item.category === 'sku'
+  ) {
+    return groundedDocuments.find(d => d.id === 'doc2') || groundedDocuments[1];
+  }
+
+  // Fallbacks by category
+  if (item.category === 'defense' || item.category === 'strategy' || item.category === 'finance') {
+    return groundedDocuments.find(d => d.id === 'doc5') || groundedDocuments[4];
+  }
+  if (item.category === 'ai') {
+    return groundedDocuments.find(d => d.id === 'doc1') || groundedDocuments[0];
+  }
+
+  return groundedDocuments.find(d => d.id === 'doc2') || groundedDocuments[1];
+}
 
 export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [query, setQuery] = useState('');
@@ -21,6 +125,9 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [activeView, setActiveView] = useState<'graph' | 'cards'>('graph');
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
   const [selectedItem, setSelectedItem] = useState<DeepGridItem | null>(null);
+  const [readingDocContent, setReadingDocContent] = useState<{title: string; text: string} | null>(null);
+  const [loadingDocContent, setLoadingDocContent] = useState<boolean>(false);
+  const [copiedModalSpec, setCopiedModalSpec] = useState<boolean>(false);
   
   const [nodePositions, setNodePositions] = useState<Record<string, {x: number; y: number}>>(() => {
     const initial: Record<string, {x: number; y: number}> = {};
@@ -107,6 +214,37 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     if (activeCategory !== 'all' && !doesItemMatchCategory(activeCategory, item?.category, targetNode?.category)) {
       setActiveCategory('all');
     }
+  };
+
+  // Load Markdown Architecture Spec inline within the audit view
+  const handleReadDocInline = (doc: GroundedDoc) => {
+    setLoadingDocContent(true);
+    setCopiedModalSpec(false);
+    fetch(doc.specFile)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then(text => {
+        setReadingDocContent({ title: doc.title, text });
+        setLoadingDocContent(false);
+      })
+      .catch(() => {
+        setReadingDocContent({
+          title: doc.title,
+          text: `# ${doc.title}\n\n` +
+            `**Document Badge:** ${doc.badge}\n` +
+            `**Subsystem:** ${doc.subsystem}\n` +
+            `**Official PDF:** \`${doc.pdfFileName}\` (${doc.fileSizePdf} · ${doc.pdfPageCount})\n` +
+            `**Architecture Spec:** \`${doc.specFileName}\` (${doc.fileSizeMd})\n\n` +
+            `---\n\n## Executive Summary\n\n${doc.summary}\n\n` +
+            `## Key Technical Parameters\n\n` +
+            doc.stats.map(s => `- **${s.label}:** ${s.value}`).join('\n') +
+            `\n\n## Core Engineering Takeaways\n\n` +
+            doc.highlights.map(h => `- ${h}`).join('\n')
+        });
+        setLoadingDocContent(false);
+      });
   };
 
   const categories = [
@@ -559,6 +697,41 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               </div>
             )}
 
+            {/* Authoritative Source Document Reference with Direct Links */}
+            {activeDetailItem && (() => {
+              const doc = resolveItemDocument(activeDetailItem);
+              return (
+                <div className="dr-drawer-doc-card">
+                  <div className="dr-drawer-doc-header">
+                    <span className="mono dr-drawer-doc-badge">{doc.badge}</span>
+                    <span className="mono dr-drawer-doc-num">DOC #{doc.docNum}</span>
+                  </div>
+                  <h4 className="dr-drawer-doc-name">{doc.title}</h4>
+                  <p className="dr-drawer-doc-citation mono">{activeDetailItem.citation}</p>
+                  <div className="dr-drawer-doc-actions">
+                    <a 
+                      href={doc.pdfFile} 
+                      download={doc.pdfFileName}
+                      className="dr-drawer-link-btn primary"
+                      title={`Download official ${doc.pdfFileName} (${doc.fileSizePdf})`}
+                    >
+                      <Download size={13} />
+                      <span>Download PDF ({doc.fileSizePdf})</span>
+                    </a>
+                    <a 
+                      href={doc.specFile} 
+                      download={doc.specFileName}
+                      className="dr-drawer-link-btn outline"
+                      title={`Download ${doc.specFileName} (${doc.fileSizeMd})`}
+                    >
+                      <FileText size={13} />
+                      <span>MD Spec</span>
+                    </a>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Action buttons */}
             <div className="dr-drawer-actions">
               {activeDetailItem?.actions && activeDetailItem.actions.map(act => (
@@ -648,6 +821,21 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                     {act.label} <ArrowUpRight size={16} />
                   </button>
                 ))}
+                {(() => {
+                  const doc = resolveItemDocument(item);
+                  return (
+                    <a 
+                      href={doc.pdfFile}
+                      download={doc.pdfFileName}
+                      className="dr-ask-card-pdf-link"
+                      title={`Download official ${doc.pdfFileName} (${doc.fileSizePdf})`}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <Download size={13} />
+                      <span>{doc.fileSizePdf} PDF</span>
+                    </a>
+                  );
+                })()}
                 <button 
                   className="text-link"
                   onClick={() => setSelectedItem(item)}
@@ -677,62 +865,194 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
 
       {/* Modal / Slide-out for Full Vector Citation */}
-      {selectedItem && (
-        <dialog 
-          className="dr-ask-modal-backdrop" 
-          open
-          aria-modal="true"
-          onKeyDown={e => {
-            if (e.key === 'Escape') setSelectedItem(null);
-          }}
-          onClick={() => setSelectedItem(null)}
-        >
-          <section 
-            className="dr-ask-modal"
-            aria-label="Audit details"
-            tabIndex={-1}
-            onKeyDown={e => e.stopPropagation()}
-            onClick={e => e.stopPropagation()}
+      {selectedItem && (() => {
+        const selectedDoc = resolveItemDocument(selectedItem);
+        return (
+          <dialog 
+            className="dr-ask-modal-backdrop" 
+            open
+            aria-modal="true"
+            onKeyDown={e => {
+              if (e.key === 'Escape') {
+                setSelectedItem(null);
+                setReadingDocContent(null);
+              }
+            }}
+            onClick={() => {
+              setSelectedItem(null);
+              setReadingDocContent(null);
+            }}
           >
-            <header className="dr-ask-modal-header">
-              <div>
-                <span className="mono">{selectedItem.category.toUpperCase()} · AUTHORITATIVE SPECIFICATION AUDIT</span>
-                <h2>{selectedItem.name}</h2>
-              </div>
-              <button className="dr-ask-modal-close" onClick={() => setSelectedItem(null)} aria-label="Close modal">
-                <X size={20} />
-              </button>
-            </header>
-            <div className="dr-ask-modal-body">
-              <p className="dr-ask-modal-tagline">{selectedItem.tagline}</p>
-              
-              <div className="dr-ask-modal-source">
-                <BookOpen size={18} />
+            <section 
+              className="dr-ask-modal"
+              aria-label="Audit details"
+              tabIndex={-1}
+              onKeyDown={e => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
+            >
+              <header className="dr-ask-modal-header">
                 <div>
-                  <strong>Primary Reference Source:</strong>
-                  <span>{selectedItem.citation}</span>
+                  <span className="mono">{selectedItem.category.toUpperCase()} · AUTHORITATIVE SPECIFICATION AUDIT</span>
+                  <h2>{selectedItem.name}</h2>
                 </div>
-              </div>
-
-              <h4>Key Technical Specifications & Operational Envelope:</h4>
-              <ul className="dr-ask-modal-facts">
-                {selectedItem.keyFacts.map((fact, idx) => (
-                  <li key={idx}>
-                    <span className="dr-ask-num mono">{String(idx + 1).padStart(2, '0')}</span>
-                    <p>{fact}</p>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="dr-ask-modal-footer">
-                <button className="primary" onClick={() => setSelectedItem(null)}>
-                  Close Specification View
+                <button 
+                  className="dr-ask-modal-close" 
+                  onClick={() => {
+                    setSelectedItem(null);
+                    setReadingDocContent(null);
+                  }} 
+                  aria-label="Close modal"
+                >
+                  <X size={20} />
                 </button>
+              </header>
+
+              <div className="dr-ask-modal-body">
+                {readingDocContent ? (
+                  <div className="dr-ask-modal-inline-reader">
+                    <div className="dr-ask-inline-reader-bar">
+                      <button 
+                        type="button"
+                        className="dr-ask-back-btn" 
+                        onClick={() => setReadingDocContent(null)}
+                      >
+                        ← Back to Specification Audit
+                      </button>
+                      <div className="dr-ask-inline-reader-actions">
+                        <button 
+                          type="button"
+                          className="dr-doc-btn"
+                          onClick={() => {
+                            navigator.clipboard.writeText(readingDocContent.text);
+                            setCopiedModalSpec(true);
+                            setTimeout(() => setCopiedModalSpec(false), 2000);
+                          }}
+                        >
+                          {copiedModalSpec ? <Check size={14} /> : <Copy size={14} />}
+                          <span>{copiedModalSpec ? 'Copied' : 'Copy Spec'}</span>
+                        </button>
+                        <a 
+                          href={selectedDoc.pdfFile} 
+                          download={selectedDoc.pdfFileName} 
+                          className="dr-doc-btn dr-doc-btn-primary"
+                        >
+                          <Download size={14} /> Download PDF ({selectedDoc.fileSizePdf})
+                        </a>
+                      </div>
+                    </div>
+                    <pre className="dr-reader-markdown-view">{readingDocContent.text}</pre>
+                  </div>
+                ) : (
+                  <>
+                    <p className="dr-ask-modal-tagline">{selectedItem.tagline}</p>
+                    
+                    {/* Authoritative Source Reference Card with Direct Document Links */}
+                    <div className="dr-ask-modal-source-card">
+                      <div className="dr-ask-source-head">
+                        <div className="dr-ask-source-badge-wrap">
+                          <BookOpen size={16} className="dr-ask-source-icon" />
+                          <span className="mono dr-ask-source-badge">{selectedDoc.badge}</span>
+                        </div>
+                        <span className="dr-ask-source-docnum mono">
+                          AUTHORITATIVE SPEC DOC #{selectedDoc.docNum} · {selectedDoc.subsystem.toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className="dr-ask-source-meta">
+                        <h4 className="dr-ask-source-title">{selectedDoc.title}</h4>
+                        <p className="dr-ask-source-sub">{selectedDoc.subtitle}</p>
+                        <div className="dr-ask-source-citation">
+                          <span className="mono">SPECIFIC AUDIT CITATION:</span>
+                          <strong>{selectedItem.citation}</strong>
+                        </div>
+                      </div>
+
+                      <div className="dr-ask-source-links">
+                        <a 
+                          href={selectedDoc.pdfFile} 
+                          download={selectedDoc.pdfFileName}
+                          className="dr-doc-link-btn primary"
+                          title={`Download official ${selectedDoc.pdfFileName} (${selectedDoc.fileSizePdf})`}
+                        >
+                          <Download size={14} />
+                          <span>Download Official PDF</span>
+                          <span className="dr-doc-link-tag mono">{selectedDoc.fileSizePdf} · {selectedDoc.pdfPageCount}</span>
+                        </a>
+
+                        <a 
+                          href={selectedDoc.specFile}
+                          download={selectedDoc.specFileName}
+                          className="dr-doc-link-btn outline"
+                          title={`Download ${selectedDoc.specFileName} (${selectedDoc.fileSizeMd})`}
+                        >
+                          <FileText size={14} />
+                          <span>Architecture Spec (.md)</span>
+                          <span className="dr-doc-link-tag mono">{selectedDoc.fileSizeMd}</span>
+                        </a>
+
+                        <button 
+                          type="button"
+                          className="dr-doc-link-btn outline"
+                          onClick={() => handleReadDocInline(selectedDoc)}
+                          title={`Read ${selectedDoc.title} inline`}
+                        >
+                          <BookOpen size={14} />
+                          <span>{loadingDocContent ? 'Loading...' : 'Read Spec Inline'}</span>
+                        </button>
+
+                        <button 
+                          type="button"
+                          className="dr-doc-link-btn text"
+                          onClick={() => {
+                            setSelectedItem(null);
+                            setReadingDocContent(null);
+                            go('library');
+                          }}
+                          title="Open Section 07 Authoritative Design Archive"
+                        >
+                          <span>Inspect in Design Library</span>
+                          <ArrowUpRight size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <h4>Key Technical Specifications & Operational Envelope:</h4>
+                    <ul className="dr-ask-modal-facts">
+                      {selectedItem.keyFacts.map((fact, idx) => (
+                        <li key={idx}>
+                          <span className="dr-ask-num mono">{String(idx + 1).padStart(2, '0')}</span>
+                          <p>{fact}</p>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="dr-ask-modal-footer">
+                      <button 
+                        type="button"
+                        className="dr-doc-link-btn outline" 
+                        onClick={() => handleReadDocInline(selectedDoc)}
+                        style={{marginRight: 'auto'}}
+                      >
+                        <BookOpen size={15} /> Read Full Document Spec (.md)
+                      </button>
+                      <button 
+                        type="button"
+                        className="primary" 
+                        onClick={() => {
+                          setSelectedItem(null);
+                          setReadingDocContent(null);
+                        }}
+                      >
+                        Close Specification View
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          </section>
-        </dialog>
-      )}
+            </section>
+          </dialog>
+        );
+      })()}
 
       <div className="dr-links dr-sec-gap" style={{marginTop: '2.5rem'}}>
         <button className="text-link" onClick={() => go('overview')}>
