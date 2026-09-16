@@ -4,7 +4,7 @@ import {useState, useMemo, useRef, useEffect} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText, Sparkles, Layers, Cpu
+  FileText, Sparkles, Cpu, Copy
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
@@ -14,16 +14,56 @@ import {
   nodeToCatalogMap, catalogToNodeMap
 } from './data/deepgrid-knowledge';
 import {
-  queryGraphify, streamGeminiRAG, GraphSearchResult, GraphifyNode
+  queryGraphify, streamGeminiRAG, GraphSearchResult
 } from './data/deepgrid-graph-search';
+
+function renderMarkdownAnswer(text: string) {
+  if (!text) return null;
+  const lines = text.split('\n');
+  return (
+    <div className="dr-answer-prose">
+      {lines.map((line, i) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={i} className="dr-ans-space" />;
+        
+        if (trimmed.startsWith('### ')) {
+          return (
+            <h4 key={i} className="dr-ans-heading">
+              {trimmed.replace('### ', '')}
+            </h4>
+          );
+        }
+        if (trimmed.startsWith('• ')) {
+          const bulletContent = trimmed.replace('• ', '');
+          const parts = bulletContent.split('**');
+          return (
+            <div key={i} className="dr-ans-bullet">
+              <span className="dr-ans-dot">•</span>
+              <span className="dr-ans-bullet-text">
+                {parts.map((p, pIdx) => (pIdx % 2 === 1 ? <strong key={pIdx}>{p}</strong> : p))}
+              </span>
+            </div>
+          );
+        }
+        const parts = trimmed.split('**');
+        return (
+          <p key={i} className="dr-ans-paragraph">
+            {parts.map((p, pIdx) => (pIdx % 2 === 1 ? <strong key={pIdx}>{p}</strong> : p))}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [query, setQuery] = useState('');
   const [selectedDocId, setSelectedDocId] = useState<string>('all');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [activeView, setActiveView] = useState<'graph' | 'cards' | 'deepgraph'>('graph');
+  const [activeView, setActiveView] = useState<'graph' | 'cards'>('graph');
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
   const [selectedItem, setSelectedItem] = useState<DeepGridItem | null>(null);
+  const [copied, setCopied] = useState(false);
   
   // Path 2 Live AI state (Background Gemini 2.5 Flash RAG)
   const [aiStreamText, setAiStreamText] = useState('');
@@ -269,69 +309,65 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         </div>
       </div>
 
-      {/* Path 1 + Path 2: Graphify BFS Subgraph & AI RAG Synthesis Panel */}
-      <div className="dr-graphify-rag-panel">
-        <div className="dr-graphify-rag-header">
-          <div className="dr-graphify-title-wrap">
-            <h3 className="dr-graphify-title">
-              <Sparkles size={17} style={{color: 'var(--copper)'}} />
-              <span>DeepGrid Silicon Intelligence (Path 1 + Path 2 RAG)</span>
-            </h3>
+      {/* Executive Answer Card (Standard Clean UX) */}
+      <div className="dr-answer-card">
+        <div className="dr-answer-card-header">
+          <div className="dr-answer-header-left">
+            <span className="dr-answer-badge-icon">
+              <Sparkles size={16} />
+            </span>
+            <div className="dr-answer-titles">
+              <h3 className="dr-answer-main-title">DeepGrid Intelligence Response</h3>
+              {query && <span className="dr-answer-query-sub">Grounded Analysis for &ldquo;{query}&rdquo;</span>}
+            </div>
           </div>
-          <div className="dr-graphify-meta-pills">
-            <span className="dr-pill-tag accent">
-              <Cpu size={12} /> BFS Traversal: {graphifyResult.subgraphNodes.length} Nodes
+          <div className="dr-answer-header-right">
+            <span className="dr-answer-grounded-pill">
+              <ShieldCheck size={13} />
+              <span>{isStreaming ? 'Synthesizing...' : 'Verified Spec Grounded'}</span>
             </span>
-            <span className="dr-pill-tag">
-              {graphifyResult.subgraphLinks.length} Relations
-            </span>
-            <span className="dr-pill-tag cyan">
-              {graphifyResult.communities.length} Clusters
-            </span>
+            <button
+              className="dr-answer-copy-action"
+              onClick={() => {
+                const textToCopy = aiStreamText || graphifyResult.instantSynthesis;
+                navigator.clipboard?.writeText(textToCopy);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              title="Copy Answer to Clipboard"
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              <span>{copied ? 'Copied' : 'Copy'}</span>
+            </button>
           </div>
         </div>
 
-        {/* Traversed Node Chips (Path 1) */}
-        {graphifyResult.subgraphNodes.length > 0 && (
-          <div className="dr-graphify-traversed-strip">
-            <span className="dr-traversed-label">TRAVERSED SUBGRAPH ENTITIES (CLICK TO QUERY):</span>
-            <div className="dr-traversed-chips">
-              {graphifyResult.subgraphNodes.map(node => (
-                <button
-                  key={node.id}
-                  className={`dr-node-chip ${graphifyResult.seedNodes.some(s => s.id === node.id) ? 'seed' : ''}`}
-                  onClick={() => handleQuerySelect(node.label)}
-                  title={`Source: ${node.source_file || 'spec'} (${node.source_location || 'L1'})`}
-                >
-                  <span>{node.label}</span>
-                  {node.source_location && <span className="chip-loc">#{node.source_location}</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="dr-answer-card-body">
+          {renderMarkdownAnswer(aiStreamText || graphifyResult.instantSynthesis)}
+        </div>
 
-        {/* AI Synthesis Box (Path 2) */}
-        {/* Dynamic Silicon Intelligence Box (Path 2 Background RAG) */}
-        <div className="dr-ai-synthesis-box">
-          <div className="dr-ai-synthesis-head">
-            <span className="dr-ai-badge">
-              <Sparkles size={15} style={{color: 'var(--copper)'}} />
-              <span>DYNAMIC SILICON INTELLIGENCE · GEMINI 2.5 FLASH RAG</span>
-            </span>
-            <div className="dr-ai-actions">
-              <span className={`dr-pill-tag ${isStreaming ? 'cyan' : 'accent'}`}>
-                <Cpu size={12} /> {isStreaming ? 'Synthesizing Subgraph...' : 'Zero-Hallucination Grounded'}
+        {/* Clean Grounded Sources Strip */}
+        <div className="dr-answer-sources-strip">
+          <div className="dr-sources-label">
+            <BookOpen size={13} />
+            <span>VERIFIED SOURCE DOCUMENTS:</span>
+          </div>
+          <div className="dr-sources-pills">
+            {activeDetailItem?.citation && (
+              <span className="dr-source-chip primary" title={activeDetailItem.citation}>
+                {activeDetailItem.citation}
               </span>
-            </div>
-          </div>
-
-          <div className="dr-ai-content">
-            {aiStreamText ? (
-              <div style={{whiteSpace: 'pre-wrap'}}>{aiStreamText}</div>
-            ) : (
-              <div style={{whiteSpace: 'pre-wrap'}}>{graphifyResult.instantSynthesis}</div>
             )}
+            {documentSources.filter(d => d.id !== 'all').slice(0, 3).map(doc => (
+              <button
+                key={doc.id}
+                className="dr-source-chip"
+                onClick={() => setSelectedDocId(doc.id)}
+                title={`Filter by ${doc.title}`}
+              >
+                {doc.badge} · {doc.title.split('(')[0].trim()}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -366,14 +402,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             onClick={() => setActiveView('graph')}
             title="Interactive Knowledge Graph Topology"
           >
-            <Network size={16} /> <span>Graph Matrix</span>
-          </button>
-          <button
-            className={`dr-ask-toggle-btn ${activeView === 'deepgraph' ? 'active' : ''}`}
-            onClick={() => setActiveView('deepgraph')}
-            title="280-Node Graphify BFS Explorer"
-          >
-            <Layers size={16} /> <span>DeepGraph ({graphifyResult.subgraphNodes.length})</span>
+            <Network size={16} /> <span>Knowledge Graph</span>
           </button>
           <button
             className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
@@ -728,84 +757,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         </div>
       )}
 
-      {/* View 3: 280-Node Graphify BFS Explorer */}
-      {activeView === 'deepgraph' && (
-        <div className="dr-deepgraph-container">
-          <div className="dr-deepgraph-card">
-            <h3>Traversed Knowledge Nodes ({graphifyResult.subgraphNodes.length})</h3>
-            <div style={{overflowX: 'auto'}}>
-              <table className="dr-deepgraph-table">
-                <thead>
-                  <tr>
-                    <th>Node Symbol</th>
-                    <th>Subsystem Cluster</th>
-                    <th>Source Document / Module</th>
-                    <th>Line</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {graphifyResult.subgraphNodes.map(n => (
-                    <tr key={n.id}>
-                      <td>
-                        <button 
-                          className="text-link" 
-                          style={{fontSize: '0.82rem', textAlign: 'left'}}
-                          onClick={() => handleQuerySelect(n.label)}
-                        >
-                          {n.label}
-                        </button>
-                      </td>
-                      <td>
-                        <span className="dr-pill-tag">{n.community_name || 'General'}</span>
-                      </td>
-                      <td style={{fontFamily: 'monospace', color: '#93a582', fontSize: '0.76rem'}}>
-                        {n.source_file || 'spec'}
-                      </td>
-                      <td style={{fontFamily: 'monospace', color: 'var(--copper)'}}>
-                        {n.source_location || 'L1'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
 
-          <div className="dr-deepgraph-card">
-            <h3>Traversed Relationships ({graphifyResult.subgraphLinks.length})</h3>
-            <div style={{overflowX: 'auto'}}>
-              <table className="dr-deepgraph-table">
-                <thead>
-                  <tr>
-                    <th>Source</th>
-                    <th>Relation</th>
-                    <th>Target</th>
-                    <th>Confidence</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {graphifyResult.subgraphLinks.slice(0, 25).map((l, idx) => {
-                    const src = typeof l.source === 'string' ? l.source : (l.source as any).label || (l.source as any).id;
-                    const tgt = typeof l.target === 'string' ? l.target : (l.target as any).label || (l.target as any).id;
-                    return (
-                      <tr key={idx}>
-                        <td style={{fontFamily: 'monospace', fontSize: '0.78rem'}}>{src}</td>
-                        <td>
-                          <span className="dr-pill-tag accent">--[{l.relation}]--&gt;</span>
-                        </td>
-                        <td style={{fontFamily: 'monospace', fontSize: '0.78rem'}}>{tgt}</td>
-                        <td style={{fontSize: '0.74rem', color: '#93a582'}}>
-                          {l.confidence || 'EXTRACTED'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal / Slide-out for Full Vector Citation */}
       {selectedItem && (

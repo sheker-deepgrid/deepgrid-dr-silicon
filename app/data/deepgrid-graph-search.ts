@@ -2,7 +2,7 @@
 // Provides BFS graph traversal, semantic subgraph retrieval, and background Gemini 2.5 Flash synthesis.
 
 import graphDataRaw from './deepgrid-graphify.json';
-import { deepGridCatalog, catalogToNodeMap, nodeToCatalogMap } from './deepgrid-knowledge';
+import { deepGridCatalog, catalogToNodeMap, nodeToCatalogMap, searchDeepGridKnowledge, DeepGridItem } from './deepgrid-knowledge';
 
 export interface GraphifyNode {
   id: string;
@@ -172,43 +172,34 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
     }))
     .slice(0, 8);
 
-  // Cross-reference with DeepGrid catalog facts to build deep dynamic answer
-  const matchedCatalogItems = deepGridCatalog.filter(item => {
-    const iid = item.id.toLowerCase();
-    const iname = item.name.toLowerCase();
-    return seedNodes.some(s => {
-      const sid = s.id.toLowerCase();
-      const slabel = s.label.toLowerCase();
-      return iid.includes(sid) || sid.includes(iid) || iname.includes(slabel) || slabel.includes(iname);
-    });
-  });
+  // Ranked catalog match based on deep keyword scoring
+  const rankedItems = searchDeepGridKnowledge(query);
+  const topItem: DeepGridItem = rankedItems.length > 0 ? rankedItems[0] : deepGridCatalog[0];
 
-  const primaryCommunity = communities[0]?.name || 'DeepGrid Architecture';
+  // Format clean, human-readable executive architectural synthesis
+  let dynamicSynthesis = `### ${topItem.name}\n\n`;
+  dynamicSynthesis += `**Architectural Thesis:** ${topItem.tagline}\n\n`;
+  dynamicSynthesis += `${topItem.summary}\n\n`;
   
-  // Format structured dynamic synthesis
-  let dynamicSynthesis = `### ${primaryCommunity}\n\n`;
-  
-  if (matchedCatalogItems.length > 0) {
-    const topItem = matchedCatalogItems[0];
-    dynamicSynthesis += `**Architectural Mandate:** ${topItem.tagline}\n\n`;
-    dynamicSynthesis += `${topItem.summary}\n\n`;
-    
-    if (topItem.keyFacts && topItem.keyFacts.length > 0) {
-      dynamicSynthesis += `**Verified Silicon Parameters:**\n`;
-      topItem.keyFacts.slice(0, 4).forEach(fact => {
-        dynamicSynthesis += `• ${fact}\n`;
-      });
-      dynamicSynthesis += `\n`;
-    }
-  } else {
-    dynamicSynthesis += `**Grounded Knowledge Retrieval:**\n`;
-    dynamicSynthesis += `Traversed **${subgraphNodes.length} nodes** and **${resultLinks.length} directional relations** across **${communities.length} clusters** for \`${query}\`.\n\n`;
+  if (topItem.keyFacts && topItem.keyFacts.length > 0) {
+    dynamicSynthesis += `**Verified Silicon Parameters:**\n`;
+    topItem.keyFacts.slice(0, 4).forEach(fact => {
+      dynamicSynthesis += `• ${fact}\n`;
+    });
+    dynamicSynthesis += `\n`;
   }
 
-  dynamicSynthesis += `**Graph Traversal Citations:**\n`;
-  citationList.slice(0, 4).forEach(c => {
-    dynamicSynthesis += `• \`${c.symbol}\` → [${c.file}#${c.location}]\n`;
-  });
+  if (topItem.nodeFoundry || topItem.voltageRail || topItem.standards) {
+    dynamicSynthesis += `**Hardware Implementation:**\n`;
+    if (topItem.nodeFoundry) dynamicSynthesis += `• Process Node: ${topItem.nodeFoundry}\n`;
+    if (topItem.voltageRail) dynamicSynthesis += `• Power Rails: ${topItem.voltageRail}\n`;
+    if (topItem.standards) dynamicSynthesis += `• Standards: ${topItem.standards}\n`;
+    dynamicSynthesis += `\n`;
+  }
+
+  if (topItem.citation) {
+    dynamicSynthesis += `**Authoritative Citation:** ${topItem.citation}\n`;
+  }
 
   return {
     query,
