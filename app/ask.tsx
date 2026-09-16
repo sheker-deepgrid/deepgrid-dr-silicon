@@ -1,10 +1,10 @@
 'use client';
 /* oxlint-disable jsx-a11y/no-noninteractive-element-interactions */
-import {useState, useMemo, useRef} from 'react';
+import {useState, useMemo, useRef, useEffect} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText, Sparkles, Layers, Key, Send, Cpu
+  FileText, Sparkles, Layers, Cpu
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
@@ -25,17 +25,9 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
   const [selectedItem, setSelectedItem] = useState<DeepGridItem | null>(null);
   
-  // Path 2 Live AI state
-  const [geminiKey, setGeminiKey] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('dg_gemini_key') || '';
-    }
-    return '';
-  });
-  const [showKeyInput, setShowKeyInput] = useState(false);
+  // Path 2 Live AI state (Background Gemini 2.5 Flash RAG)
   const [aiStreamText, setAiStreamText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
-  const [aiError, setAiError] = useState('');
   const [nodePositions, setNodePositions] = useState<Record<string, {x: number; y: number}>>(() => {
     const initial: Record<string, {x: number; y: number}> = {};
     graphNodes.forEach(n => {
@@ -75,29 +67,28 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     return queryGraphify(query);
   }, [query]);
 
-  // Path 2 Live AI Stream Handler
-  const handleLiveAIStream = async () => {
-    if (!query) return;
-    if (!geminiKey) {
-      setShowKeyInput(true);
+  // Path 2: Auto-trigger background dynamic RAG synthesis on query change
+  useEffect(() => {
+    if (!query.trim()) {
+      setAiStreamText('');
+      setIsStreaming(false);
       return;
     }
-    try {
-      setIsStreaming(true);
-      setAiError('');
-      setAiStreamText('');
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('dg_gemini_key', geminiKey);
-      }
-      await streamGeminiRAG(query, graphifyResult, geminiKey, chunk => {
-        setAiStreamText(chunk);
+    let active = true;
+    setIsStreaming(true);
+    const timer = setTimeout(() => {
+      streamGeminiRAG(query, graphifyResult, chunk => {
+        if (active) setAiStreamText(chunk);
+      }).finally(() => {
+        if (active) setIsStreaming(false);
       });
-    } catch (err: any) {
-      setAiError(err.message || 'Failed to stream from Gemini API');
-    } finally {
-      setIsStreaming(false);
-    }
-  };
+    }, 150);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [query, graphifyResult]);
 
   // Document filter for quick queries
   const filteredPrompts = useMemo(() => {
@@ -321,60 +312,19 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         )}
 
         {/* AI Synthesis Box (Path 2) */}
+        {/* Dynamic Silicon Intelligence Box (Path 2 Background RAG) */}
         <div className="dr-ai-synthesis-box">
           <div className="dr-ai-synthesis-head">
             <span className="dr-ai-badge">
-              <ShieldCheck size={14} /> ZERO-HALLUCINATION GROUNDED SYNTHESIS
+              <Sparkles size={15} style={{color: 'var(--copper)'}} />
+              <span>DYNAMIC SILICON INTELLIGENCE · GEMINI 2.5 FLASH RAG</span>
             </span>
             <div className="dr-ai-actions">
-              <button
-                className="dr-btn-ai-stream"
-                onClick={handleLiveAIStream}
-                disabled={isStreaming}
-                title="Stream live generative synthesis via Gemini 1.5 Flash"
-              >
-                <Sparkles size={14} />
-                <span>{isStreaming ? 'Streaming AI...' : 'Live AI Stream'}</span>
-              </button>
-              <button
-                className="text-link"
-                style={{fontSize: '0.78rem', color: '#93a582'}}
-                onClick={() => setShowKeyInput(!showKeyInput)}
-              >
-                <Key size={13} /> {geminiKey ? 'Key Configured' : 'Configure API Key'}
-              </button>
+              <span className={`dr-pill-tag ${isStreaming ? 'cyan' : 'accent'}`}>
+                <Cpu size={12} /> {isStreaming ? 'Synthesizing Subgraph...' : 'Zero-Hallucination Grounded'}
+              </span>
             </div>
           </div>
-
-          {showKeyInput && (
-            <div className="dr-ai-key-input-row">
-              <input
-                type="password"
-                className="dr-ai-key-input"
-                value={geminiKey}
-                onChange={e => setGeminiKey(e.target.value)}
-                placeholder="Enter Gemini API key for live browser streaming (stored in session only)..."
-              />
-              <button
-                className="primary"
-                style={{padding: '6px 12px', fontSize: '0.78rem'}}
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    sessionStorage.setItem('dg_gemini_key', geminiKey);
-                  }
-                  setShowKeyInput(false);
-                }}
-              >
-                Save Key
-              </button>
-            </div>
-          )}
-
-          {aiError && (
-            <div style={{color: '#ff8a80', fontSize: '0.82rem', fontFamily: 'monospace'}}>
-              {aiError}
-            </div>
-          )}
 
           <div className="dr-ai-content">
             {aiStreamText ? (

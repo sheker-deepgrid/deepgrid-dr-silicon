@@ -1,7 +1,8 @@
-// Client-Side Graphify Engine & RAG Synthesizer
-// Provides BFS graph traversal, semantic subgraph retrieval, and live AI synthesis.
+// Client-Side Graphify Engine & Dynamic RAG Synthesizer
+// Provides BFS graph traversal, semantic subgraph retrieval, and background Gemini 2.5 Flash synthesis.
 
 import graphDataRaw from './deepgrid-graphify.json';
+import { deepGridCatalog, catalogToNodeMap, nodeToCatalogMap } from './deepgrid-knowledge';
 
 export interface GraphifyNode {
   id: string;
@@ -76,13 +77,13 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
       subgraphLinks: [],
       communities: [],
       citationList: [],
-      instantSynthesis: 'Enter a specification query to traverse the 280-node DeepGrid knowledge graph.'
+      instantSynthesis: 'Enter any specification or architecture query above to traverse the 280-node DeepGrid knowledge graph in real time.'
     };
   }
 
   const terms = q.split(/\s+/).filter(t => t.length > 1);
 
-  // Score nodes
+  // Score nodes based on label, source file, community name, and id
   const scoredNodes = graphData.nodes.map(node => {
     let score = 0;
     const label = (node.label || '').toLowerCase();
@@ -91,11 +92,11 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
     const id = node.id.toLowerCase();
 
     terms.forEach(term => {
-      if (label === term) score += 50;
-      else if (label.includes(term)) score += 25;
-      if (id.includes(term)) score += 20;
-      if (cname.includes(term)) score += 15;
-      if (sf.includes(term)) score += 10;
+      if (label === term) score += 60;
+      else if (label.includes(term)) score += 30;
+      if (id.includes(term)) score += 25;
+      if (cname.includes(term)) score += 20;
+      if (sf.includes(term)) score += 15;
     });
 
     return { node, score };
@@ -112,7 +113,7 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
       subgraphLinks: [],
       communities: [],
       citationList: [],
-      instantSynthesis: `No direct graph matches for "${query}". Try querying keywords like "lockstep", "dshot", "sdv", "cwru", "198-day loop", or "dap-2020".`
+      instantSynthesis: `No direct graph matches for "${query}". Try querying keywords like "lockstep delay", "dshot telemetry", "sdv architecture", "cwru benchmark", "198-day loop", or "dap-2020 moats".`
     };
   }
 
@@ -171,13 +172,43 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
     }))
     .slice(0, 8);
 
-  // Generate instant deterministic synthesis
+  // Cross-reference with DeepGrid catalog facts to build deep dynamic answer
+  const matchedCatalogItems = deepGridCatalog.filter(item => {
+    const iid = item.id.toLowerCase();
+    const iname = item.name.toLowerCase();
+    return seedNodes.some(s => {
+      const sid = s.id.toLowerCase();
+      const slabel = s.label.toLowerCase();
+      return iid.includes(sid) || sid.includes(iid) || iname.includes(slabel) || slabel.includes(iname);
+    });
+  });
+
   const primaryCommunity = communities[0]?.name || 'DeepGrid Architecture';
-  const instantSynthesis = `**DeepGrid Graph Traversal Result:**\n` +
-    `• **Primary Subsystem:** ${primaryCommunity}\n` +
-    `• **Traversed:** ${subgraphNodes.length} nodes and ${resultLinks.length} directional relations across ${communities.length} clusters.\n` +
-    `• **Key Entities:** ${seedNodes.map(n => `\`${n.label}\``).join(', ')}\n` +
-    `• **Primary Sources:** ${citationList.slice(0, 3).map(c => `[${c.file}#${c.location}]`).join(' · ')}`;
+  
+  // Format structured dynamic synthesis
+  let dynamicSynthesis = `### ${primaryCommunity}\n\n`;
+  
+  if (matchedCatalogItems.length > 0) {
+    const topItem = matchedCatalogItems[0];
+    dynamicSynthesis += `**Architectural Mandate:** ${topItem.tagline}\n\n`;
+    dynamicSynthesis += `${topItem.summary}\n\n`;
+    
+    if (topItem.keyFacts && topItem.keyFacts.length > 0) {
+      dynamicSynthesis += `**Verified Silicon Parameters:**\n`;
+      topItem.keyFacts.slice(0, 4).forEach(fact => {
+        dynamicSynthesis += `• ${fact}\n`;
+      });
+      dynamicSynthesis += `\n`;
+    }
+  } else {
+    dynamicSynthesis += `**Grounded Knowledge Retrieval:**\n`;
+    dynamicSynthesis += `Traversed **${subgraphNodes.length} nodes** and **${resultLinks.length} directional relations** across **${communities.length} clusters** for \`${query}\`.\n\n`;
+  }
+
+  dynamicSynthesis += `**Graph Traversal Citations:**\n`;
+  citationList.slice(0, 4).forEach(c => {
+    dynamicSynthesis += `• \`${c.symbol}\` → [${c.file}#${c.location}]\n`;
+  });
 
   return {
     query,
@@ -186,19 +217,30 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
     subgraphLinks: resultLinks,
     communities,
     citationList,
-    instantSynthesis
+    instantSynthesis: dynamicSynthesis
   };
 }
 
 /**
- * Path 2 Live AI Streamer: Calls Gemini API directly from the browser if user provides key.
+ * Background Gemini 2.5 Flash Streamer.
+ * Uses NEXT_PUBLIC_GEMINI_API_KEY from background environment.
  */
+export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+
 export async function streamGeminiRAG(
   query: string,
   searchResult: GraphSearchResult,
-  apiKey: string,
   onChunk: (text: string) => void
 ): Promise<string> {
+  // Read background API key from environment variable
+  const apiKey = (process.env.NEXT_PUBLIC_GEMINI_API_KEY || '').trim();
+  
+  if (!apiKey) {
+    // If no network key is embedded in build, deliver the instant deep synthesis
+    onChunk(searchResult.instantSynthesis);
+    return searchResult.instantSynthesis;
+  }
+
   const context = searchResult.subgraphNodes.map(n => 
     `- Entity: "${n.label}" (File: ${n.source_file || 'spec'}, Line: ${n.source_location || '1'}, Community: ${n.community_name || 'DeepGrid'})`
   ).join('\n');
@@ -208,58 +250,69 @@ export async function streamGeminiRAG(
   ).join('\n');
 
   const systemInstruction = 
-    `You are the DeepGrid Semi Silicon Intelligence Architect. ` +
+    `You are the DeepGrid Semi Lead Silicon Architect. ` +
     `Answer the user query strictly using the verified Graphify knowledge graph context provided below. ` +
-    `Rules: Zero hallucination, cite exact silicon nodes (SkyWater 130nm / 180nm BCD), pinout references, and statutory moats (DAP-2020 Make-II) where relevant. Format clearly with bullet points and bold headers.`;
+    `Rules: Zero hallucination, cite exact silicon nodes (SkyWater 130nm / 180nm BCD), pinout references, and statutory moats (DAP-2020 Make-II) where relevant. Format clearly with bold headers and bullet points.`;
 
   const prompt = `User Query: "${query}"\n\nVerified Subgraph Context:\n${context}\n\nKey Graph Relationships:\n${edgeContext}\n\nProvide an authoritative, executive engineering response:`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${apiKey.trim()}`;
+  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: `${systemInstruction}\n\n${prompt}` }] }]
-    })
-  });
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Gemini API error (${response.status}): ${errText}`);
-  }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: `${systemInstruction}\n\n${prompt}` }] }]
+        })
+      });
 
-  const reader = response.body?.getReader();
-  const decoder = new TextDecoder();
-  let fullText = '';
+      if (!response.ok) {
+        continue;
+      }
 
-  if (!reader) throw new Error('ReadableStream not supported');
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+      if (!reader) throw new Error('ReadableStream not supported');
 
-    const chunk = decoder.decode(value, { stream: true });
-    const lines = chunk.split('\n');
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const jsonStr = line.replace('data: ', '').trim();
-        if (!jsonStr || jsonStr === '[DONE]') continue;
-        try {
-          const parsed = JSON.parse(jsonStr);
-          const candidate = parsed.candidates?.[0];
-          const partText = candidate?.content?.parts?.[0]?.text || '';
-          if (partText) {
-            fullText += partText;
-            onChunk(fullText);
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.replace('data: ', '').trim();
+            if (!jsonStr || jsonStr === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const candidate = parsed.candidates?.[0];
+              const partText = candidate?.content?.parts?.[0]?.text || '';
+              if (partText) {
+                fullText += partText;
+                onChunk(fullText);
+              }
+            } catch {
+              // Ignore SSE framing chunks
+            }
           }
-        } catch {
-          // Ignore SSE framing chunks
         }
       }
+
+      if (fullText) return fullText;
+    } catch {
+      // Try fallback model
     }
   }
 
-  return fullText;
+  // Fallback to instant synthesis if streaming fails
+  onChunk(searchResult.instantSynthesis);
+  return searchResult.instantSynthesis;
 }
