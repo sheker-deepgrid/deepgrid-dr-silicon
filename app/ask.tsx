@@ -93,7 +93,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   };
 
   const categories = [
-    { id: 'all', label: 'All Intelligence' },
+    { id: 'all', label: 'All Portfolio' },
     { id: 'ai', label: 'Edge AI (30 Tasks)' },
     { id: 'sku', label: 'SKUs (10 Chips)' },
     { id: 'strategy', label: 'Three-Factory Roadmap' },
@@ -151,8 +151,8 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     <section className="page-wrap dr-ask-section">
       <SectionHead 
         tag="08 / ASK DEEPGRID" 
-        title="Vector-Grounded Silicon Intelligence & Knowledge Graph" 
-        copy="Query the full vector knowledge matrix of DeepGrid Semi: 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 350GHz), the 198-day loop, and sovereign defense moats. Zero hallucination: every parameter is grounded in the Master Whitepaper and Technical Annex v3."
+        title="Silicon Intelligence & Architecture Navigator" 
+        copy="Explore the complete DeepGrid Semi technology portfolio: 10-chip SKU compendium, automotive & defense qualification (AEC-Q100, DAP-2020), sovereign fab manufacturing, and dual-core lockstep benchmarks. All specifications are directly extracted and verified against authoritative engineering whitepapers."
       />
 
       {/* Query Search Bar */}
@@ -214,7 +214,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
           {/* Filtered Quick Prompts */}
           <div className="dr-ask-prompts" aria-label="Quick queries">
-            <span className="dr-ask-prompts-label">HIGH-YIELD QUERIES ({filteredPrompts.length}):</span>
+            <span className="dr-ask-prompts-label">FEATURED QUERIES ({filteredPrompts.length}):</span>
             {filteredPrompts.map(p => (
               <button
                 key={p.id}
@@ -258,16 +258,16 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           <button
             className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
             onClick={() => setActiveView('graph')}
-            title="Interactive Knowledge Graph Topology"
+            title="Interactive Silicon Architecture Map"
           >
-            <Network size={16} /> <span>Knowledge Graph</span>
+            <Network size={16} /> <span>System Map</span>
           </button>
           <button
             className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
             onClick={() => setActiveView('cards')}
-            title="Catalog Intel Dossiers"
+            title="Executive Technical Dossiers"
           >
-            <LayoutGrid size={16} /> <span>Dossier Cards ({results.length})</span>
+            <LayoutGrid size={16} /> <span>Dossiers ({results.length})</span>
           </button>
         </div>
       </div>
@@ -276,11 +276,11 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
       <div className="dr-ask-meta-strip">
         <span className="mono">
           {activeView === 'graph' 
-            ? `INTERACTIVE KNOWLEDGE GRAPH · ${graphNodes.length} GROUNDED NODES & ${graphEdges.length} RELATIONSHIPS · DRAG TO EXPLORE`
-            : `SHOWING ${results.length} VERIFIED INTEL ARTIFACTS ${query ? `FOR "${query.toUpperCase()}"` : ''}`}
+            ? `SILICON ARCHITECTURE MAP · SELECT ANY MODULE TO INSPECT SPECIFICATIONS`
+            : `EXECUTIVE SPECIFICATION DOSSIERS (${results.length} VERIFIED ENTRIES)${query ? ` · FILTER: "${query.toUpperCase()}"` : ''}`}
         </span>
         <span className="dr-ask-badge-verified">
-          <ShieldCheck size={14} /> ZERO-HALLUCINATION GROUNDED
+          <ShieldCheck size={14} /> 100% SPEC-VERIFIED
         </span>
       </div>
 
@@ -297,7 +297,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               <span className="legend-item"><i style={{background: '#ffd54f'}}/> Anchors</span>
               <span className="legend-item"><i style={{background: '#ff8a65'}}/> Governance</span>
               <button className="dr-graph-reset" onClick={resetGraphPositions} title="Reset Graph Layout">
-                <RotateCcw size={14} /> Reset
+                <RotateCcw size={14} /> Reset View
               </button>
             </div>
 
@@ -488,7 +488,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             {/* Key Facts list */}
             {activeDetailItem && (
               <div className="dr-drawer-facts">
-                <span className="mono dr-drawer-facts-title">GROUNDED TAKEAWAYS</span>
+                <span className="mono dr-drawer-facts-title">KEY SPECIFICATIONS & HIGHLIGHTS</span>
                 <ul>
                   {activeDetailItem.keyFacts.map((fact, idx) => (
                     <li key={idx}>
@@ -516,7 +516,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   className="text-link"
                   onClick={() => setSelectedItem(activeDetailItem)}
                 >
-                  Full Socratic Audit <ArrowRight size={15} />
+                  Full Technical Specification <ArrowRight size={15} />
                 </button>
               )}
             </div>
@@ -567,7 +567,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
               {/* Key Verified Facts */}
               <div className="dr-ask-facts">
-                <span className="dr-ask-facts-title mono">AUTHENTIC VECTOR FACTS</span>
+                <span className="dr-ask-facts-title mono">KEY TECHNICAL HIGHLIGHTS</span>
                 <ul>
                   {item.keyFacts.map((fact, idx) => (
                     <li key={idx}>
@@ -593,7 +593,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   className="text-link"
                   onClick={() => setSelectedItem(item)}
                 >
-                  Inspect Full Citations <ArrowRight size={15} />
+                  Inspect Technical Dossier <ArrowRight size={15} />
                 </button>
               </div>
             </article>
@@ -637,7 +637,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           >
             <header className="dr-ask-modal-header">
               <div>
-                <span className="mono">{selectedItem.category.toUpperCase()} · VERIFIED VECTOR AUDIT</span>
+                <span className="mono">{selectedItem.category.toUpperCase()} · AUTHORITATIVE SPECIFICATION AUDIT</span>
                 <h2>{selectedItem.name}</h2>
               </div>
               <button className="dr-ask-modal-close" onClick={() => setSelectedItem(null)} aria-label="Close modal">
@@ -655,7 +655,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                 </div>
               </div>
 
-              <h4>Core Takeaways & Socratic Boundary:</h4>
+              <h4>Key Technical Specifications & Operational Envelope:</h4>
               <ul className="dr-ask-modal-facts">
                 {selectedItem.keyFacts.map((fact, idx) => (
                   <li key={idx}>
@@ -667,7 +667,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
               <div className="dr-ask-modal-footer">
                 <button className="primary" onClick={() => setSelectedItem(null)}>
-                  Close Audit View
+                  Close Specification View
                 </button>
               </div>
             </div>
