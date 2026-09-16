@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGrid SDV Platform — Interactive Zonal Architecture & Fault Explorer</title>
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-panel: rgba(15, 23, 42, 0.85);
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(148, 163, 184, 0.15);
+      --cyan-accent: #06b6d4;
+      --teal-accent: #0e7490;
+      --green-accent: #10b981;
+      --amber-accent: #f59e0b;
+      --red-accent: #ef4444;
+      --purple-accent: #8b5cf6;
+      --blue-accent: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(10, 15, 29, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+    .brand-title { display: flex; align-items: center; gap: 12px; }
+    .badge-sovereign {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan-accent);
+      border: 1px solid var(--cyan-accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .brand-h1 { font-size: 18px; font-weight: 700; color: #fff; }
+    .brand-sub { font-size: 12px; color: var(--text-muted); }
+
+    .mode-pills {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pill-btn.active {
+      background: var(--teal-accent);
+      color: #fff;
+    }
+    .pill-btn.danger-pill.active {
+      background: var(--red-accent);
+    }
+    .pill-btn.purple-pill.active {
+      background: var(--purple-accent);
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      flex: 1;
+      height: calc(100vh - 65px);
+    }
+
+    .canvas-area {
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.2) 0%, rgba(10, 15, 29, 0.9) 100%);
+    }
+
+    .bus-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-accent);
+      box-shadow: 0 0 8px var(--green-accent);
+    }
+    .status-dot.warning { background: var(--amber-accent); box-shadow: 0 0 8px var(--amber-accent); }
+    .status-dot.danger { background: var(--red-accent); box-shadow: 0 0 8px var(--red-accent); }
+
+    .cluster-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      backdrop-filter: blur(8px);
+    }
+    .cluster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+    }
+    .cluster-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .node-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .arch-node {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .arch-node:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan-accent);
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2);
+    }
+    .arch-node.selected {
+      border-color: var(--cyan-accent);
+      background: rgba(6, 182, 212, 0.12);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+    }
+    .arch-node.fault-injected {
+      border-color: var(--red-accent) !important;
+      background: rgba(239, 68, 68, 0.2) !important;
+      animation: flash 1s infinite alternate;
+    }
+    @keyframes flash {
+      from { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+      to { box-shadow: 0 0 18px rgba(239, 68, 68, 0.8); }
+    }
+
+    .node-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .node-spec { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+    .node-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+    }
+
+    .detail-sidebar {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .inspector-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 14px;
+    }
+    .inspector-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .inspector-subtitle { font-size: 12px; color: var(--cyan-accent); font-family: monospace; }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+    }
+    .stat-label { color: var(--text-muted); }
+    .stat-val { color: #fff; font-weight: 600; font-family: monospace; }
+
+    .detail-card {
+      background: rgba(10, 15, 29, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .detail-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .detail-text { font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+
+    .alert-box {
+      background: rgba(6, 182, 212, 0.12);
+      border-left: 3px solid var(--cyan-accent);
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #a5f3fc;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span class="badge-sovereign">ISO 26262 ASIL-D</span>
+      <div>
+        <div class="brand-h1">DeepGrid SDV Platform Reference Architecture</div>
+        <div class="brand-sub">Central Zonal Compute · Triple-Lockstep TMR · AXI-REALM QoS · 16x Smart e-Fuses</div>
+      </div>
+    </div>
+
+    <div class="mode-pills">
+      <button class="pill-btn active" onclick="setMode('nominal')">Nominal Execution</button>
+      <button class="pill-btn danger-pill" onclick="setMode('tmr_fault')">Simulate Core 1 Bit-Flip (TMR)</button>
+      <button class="pill-btn purple-pill" onclick="setMode('fuse_trip')">Simulate 48V e-Fuse Trip</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+
+    <div class="canvas-area">
+
+      <div class="bus-indicator" id="bus_banner">
+        <span class="status-dot" id="status_dot"></span>
+        <span id="banner_text">SYSTEM STATE: <strong>NOMINAL OPERATION</strong> · 64-bit Coherent AXI4 Matrix @ 400 MHz · Bounded Latency: 4.8 ns</span>
+      </div>
+
+      <!-- SAFE REAL-TIME CLUSTER (TMR) -->
+      <div class="cluster-card" style="border-color: rgba(220, 38, 38, 0.4);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--red-accent);">
+            <span>🛡️ Domain 1: Safe Real-Time Domain (ISO 26262 ASIL-D / SIL-3)</span>
+          </div>
+          <span class="node-spec" style="color: var(--red-accent);">Triple-Core Lockstep (TMR)</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('core0')" id="node_core0">
+            <div class="node-tag">Core 0 (T)</div>
+            <div class="node-title">DGCV32-RT (TMR-0)</div>
+            <div class="node-spec">Private ISPM/DSPM + ECC</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('core1')" id="node_core1">
+            <div class="node-tag">Core 1 (T+1)</div>
+            <div class="node-title">DGCV32-RT (TMR-1)</div>
+            <div class="node-spec">1-Cycle Skew Execution</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('core2')" id="node_core2">
+            <div class="node-tag">Core 2 (T+2)</div>
+            <div class="node-title">DGCV32-RT (TMR-2)</div>
+            <div class="node-spec">2-Cycle Skew Execution</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('voter')" id="node_voter">
+            <div class="node-tag">&le;2 Cycles</div>
+            <div class="node-title">Hardware Majority Voter</div>
+            <div class="node-spec">Single-Cycle Masking Logic</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTRAL FABRIC (AXI-REALM) -->
+      <div class="cluster-card" style="border-color: rgba(6, 182, 212, 0.4);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--cyan-accent);">
+            <span>⚡ Domain 2: Central System Interconnect & AXI-REALM QoS</span>
+          </div>
+          <span class="node-spec">64-bit Non-Blocking @ 400 MHz</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('axi_crossbar')" id="node_axi_crossbar">
+            <div class="node-tag">&gt;50 GB/s</div>
+            <div class="node-title">Coherent AXI4 Matrix</div>
+            <div class="node-spec">Non-Blocking Multi-Master</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('axi_realm')" id="node_axi_realm">
+            <div class="node-tag">WCRT &le; 12.5ns</div>
+            <div class="node-title">AXI-REALM QoS Arbiter</div>
+            <div class="node-spec">Anti-Starvation Bandwidth Shaper</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('hsm')" id="node_hsm">
+            <div class="node-tag">EAL5+</div>
+            <div class="node-title">EVITA-Full Secure Enclave</div>
+            <div class="node-spec">Dual-Lockstep Crypto Root</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOST LINUX COMPUTE -->
+      <div class="cluster-card">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--blue-accent);">
+            <span>🖥️ Domain 3: Host Linux Compute Domain (POSIX / ASIL-B)</span>
+          </div>
+          <span class="node-spec">Multi-Core 64-bit RV64GCH</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('rv64_linux')" id="node_rv64_linux">
+            <div class="node-tag">RV64GCH</div>
+            <div class="node-title">DGCVA6RT Host CPU</div>
+            <div class="node-spec">MMU, FPU, L1 D$/I$ Cache</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('l2_cache')" id="node_l2_cache">
+            <div class="node-tag">1 MB ECC</div>
+            <div class="node-title">Shared Coherent L2 Cache</div>
+            <div class="node-spec">Coherency Unit + LPDDR4/5 PHY</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONAL I/O & SMART POWER -->
+      <div class="cluster-card" style="border-color: rgba(139, 92, 246, 0.4);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--purple-accent);">
+            <span>🔌 Domain 4: Zonal Actuation & Smart Solid-State Power (SKU-9)</span>
+          </div>
+          <span class="node-spec">16x Smart Electronic Fuses</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('tsn_switch')" id="node_tsn_switch">
+            <div class="node-tag">802.1Qbv</div>
+            <div class="node-title">Gigabit TSN Switch</div>
+            <div class="node-spec">Time-Aware Traffic Shaper</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('canxl')" id="node_canxl">
+            <div class="node-tag">20 Mbps</div>
+            <div class="node-title">4x CAN-XL Controllers</div>
+            <div class="node-spec">2048-Byte Tactical Frame</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('efuse')" id="node_efuse">
+            <div class="node-tag">&lt;1 µs Trip</div>
+            <div class="node-title">16x Smart e-Fuses</div>
+            <div class="node-spec">48V/12V Solid-State Switches</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="detail-sidebar">
+      <div class="inspector-header">
+        <div class="inspector-title" id="ins_title">Hardware Majority Voter</div>
+        <div class="inspector-subtitle" id="ins_sub">Single-Cycle Masking Logic · ISO 26262 ASIL-D</div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-card-title">Technical Telemetry</div>
+        <div class="stat-row"><span class="stat-label">Architecture:</span><span class="stat-val" id="st_arch">Triple-Modular Redundancy</span></div>
+        <div class="stat-row"><span class="stat-label">Temporal Skew:</span><span class="stat-val" id="st_skew">2-Cycle Stagger</span></div>
+        <div class="stat-row"><span class="stat-label">Voting Latency:</span><span class="stat-val" id="st_latency">&le; 2 Clock Cycles</span></div>
+        <div class="stat-row"><span class="stat-label">Fault Masking:</span><span class="stat-val" id="st_mask">Instantaneous (2-out-of-3)</span></div>
+        <div class="stat-row"><span class="stat-label">Safety Level:</span><span class="stat-val" id="st_safety">ASIL-D / SIL-3</span></div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-card-title">Subsystem Description</div>
+        <p class="detail-text" id="ins_desc">
+          Samples all three DGCV32-RT cores on every clock cycle. When single-event upsets (SEU) from alpha particles or EMI power transients invert a bit in one core, the voter automatically passes the 2-out-of-3 consensus without halting execution.
+        </p>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-card-title">Deterministic Safety Bound</div>
+        <p class="detail-text" id="ins_bound">
+          Chassis brake-by-wire and steer-by-wire loops never stall. Discrepancies are logged in the Fault Collection & Control Unit (FCCU), and the faulty core is autonomously reset and resynchronized in the background.
+        </p>
+      </div>
+
+      <div class="alert-box" id="ins_alert">
+        <strong>SOVEREIGN OPEN IP:</strong> Fully owned RISC-V implementation eliminating ARM Cortex-R52/R82 recurring per-chassis royalties.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const sdvNodes = {
+      voter: {
+        title: "Hardware Majority Voter",
+        sub: "Single-Cycle Masking Logic · ISO 26262 ASIL-D",
+        arch: "Triple-Modular Redundancy (TMR)",
+        skew: "2-Cycle Stagger Across 3 Cores",
+        latency: "≤ 2 Clock Cycles",
+        mask: "Instantaneous (2-out-of-3)",
+        safety: "ISO 26262 ASIL-D / SIL-3",
+        desc: "Samples all three DGCV32-RT cores on every clock cycle. When transient single-event upsets (SEU) or EMI invert a bit in one core, the voter automatically passes the 2-out-of-3 consensus without halting execution.",
+        bound: "Chassis brake-by-wire and steer-by-wire loops never stall. Discrepancies are logged in the FCCU, and the faulty core is autonomously resynchronized in the background.",
+        alert: "SOVEREIGN OPEN IP: Fully owned RISC-V implementation eliminating ARM Cortex-R52/R82 recurring royalties."
+      },
+      core0: {
+        title: "DGCV32-RT (TMR Core 0)",
+        sub: "Cycle T Execution · 300 MHz · Private ISPM/DSPM",
+        arch: "6-Stage In-Order 32-bit RISC-V",
+        skew: "Cycle T (Reference)",
+        latency: "Zero Wait-State",
+        mask: "Monitored by TMR Voter",
+        safety: "ASIL-D Single-Core Element",
+        desc: "Primary real-time execution core running vehicle dynamics control laws out of dedicated SRAM scratchpads with SECDED ECC.",
+        bound: "Deterministic Harvard bus structure ensures branch mispredicts and cache misses cannot alter loop timing.",
+        alert: "FAULT DETECTION: Mismatch against Core 1 and Core 2 triggers FCCU interrupt."
+      },
+      axi_realm: {
+        title: "AXI-REALM QoS Arbiter",
+        sub: "Deterministic Latency Regulator · Bounded WCRT ≤ 12.5 ns",
+        arch: "Bandwidth Shaper & Priority Credit Engine",
+        skew: "Sub-Nanosecond Arbitration",
+        latency: "< 2.5 ns Preemptive Priority",
+        mask: "Anti-Starvation Credit Throttle",
+        safety: "Mixed-Criticality Guarantee",
+        desc: "Monitors bus transactions across all crossbar ports. Regulates Linux DMA throughput so that ASIL-D chassis safety packets are granted instant, non-blocking bus access.",
+        bound: "Mathematical Worst-Case Response Time (WCRT) is rigorously bounded to ≤ 12.5 ns across all operating temperatures.",
+        alert: "PATENTED ADVANTAGE: Solves the fundamental bottleneck of mixed-criticality Linux + Safety SoCs."
+      },
+      efuse: {
+        title: "16x Smart Electronic Fuses",
+        sub: "180nm BCD Solid-State Switches · 48V / 12V Power Branches",
+        arch: "Integrated Power MOSFETs + Current Sensing",
+        skew: "Continuous Analog Monitoring",
+        latency: "< 1 µs Short-Circuit Trip",
+        mask: "Programmable Digital I²t Curve",
+        safety: "AEC-Q100 Grade 0 (-40°C to +150°C)",
+        desc: "Replaces physical melting fuses and mechanical relays. Handles up to 25A continuous per channel with integrated current mirror telemetry and thermal shutoff.",
+        bound: "Prevents wiring harness fire and wire melting during dead short-circuits. Digitally configurable over CAN-XL.",
+        alert: "WEIGHT & HARNESS REDUCTION: Slashes vehicle wiring mass by over 40% across commercial vehicle platforms."
+      },
+      tsn_switch: {
+        title: "Gigabit TSN Automotive Switch",
+        sub: "IEEE 802.1Qbv Time-Aware Shaper · 4-Port Switch",
+        arch: "Hardware Scheduled Ethernet Switch",
+        skew: "Time-Slot Determinism",
+        latency: "Bounded Queue Latency",
+        mask: "Congestion Free Scheduling",
+        safety: "Automotive Ethernet Backbone",
+        desc: "Guarantees dedicated transmission time slots for high-resolution radar and vision streams traveling between zonal controllers and central compute.",
+        bound: "Immune to network storms and payload overflows.",
+        alert: "HIGH THROUGHPUT: Standardizes Indian vehicle backbones on modern automotive Ethernet."
+      }
+    };
+
+    function inspectNode(key) {
+      document.querySelectorAll('.arch-node').forEach(el => el.classList.remove('selected'));
+      const activeEl = document.getElementById('node_' + key);
+      if (activeEl) activeEl.classList.add('selected');
+
+      const data = sdvNodes[key];
+      if (!data) return;
+
+      document.getElementById('ins_title').innerText = data.title;
+      document.getElementById('ins_sub').innerText = data.sub;
+      document.getElementById('st_arch').innerText = data.arch;
+      document.getElementById('st_skew').innerText = data.skew;
+      document.getElementById('st_latency').innerText = data.latency;
+      document.getElementById('st_mask').innerText = data.mask;
+      document.getElementById('st_safety').innerText = data.safety;
+      document.getElementById('ins_desc').innerText = data.desc;
+      document.getElementById('ins_bound').innerText = data.bound;
+      document.getElementById('ins_alert').innerHTML = `<strong>PLATFORM HIGHLIGHT:</strong> ${data.alert}`;
+    }
+
+    function setMode(mode) {
+      document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+      const dot = document.getElementById('status_dot');
+      const text = document.getElementById('banner_text');
+      const core1 = document.getElementById('node_core1');
+      const efuse = document.getElementById('node_efuse');
+
+      core1.classList.remove('fault-injected');
+      efuse.classList.remove('fault-injected');
+
+      if (mode === 'nominal') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot';
+        text.innerHTML = 'SYSTEM STATE: <strong>NOMINAL OPERATION</strong> · 64-bit Coherent AXI4 Matrix @ 400 MHz · Bounded Latency: 4.8 ns';
+        inspectNode('voter');
+      } else if (mode === 'tmr_fault') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot warning';
+        text.innerHTML = 'SYSTEM STATE: <strong>CORE 1 TRANSIENT BIT-FLIP DETECTED</strong> · TMR Majority Voter Masked Error in 1 Cycle · Zero Chassis Disruption';
+        core1.classList.add('fault-injected');
+        inspectNode('voter');
+      } else if (mode === 'fuse_trip') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot danger';
+        text.innerHTML = 'SYSTEM STATE: <strong>48V CHANNEL 3 SHORT-CIRCUIT DETECTED</strong> · Smart e-Fuse Disconnected in 0.82 µs · Wire Harness Protected';
+        efuse.classList.add('fault-injected');
+        inspectNode('efuse');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      inspectNode('voter');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<mxfile host="Electron" modified="2026-09-15T08:35:00.000Z" agent="Antigravity DeepGrid Engine" version="21.6.8" type="device">
+  <diagram id="qfn64-pinout-architecture" name="DG32 QFN-64 Package &amp; Pinout Architecture">
+    <mxGraphModel dx="1422" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" background="#0B0F19">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title Block -->
+        <mxCell id="title" value="&lt;b&gt;DEEPGRID SEMI — DG32-LITE &amp;amp; DG32-2DOM QFN-64 PINOUT &amp;amp; HARDWARE ARCHITECTURE&lt;/b&gt;&lt;br&gt;&lt;font color='#94A3B8'&gt;64-Pin QFN 9x9mm 0.5mm Pitch · OpenFrame CI2609 &amp;amp; CI2612 Shuttle · Full Functional Pin Assignment &amp;amp; Power Sequencing&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;strokeWidth=2;fontColor=#F8FAFC;fontSize=15;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="1520" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- QFN-64 Package Outline -->
+        <mxCell id="qfn_body" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#475569;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="480" y="160" width="640" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="qfn_paddle" value="&lt;b&gt;EXPOSED DIE PADDLE (EP)&lt;/b&gt;&lt;br&gt;&lt;font color='#94A3B8'&gt;VSS (Die Ground)&lt;br&gt;Solder directly to solid PCB ground plane&lt;br&gt;Provides thermal dissipation &amp;amp; ground loop return&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#64748B;strokeWidth=2;fontColor=#F8FAFC;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="640" y="340" width="320" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="pin1_dot" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#EF4444;strokeColor=#B91C1C;" vertex="1" parent="1">
+          <mxGeometry x="500" y="180" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="qfn_label" value="&lt;b&gt;DG32-LITE / DG32-2DOM&lt;/b&gt;&lt;br&gt;&lt;font color='#38BDF8'&gt;QFN-64 · 9.0 x 9.0 mm · 0.5 mm Pitch&lt;/font&gt;&lt;br&gt;&lt;font color='#94A3B8'&gt;Top View (Counter-Clockwise Numbering)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontColor=#F8FAFC;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="670" y="240" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- WEST PINS (Pins 1 to 16) -->
+        <mxCell id="grp_west" value="WEST SIDE: Pins 1–16 (Analog ADC &amp;amp; 3-Phase Gate Outputs)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#F97316;fontColor=#F97316;fontSize=11;fontStyle=1;startSize=25;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="400" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" value="Pin 1: vssa2 (Power Ground)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#64748B;fontColor=#94A3B8;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="35" width="370" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="&lt;b&gt;Pin 2: ADC_VINN&lt;/b&gt; (Analog Negative Input 0–1.8V, SAR Diff Pair)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#451A03;strokeColor=#F97316;fontColor=#FFEDD5;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="58" width="370" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_8" value="&lt;b&gt;Pins 3–8: PWM_AH, AL, BH, BL, CH, CL&lt;/b&gt;&lt;br&gt;3-Phase Gate Drive / DShot Channels 0–2 (Pin-Muxed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E1B4B;strokeColor=#6366F1;fontColor=#EEF2FF;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="82" width="370" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="p9_10" value="Pin 9: vdda2 (Tie to 3.3V) · Pin 10: vssd2 (Ground)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#64748B;fontColor=#94A3B8;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="132" width="370" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p11" value="&lt;b&gt;Pin 11: PWM_TRIG&lt;/b&gt; (ADC Sample Pulse at Ripple Null)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="156" width="370" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p12_14" value="&lt;b&gt;Pins 12–14: ENC_A, ENC_B, ENC_Z&lt;/b&gt; (Quadrature + Index)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064E3B;strokeColor=#10B981;fontColor=#A7F3D0;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="180" width="370" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p15_16" value="&lt;b&gt;Pins 15–16: HALL_A, HALL_B&lt;/b&gt; (3-Phase Hall Inputs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064E3B;strokeColor=#10B981;fontColor=#A7F3D0;fontSize=10;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="215" width="370" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="west_summary" value="&lt;b&gt;Direct Inverter Interface:&lt;/b&gt; Connects directly to external 3-phase gate driver (e.g. DRV8300) with complementary outputs and shoot-through hardware brake protection." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#94A3B8;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="grp_west">
+          <mxGeometry x="15" y="250" width="370" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- SOUTH PINS (Pins 17 to 32) -->
+        <mxCell id="grp_south" value="SOUTH SIDE: Pins 17–32 (Power, JTAG, Reset, Core CLK &amp;amp; QSPI Flash)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=11;fontStyle=1;startSize=25;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="400" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="p17_18" value="&lt;b&gt;Pin 17: vddio (3.3V Pad Supply)&lt;/b&gt; · &lt;b&gt;Pin 18: vccd (1.8V Harness)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#EF4444;fontColor=#FCA5A5;fontSize=10;" vertex="1" parent="grp_south">
+          <mxGeometry x="15" y="35" width="370" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="p21_22" value="&lt;b&gt;Pin 21: resetb (3.3V Harness Reset)&lt;/b&gt; · &lt;b&gt;Pin 22: HALL_C&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#F8FAFC;fontSize=10;" vertex="1" parent="grp_south">
+          <mxGeometry x="15" y="62" width="370" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="p24_27" value="&lt;b&gt;Pins 24–27: TCK, TMS, TDI, TDO (JTAG Debug Port)&lt;/b&gt;&lt;br&gt;Internal pull-up on TMS/TDI, pull-down on TCK (idles safely without probe)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#A855F7;fontColor=#E9D5FF;fontSize=10;" vertex="1" parent="grp_south">
+          <mxGeometry x="15" y="89" width="370" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p28_30" value="&lt;b&gt;Pin 28: RST_N&lt;/b&gt; (ANDed on-die) · &lt;b&gt;Pin 30: vdda (3.3V Analog POR)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FEF3C7;fontSize=10;" vertex="1" parent="grp_south">
+          <mxGeometry x="15" y="134" width="370" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="p31_32" value="&lt;b&gt;Pin 31: CLK (50 MHz System Clock)&lt;/b&gt; · &lt;b&gt;Pin 32: QSPI_SCLK (25 MHz)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#10B981;fontColor=#34D399;fontSize=10;" vertex="1" parent="grp_south">
+          <mxGeometry x="15" y="161" width="370" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="south_summary" value="&lt;b&gt;Clock &amp;amp; Reset Protocol:&lt;/b&gt; 50 MHz external oscillator enters CLK (pin 31). No on-die PLL. Dual resets (pin 21 resetb + pin 28 RST_N) are ANDed on-die." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#94A3B8;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="grp_south">
+          <mxGeometry x="15" y="195" width="370" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- EAST PINS (Pins 33 to 48) -->
+        <mxCell id="grp_east" value="EAST SIDE: Pins 33–48 (QSPI Boot Flash, UART0/1 &amp;amp; SPI Master)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#10B981;fontColor=#10B981;fontSize=11;fontStyle=1;startSize=25;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="140" width="400" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="p33_37" value="&lt;b&gt;Pins 33–37: QSPI_CSN0, IO0, IO1, IO2, IO3 (NOR Boot Flash)&lt;/b&gt;&lt;br&gt;Quad-output-fast-read (0x6B), reads magic 0xD632_B007, copies to SRAM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064E3B;strokeColor=#10B981;fontColor=#A7F3D0;fontSize=10;" vertex="1" parent="grp_east">
+          <mxGeometry x="15" y="35" width="370" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="p41" value="&lt;b&gt;Pin 41: QSPI_CSN1&lt;/b&gt; (Optional second SPI device / external PSRAM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#64748B;fontColor=#94A3B8;fontSize=10;" vertex="1" parent="grp_east">
+          <mxGeometry x="15" y="85" width="370" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p42_45" value="&lt;b&gt;Pins 42–45: UART0_TX, UART0_RX, UART1_TX, UART1_RX&lt;/b&gt;&lt;br&gt;UART0: Boot Banner @ 115200 8N1 + Monitor | UART1: Free Telemetry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=10;" vertex="1" parent="grp_east">
+          <mxGeometry x="15" y="110" width="370" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="p46_51" value="&lt;b&gt;Pins 46, 48, 50, 51: SPI_SCLK, MOSI, MISO, SPI_CSN&lt;/b&gt;&lt;br&gt;Hardware Master up to 25 MHz (0.64 µs per 16-bit word)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FEF3C7;fontSize=10;" vertex="1" parent="grp_east">
+          <mxGeometry x="15" y="160" width="370" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p49" value="&lt;b&gt;Pin 49: vccd1 (1.8V Core / SRAM / SAR ADC Supply — REQUIRED)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#450A0A;strokeColor=#EF4444;fontColor=#FCA5A5;fontSize=10;" vertex="1" parent="grp_east">
+          <mxGeometry x="15" y="205" width="370" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="east_summary" value="&lt;b&gt;Boot Path Reality:&lt;/b&gt; Instruction fetch is ROM-only. QSPI-XIP window is accessible by load/store only. Flash image is copied to SRAM, then CPU jumps to SRAM." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#94A3B8;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="grp_east">
+          <mxGeometry x="15" y="235" width="370" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- NORTH PINS (Pins 49 to 64) -->
+        <mxCell id="grp_north" value="NORTH SIDE: Pins 49–64 (I2C, GPIO, Supervisor &amp;amp; ADC_VINP)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#A855F7;fontColor=#A855F7;fontSize=11;fontStyle=1;startSize=25;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="580" width="400" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="p53_54" value="&lt;b&gt;Pins 53–54: I2C_SCL, I2C_SDA (Open-Drain, 100/400 kHz)&lt;/b&gt;&lt;br&gt;External pull-up resistors (2.2k–4.7k to 3.3V) required on carrier board" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#A855F7;fontColor=#E9D5FF;fontSize=10;" vertex="1" parent="grp_north">
+          <mxGeometry x="15" y="35" width="370" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p55_58" value="&lt;b&gt;Pins 55, 57, 58: GPIO0, GPIO1, GPIO2&lt;/b&gt;&lt;br&gt;General-purpose I/O with atomic SET/CLR registers at 0xD300_000C/10" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#38BDF8;fontColor=#38BDF8;fontSize=10;" vertex="1" parent="grp_north">
+          <mxGeometry x="15" y="80" width="370" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p59" value="&lt;b&gt;Pin 59: FAULT_N (Active-Low Hardware Trip Output)&lt;/b&gt;&lt;br&gt;Asserts within &amp;lt;=2 cycles of lockstep comparator mismatch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#450A0A;strokeColor=#EF4444;fontColor=#FCA5A5;fontSize=10;" vertex="1" parent="grp_north">
+          <mxGeometry x="15" y="125" width="370" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p60_61" value="&lt;b&gt;Pins 60–61: RAIL_OK0, RAIL_OK1&lt;/b&gt; (Rail Supervisor Deglitched Inputs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FEF3C7;fontSize=10;" vertex="1" parent="grp_north">
+          <mxGeometry x="15" y="170" width="370" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="p62_64" value="&lt;b&gt;Pin 62: ADC_VINP (SAR Positive Input 0–1.8V)&lt;/b&gt; · &lt;b&gt;Pin 64: vddio (3.3V)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#451A03;strokeColor=#F97316;fontColor=#FFEDD5;fontSize=10;" vertex="1" parent="grp_north">
+          <mxGeometry x="15" y="200" width="370" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="north_summary" value="&lt;b&gt;Analog &amp;amp; Safety Rules:&lt;/b&gt; Keep ADC_VINP (62) and ADC_VINN (2) tightly coupled away from PWM gate traces. Route FAULT_N (59) directly to gate-driver disable." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#334155;fontColor=#94A3B8;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="grp_north">
+          <mxGeometry x="15" y="235" width="370" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION: POWER SEQUENCING & ELECTRICAL CONSTRAINTS -->
+        <mxCell id="grp_pwr" value="POWER SUPPLY SEQUENCING &amp;amp; ELECTRICAL LIMITS (SkyWater sky130A)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#EF4444;fontColor=#EF4444;fontSize=12;fontStyle=1;startSize=25;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="920" width="1520" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="pwr_seq" value="&lt;b&gt;Power-Up Sequencing Rule:&lt;/b&gt;&lt;br&gt;1. Bring up 3.3 V I/O supply (&lt;b&gt;vddio&lt;/b&gt; pins 17, 64 &amp;amp; &lt;b&gt;vdda&lt;/b&gt; pin 30) before or coincident with 1.8 V core supply (&lt;b&gt;vccd&lt;/b&gt; pin 18 &amp;amp; &lt;b&gt;vccd1&lt;/b&gt; pin 49).&lt;br&gt;2. Core voltage &lt;b&gt;vccd1&lt;/b&gt; must never exceed &lt;b&gt;vddio&lt;/b&gt; by &amp;gt;0.3 V during ramp or operation.&lt;br&gt;3. Tie unused rails (&lt;b&gt;vdda1&lt;/b&gt; pins 40/47, &lt;b&gt;vdda2&lt;/b&gt; pin 9 to 3.3 V; &lt;b&gt;vccd2&lt;/b&gt; pin 63 to 1.8 V) so pad-ring domain-order ESD diodes remain biased." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#EF4444;fontColor=#F8FAFC;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_pwr">
+          <mxGeometry x="20" y="35" width="720" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="pwr_limits" value="&lt;b&gt;Absolute Maximum Ratings (Pre-Silicon sky130 Process Limits):&lt;/b&gt;&lt;br&gt;• Core Supply (&lt;b&gt;vccd1&lt;/b&gt;): -0.3 V to +1.95 V (Nominal: 1.8 V ±5%)&lt;br&gt;• I/O Supply (&lt;b&gt;vddio&lt;/b&gt;): -0.3 V to +3.63 V (Nominal: 3.3 V ±10%)&lt;br&gt;• Digital Pad Voltage: -0.3 V to vddio + 0.3 V | Analog Pad Voltage: -0.3 V to vccd1 + 0.3 V&lt;br&gt;• Estimated Power: ~0.43 W @ 50 MHz (tt 25 °C, 1.8 V vccd1). All active current drawn from vccd1.&lt;br&gt;• Temperature: -40 °C to +125 °C target junction range." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#F59E0B;fontColor=#FEF3C7;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="grp_pwr">
+          <mxGeometry x="760" y="35" width="740" height="100" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

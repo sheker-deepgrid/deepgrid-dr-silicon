@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGrid — One Method, Three Factories Architecture Deck</title>
+  <style>
+    :root {
+      --bg-space: #07090e;
+      --bg-slide-dark: #0a192f;
+      --bg-slide-light: #f8fafc;
+      --navy-900: #0f172a;
+      --navy-800: #1e293b;
+      --card-white: #ffffff;
+      --cyan-500: #06b6d4;
+      --teal-700: #0e7490;
+      --blue-600: #2563eb;
+      --amber-600: #d97706;
+      --red-600: #dc2626;
+      --green-600: #16a34a;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-space);
+      color: #e2e8f0;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .deck-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(10, 25, 47, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .deck-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .brand-tag {
+      background: rgba(6, 182, 212, 0.2);
+      color: var(--cyan-500);
+      border: 1px solid var(--cyan-500);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-nav {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-nav:hover:not(:disabled) {
+      background: var(--teal-700);
+      border-color: var(--cyan-500);
+    }
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .slide-counter {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--cyan-500);
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .slide-viewport {
+      width: 1280px;
+      height: 720px;
+      margin-top: 56px;
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .slide-canvas {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+      transform: scale(0.98);
+      display: flex;
+      flex-direction: column;
+      padding: 40px 50px;
+    }
+    .slide-canvas.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      z-index: 10;
+    }
+
+    .slide-canvas.theme-dark {
+      background: var(--bg-slide-dark);
+      color: #fff;
+    }
+    .slide-canvas.theme-light {
+      background: var(--bg-slide-light);
+      color: var(--text-dark);
+    }
+
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .theme-light .slide-tag { color: var(--teal-700); }
+    .theme-dark .slide-tag { color: var(--cyan-500); }
+
+    .slide-title {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .theme-light .slide-title { color: var(--text-dark); }
+    .theme-dark .slide-title { color: #ffffff; }
+
+    .slide-sub {
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+    .theme-light .slide-sub { color: var(--text-muted); }
+    .theme-dark .slide-sub { color: #94a3b8; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+    .grid-2x5 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 10px;
+      flex: 1;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+    .theme-dark .card {
+      background: #0f1e38;
+      border-color: #1e3a64;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .card-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+    .theme-light .card-title { color: var(--text-dark); }
+    .theme-dark .card-title { color: #ffffff; }
+
+    .card-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bullet-item {
+      font-size: 12px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .theme-light .bullet-item { color: #475569; }
+    .theme-dark .bullet-item { color: #cbd5e1; }
+    .bullet-dot {
+      color: var(--teal-700);
+      font-size: 14px;
+      line-height: 1;
+    }
+    .theme-dark .bullet-dot { color: var(--cyan-500); }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .theme-dark .slide-footer {
+      border-top-color: rgba(255, 255, 255, 0.08);
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-nav">
+    <div class="deck-brand">
+      <span class="brand-tag">DEEPGRID SEMI</span>
+      <span>Three-Factory Sovereignty Roadmap · Architecture Deck (10 Slides)</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-nav" id="btn_prev" onclick="prevSlide()">◀ Previous</button>
+      <span class="slide-counter" id="slide_num">1 / 10</span>
+      <button class="btn-nav" id="btn_next" onclick="nextSlide()">Next ▶</button>
+      <button class="btn-nav" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <div class="slide-viewport">
+
+    <!-- SLIDE 1: Title (Dark) -->
+    <div class="slide-canvas theme-dark active" id="slide_1">
+      <div style="margin-top: 40px;">
+        <div class="slide-tag">DEEPGRID SEMI · SOVEREIGN FOUNDRY MIGRATION ROADMAP</div>
+        <h1 style="font-size: 42px; font-weight: 800; line-height: 1.15; margin: 16px 0 20px 0; color: #fff;">
+          One Method, Three Factories<br>
+          <span style="color: var(--cyan-500);">Sovereignty & Foundry Portability</span>
+        </h1>
+        <p style="font-size: 18px; color: #94a3b8; max-width: 900px; line-height: 1.5;">
+          SkyWater (USA) Prototyping -> IHP (Germany) 77 GHz Radar -> SCL Mohali (India) Buy(Indian-IDDM) Defence Lock-in.
+        </p>
+      </div>
+
+      <div class="grid-4" style="margin-top: 60px; max-height: 140px;">
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">FACTORY 1: PROVEN</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">SkyWater 130nm (USA)</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Validated Silicon on MPW</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--green-600);">FACTORY 2: DIFFERENTIATED</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">IHP SG13G2 SiGe (Germany)</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">350 GHz fT mmWave Radar</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--red-600);">FACTORY 3: SOVEREIGN</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">SCL Mohali 180nm (India)</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">100% Domestic IDDM Defense Fab</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--amber-600);">PORTING BOUNDARY</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">Scripted Digital (.lib)</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Manual Analog Recalibration</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi Pvt Ltd · Hyderabad, India</span>
+        <span>Slide 1 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Geopolitical Dilemma -->
+    <div class="slide-canvas theme-light" id="slide_2">
+      <div class="slide-tag">GEOPOLITICAL SILICON DILEMMA</div>
+      <div class="slide-title">The $9B Mature-Node Import Trap Demands Multi-Factory Portability</div>
+      <div class="slide-sub">Relying solely on foreign fabs risks export embargoes, while waiting for domestic fab modernization stalls commercial traction.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">1. Foreign Fab Single-Sourcing Risk</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> India imports $9B in mature-node chips (130nm–180nm) powering defense and aerospace.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Western fabs are bound by ITAR and potential sudden export license revocations.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Taiwanese fabs (TSMC/UMC) face severe geopolitical disruption risks across the Taiwan Strait.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Indian military programs cannot build sovereign defense on fragile foreign silicon.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">2. The Domestic Fab Reality (SCL)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Semi-Conductor Laboratory (SCL) Mohali operates an operational 180nm CMOS/BCD line.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> However, prototyping every early digital experiment solely at SCL slows iteration cycles.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Commercial fabless teams need fast, low-cost tapeouts to validate digital RTL quickly.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> The answer is a sequential bridge: prove digital IP globally, transfer sovereignty domestically.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. The DeepGrid 3-Factory Thesis</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> One standardized open-source design flow (OpenLane / Yosys / OpenROAD).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Factory 1 (SkyWater): Fast, $14.3K MPW digital proof of silicon.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Factory 2 (IHP Germany): World-class 350 GHz SiGe for 77 GHz radar.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Factory 3 (SCL Mohali): Complete sovereign defense lock-in under DAP-2020 Make-II.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Master Whitepaper v3 · Chapter 7</span>
+        <span>Slide 2 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: The Three Foundries Compared -->
+    <div class="slide-canvas theme-light" id="slide_3">
+      <div class="slide-tag">THE THREE FOUNDRIES COMPARED</div>
+      <div class="slide-title">Distinct Roles Across Prototyping, High-Frequency Radar, And Sovereign Defense</div>
+      <div class="slide-sub">Each foundry serves a specific economic and physical purpose in DeepGrid's long-term silicon compounding model.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div class="card-badge" style="color: var(--blue-600);">STATUS: PROVEN (DONE)</div>
+          <div class="card-title">1. SkyWater SKY130 (USA)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Node: 130 nm Planar CMOS (5-Metal Stack).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Status: PROVEN SILICON — Physical working test chips fabricated & validated.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Cost: $14,300 per MPW shuttle run; eliminates $1M EDA tool tax.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Procurement: Qualifies as DAP-2020 Buy (Indian) since RTL is Indian-owned.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Primary Role: Rapid commercial prototyping & digital processor IP proof.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-badge" style="color: var(--green-600);">STATUS: DIFFERENTIATED</div>
+          <div class="card-title">2. IHP Leibniz SG13G2 (Germany)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Node: 130 nm SiGe:C BiCMOS Heterojunction Bipolar.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Transistor Physics: Ultra-high speed fT = 350 GHz, fmax = 450 GHz.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Status: PLANNED — Target tapeout for SKU-7 77 GHz MIMO Radar.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Aerospace Profile: DO-160G airborne qualified high-frequency RF front-end.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Primary Role: 4D mmWave radar for drone & automotive collision avoidance.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-badge" style="color: var(--red-600);">STATUS: SOVEREIGN DEFENCE</div>
+          <div class="card-title">3. SCL Mohali (India)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Node: 180 nm Military-Qualified CMOS & High-Voltage BCD.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Status: STRATEGIC TRANSFER — Dedicated domestic defense manufacturing.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Procurement: Unlocks DAP-2020 Buy (Indian-IDDM) absolute monopoly status.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Sovereignty: 100% domestic IP, fab, assembly, and test immune to sanctions.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Primary Role: Sovereign military production for Indian Army, BEL, and DRDO.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Three Factory Matrix</span>
+        <span>Slide 3 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: The Honest Porting Boundary -->
+    <div class="slide-canvas theme-light" id="slide_4">
+      <div class="slide-tag">THE HONEST PORTING BOUNDARY</div>
+      <div class="slide-title">Digital Logic Moves By Script; Analog Circuits Require Physical Re-Engineering</div>
+      <div class="slide-sub">DeepGrid rejects false marketing claims of 'instant zero-cost analog migration': physics dictates the real engineering boundary.</div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div class="card-badge" style="color: var(--blue-600);">AUTOMATED: DIGITAL LOGIC</div>
+          <div class="card-title">Portable Via Scripting (Automated)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Verilog / SystemVerilog digital RTL codebases and synthesizable modules.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> DGridRiscV processor core architecture (RV32IM_Safety).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> AXI4 crossbar interconnect matrices, arbiters, and FIFO buffers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> UVM verification testbenches, assertions, and coverage closure plans.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Porting Mechanism: Automated Liberty (.lib) timing file swap + OpenROAD re-run.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Engineering Overhead: &lt;2 weeks of scripted timing closure per foundry retarget.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-badge" style="color: var(--red-600);">PHYSICS-BOUND: ANALOG & BCD</div>
+          <div class="card-title">Requires Manual Re-Engineering (Physics-Bound)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Bandgap Voltage References: Brokaw cells require resistor trimming for 12 ppm/°C.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> High-Voltage BCD Output Stages: 5V–120V LDMOS doping profiles differ per foundry.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Foundry Non-Volatile Memory (NVM / OTP / EEPROM): Proprietary hard macros.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ESD / EOS Pad Protection Rings: Must be redrawn and sized to meet ±15 kV HBM.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Porting Mechanism: 1 to 2 dedicated calibration shuttle cycles per new foundry node.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Engineering Overhead: 6–9 months of physical layout and silicon characterization.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Physics vs Synthesis Reality</span>
+        <span>Slide 4 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Open-Source EDA Flow -->
+    <div class="slide-canvas theme-light" id="slide_5">
+      <div class="slide-tag">OPEN-SOURCE EDA PORTABILITY</div>
+      <div class="slide-title">OpenLane, Yosys, And OpenROAD Slashes NRE And Enables Frictionless Retargeting</div>
+      <div class="slide-sub">Automated physical design flow removes the multi-million-dollar tool barrier and locks IP into reproducible scripts.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">1. Zero Tooling License Tax</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Proprietary EDA tool suites (Synopsys, Cadence) cost $1M–$2M per tapeout.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> DeepGrid's physical design operates 100% on open-source Yosys and OpenROAD.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Eliminates per-seat licensing costs and legal export approval from US EDA vendors.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Complete GDSII generation executes on local workstations in Hyderabad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div class="card-title">2. Automated Liberty (.lib) Swap</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> When moving from SkyWater to SCL Mohali, the digital RTL remains completely untouched.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Tool scripts swap target technology LEF files and standard-cell timing libraries (.lib).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Floorplanning, clock-tree synthesis (CTS), and global routing execute deterministically.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Guarantees timing closure at target clock boundaries (200 MHz fixed).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-title">3. Fast Shuttle Compounding</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Multi-Project Wafer (MPW) shuttles allow rapid silicon validation at $14.3K per run.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> DeepGrid executes a complete design-to-silicon shuttle loop every 198 days.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Validates 1,000 silicon-tested building blocks that compound into 50 approved SKUs.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> De-risks complex SoC subsystems before committing to volume SCL production.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 2: Cost Economics</span>
+        <span>Slide 5 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Procurement Moat -->
+    <div class="slide-canvas theme-light" id="slide_6">
+      <div class="slide-tag">DEFENCE PROCUREMENT LAW MOAT</div>
+      <div class="slide-title">Buy (Indian-IDDM) Grants Unconditional Monopoly Priority In Indian Defence Tenders</div>
+      <div class="slide-sub">Foreign chipmakers (TI, STMicro, ADI) are legally excluded from top-tier sovereign military procurement.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">1. Buy (Indian) vs Buy (IDDM)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> DAP-2020 establishes a rigid legal hierarchy for all Indian military procurement.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> SkyWater & IHP silicon qualifies as Buy (Indian) because design & IP are 100% Indian.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> SCL Mohali silicon unlocks Buy (Indian-IDDM): Indigenously Designed, Developed & Manufactured.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Buy (Indian-IDDM) holds mandatory statutory priority over all other procurement tiers.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">2. Positive Indigenisation Lists</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Ministry of Defence (MoD) has notified 5 Positive Indigenisation Lists banning imports.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Covers drone flight controllers, high-reliability PMICs, and tactical communications ICs.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Foreign suppliers cannot bid once a verified domestic IDDM alternative exists.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Guarantees a legally protected domestic market for DeepGrid's mature-node SKUs.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. SCL Mohali Sovereign Lock-in</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Domestic fabrication at SCL Mohali makes DeepGrid products completely sanction-proof.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero ITAR dependencies; immune to US, European, or Chinese geopolitical embargoes.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Secures long-term 15-to-20-year defense program availability.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Establishes DeepGrid as the default semiconductor provider to BEL, DRDO, and MCEME.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 1: Legal Moats</span>
+        <span>Slide 6 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Post-Silicon Productization -->
+    <div class="slide-canvas theme-light" id="slide_7">
+      <div class="slide-tag">POST-SILICON PRODUCTIZATION</div>
+      <div class="slide-title">Fabrication Is Step One: Packaging, ATE Screening, And Qualification In Hyderabad</div>
+      <div class="slide-sub">DeepGrid completes the semiconductor loop with in-house automated test equipment and domestic multi-die packaging.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">1. Multi-Die Organic SiP</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Standard 4-layer organic laminate substrate (FR4/BT core) BGA packaging.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Composes mature dies from SkyWater, IHP, and SCL into a single rugged module.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Deliberately rejects expensive UCIe / TSMC CoWoS silicon interposers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Packaging NRE under $35,000 with &gt;99% assembly yield across domestic ATMP lines.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div class="card-title">2. Dedicated ₹1.2 Cr ATE Line</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> High-throughput automated test equipment (ATE) production line in Hyderabad.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Automated wafer probe testing to ensure Known Good Die (KGD) before SiP assembly.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Thermal chamber screening across full aerospace range (-55°C to +125°C).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Eliminates reliance on foreign test houses and preserves design IP security.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-title">3. Environmental Qualification</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> MIL-STD-883K: High/low temperature cycling, thermal shock, and hermetic seal tests.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> MIL-STD-461G: Radiated emissions and electromagnetic interference shielding.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> CEMILAC and JSS-55555 airworthiness certification for frontline defense flight.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Pre-ASIC live orders (MCEME ₹1.01 Cr, Infinis, Axitech) validate field reliability.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 10: Testing & Qualification</span>
+        <span>Slide 7 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: 10-SKU Allocation Matrix -->
+    <div class="slide-canvas theme-light" id="slide_8">
+      <div class="slide-tag">10-SKU FOUNDRY ALLOCATION MATRIX</div>
+      <div class="slide-title">Matching Each Semiconductor SKU To Its Optimal Foundry Physics And Procurement Path</div>
+      <div class="slide-sub">Every chip in DeepGrid's portfolio is mapped to a specific process node based on voltage, frequency, and market sovereignty.</div>
+
+      <div class="grid-2x5">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-1: BLDC MOTOR CONTROLLER</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm BCD -> SCL 180nm BCD</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">5–120V Rail, FOC CORDIC PID (&lt;1 µs), BEE 5-Star Fans & EV 2-Wheelers</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-2: SMART METER SOC</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm CMOS -> SCL 180nm CMOS</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">24-bit Sigma-Delta ADC, &lt;2 µW RTC, 250M National Smart Meter Rollout</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-3: HI-REL PMIC (28V)</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SCL Mohali 180nm BCD / SkyWater</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Brokaw Bandgap (12 ppm/°C), DICE FSM, DO-160 & SRIJAN Defense Power</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-4: LOCKSTEP SAFETY MCU</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm -> SCL 180nm</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Dual DGridRiscV with 2-Cycle Skew, ISO 26262 ASIL-D, &le;2-cycle FAULTn</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-5: INTERFACE TRANSCEIVER</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm Thick-Oxide HV</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">5V LDMOS, CAN-FD (5 Mbps), RS-485, ±15 kV HBM ESD Protection</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-6: VOLTAGE SUPERVISOR</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SCL Mohali 180nm / SkyWater</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Chopper-Stabilized Reference, 8 µs Deglitch, MIL-STD-883 Pathfinder</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--green-600);">SKU-7: 77GHZ MIMO RADAR</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">IHP Leibniz SG13G2 (Germany)</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">SiGe:C BiCMOS 350 GHz fT, 3.75 cm Distance Res, 4D Imaging Automotive ADAS</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-8: RUGGED DISPLAY DRIVER</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm HV -> SCL 180nm</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">0–12V Column Amps, 1280x10b DACs, BEL 17" Rugged SXGA, PIL-5 Item #5</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SKU-9: SDV ZONAL GATEWAY</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm + SCL 180nm BCD</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">16x Smart Solid-State e-Fuses, Gigabit TSN Switch, 4x CAN-XL (20 Mbps)</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--blue-600);">TRACK B: D100 DRONE SOC</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-dark);">SkyWater 130nm + 28nm Compute SiP</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Dual DGridRiscV Flight Loop + 30 Hz EKF VIO + Isolated Hardware Failsafe</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 9: 10-SKU Portfolio</span>
+        <span>Slide 8 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Sequential Schedule -->
+    <div class="slide-canvas theme-light" id="slide_9">
+      <div class="slide-tag">SEQUENTIAL MIGRATION TIMELINE</div>
+      <div class="slide-title">De-Risking Execution: Commercial Validation Precedes Domestic Defence Fab Transfer</div>
+      <div class="slide-sub">A disciplined, phased execution model ensures revenue generation begins while long-cycle military qualification matures.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-600);"></div>
+          <div class="card-badge" style="color: var(--blue-600);">PHASE 1: PROTOTYPING</div>
+          <div class="card-title">Months 1–12: Commercial Shuttles</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Fabricate digital test chips on SkyWater 130nm MPW shuttles (CI2609 & CI2612).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Validate DGridRiscV core and basic analog macros in physical silicon.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Fulfill live commercial pilot orders with MCEME (₹1.01 Cr), Infinis, and Axitech.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Establish automated testing scripts and baseline yield metrics in Hyderabad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-badge" style="color: var(--green-600);">PHASE 2: DIFFERENTIATION</div>
+          <div class="card-title">Months 10–24: Radar & SiGe</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Execute IHP SG13G2 SiGe BiCMOS radar front-end tapeout (SKU-7).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Validate 77 GHz mmWave transceivers and 4D imaging MIMO antennas.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Assemble multi-die packaging prototypes combining digital compute with radar die.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Initiate automotive Tier-1 ADAS pilots and airborne UAV integration.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-badge" style="color: var(--red-600);">PHASE 3: SOVEREIGN LOCK-IN</div>
+          <div class="card-title">Months 18–36: SCL Mohali Transfer</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Transfer validated RTL and re-engineer analog BCD macros for SCL 180nm fab line.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Run initial pilot qualification shuttles at SCL Mohali under Make-II program.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Achieve formal Buy (Indian-IDDM) certification and Approved Vendor List (AVL) inclusion.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Scale to full multi-thousand-unit production for Indian armed forces.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · 3-Phase Execution Schedule</span>
+        <span>Slide 9 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Financial Buildup (Dark) -->
+    <div class="slide-canvas theme-dark" id="slide_10">
+      <div class="slide-tag">FINANCIAL MODEL & CAPITAL EFFICIENCY</div>
+      <div class="slide-title">How ₹10 Cr In Capital Unlocks A ₹1,000 Cr Sovereign Semiconductor Business</div>
+      <div class="slide-sub">Capital allocation breakdown, Chinese price crash insulation, and the FY31 sovereign revenue buildup.</div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">USE OF ₹10 CR FUNDS</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">Precision Allocation</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹3.6 Cr: Foundry fabrication and MPW shuttles across SkyWater, IHP, and SCL.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹2.4 Cr: Core engineering team (12 senior physical design & analog IC engineers).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹1.8 Cr: Defense environmental qualification (MIL-STD-883, JSS-55555, CEMILAC).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹1.2 Cr: Dedicated ATE testing line & probe station in Hyderabad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--amber-600);">CRASH RESILIENCE</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">Stop Rules S1–S4</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Stress-tested against a 50% Chinese mature-node price dumping crash.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Gross margin remains resilient at 58% under extreme price competition.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Domestic defense buyers legally cannot buy Chinese silicon under PIL rules.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Strict stop rules enforce financial discipline before each tapeout commitment.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--green-600);">SOVEREIGN MONOPOLY</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">DAP-2020 Make-II</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Buy(Indian-IDDM) creates statutory insulation: foreign bids excluded by law.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Indian Army MCEME, BEL, and ideaForge anchor demand guarantees off-take.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Pre-ASIC contracted traction (₹2.88 Cr) proves demand before volume fab.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> High customer switching costs once design is frozen into military avionics.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">REVENUE BUILDUP</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">₹1,000 Cr by FY31</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> FY27: ₹12 Cr (Commercial pilots & initial defense delivery).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> FY28: ₹65 Cr (Volume drone SoCs & smart meter rollouts).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> FY29: ₹240 Cr (Automotive zonal controllers & radar adoption).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> FY31: ₹1,000 Cr+ across 50 mature building blocks powering 10 SKUs.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 13: Financial Model</span>
+        <span>Slide 10 of 10</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function updateSlide() {
+      for (let i = 1; i <= totalSlides; i++) {
+        const el = document.getElementById('slide_' + i);
+        if (el) {
+          if (i === currentSlide) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      }
+      document.getElementById('slide_num').innerText = `${currentSlide} / ${totalSlides}`;
+      document.getElementById('btn_prev').disabled = (currentSlide === 1);
+      document.getElementById('btn_next').disabled = (currentSlide === totalSlides);
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.querySelector('.slide-viewport').requestFullscreen().catch(err => {
+          alert(`Error entering fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

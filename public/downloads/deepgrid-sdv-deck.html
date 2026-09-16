@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGrid SDV Platform — 10-Slide Executive Architecture Deck</title>
+  <style>
+    :root {
+      --bg-space: #07090e;
+      --bg-slide-dark: #0a0f1d;
+      --bg-slide-light: #f8fafc;
+      --navy-900: #0f172a;
+      --navy-800: #1e293b;
+      --card-white: #ffffff;
+      --cyan-500: #06b6d4;
+      --teal-700: #0e7490;
+      --amber-600: #d97706;
+      --red-600: #dc2626;
+      --green-600: #16a34a;
+      --purple-600: #7c3aed;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-space);
+      color: #e2e8f0;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .deck-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(10, 15, 29, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .deck-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .brand-tag {
+      background: rgba(6, 182, 212, 0.2);
+      color: var(--cyan-500);
+      border: 1px solid var(--cyan-500);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-nav {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-nav:hover:not(:disabled) {
+      background: var(--teal-700);
+      border-color: var(--cyan-500);
+    }
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .slide-counter {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--cyan-500);
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .slide-viewport {
+      width: 1280px;
+      height: 720px;
+      margin-top: 56px;
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .slide-canvas {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+      transform: scale(0.98);
+      display: flex;
+      flex-direction: column;
+      padding: 40px 50px;
+    }
+    .slide-canvas.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      z-index: 10;
+    }
+
+    .slide-canvas.theme-dark {
+      background: var(--bg-slide-dark);
+      color: #fff;
+    }
+    .slide-canvas.theme-light {
+      background: var(--bg-slide-light);
+      color: var(--text-dark);
+    }
+
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .theme-light .slide-tag { color: var(--teal-700); }
+    .theme-dark .slide-tag { color: var(--cyan-500); }
+
+    .slide-title {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .theme-light .slide-title { color: var(--text-dark); }
+    .theme-dark .slide-title { color: #ffffff; }
+
+    .slide-sub {
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+    .theme-light .slide-sub { color: var(--text-muted); }
+    .theme-dark .slide-sub { color: #94a3b8; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+    .grid-2x3 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 14px;
+      flex: 1;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+    .theme-dark .card {
+      background: #0f1e38;
+      border-color: #1e3a64;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .card-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+    .theme-light .card-title { color: var(--text-dark); }
+    .theme-dark .card-title { color: #ffffff; }
+
+    .card-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bullet-item {
+      font-size: 12px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .theme-light .bullet-item { color: #475569; }
+    .theme-dark .bullet-item { color: #cbd5e1; }
+    .bullet-dot {
+      color: var(--teal-700);
+      font-size: 14px;
+      line-height: 1;
+    }
+    .theme-dark .bullet-dot { color: var(--cyan-500); }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .theme-dark .slide-footer {
+      border-top-color: rgba(255, 255, 255, 0.08);
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-nav">
+    <div class="deck-brand">
+      <span class="brand-tag">DEEPGRID SEMI</span>
+      <span>DG SDV Platform · Sovereign Automotive Architecture Deck (10 Slides)</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-nav" id="btn_prev" onclick="prevSlide()">◀ Previous</button>
+      <span class="slide-counter" id="slide_num">1 / 10</span>
+      <button class="btn-nav" id="btn_next" onclick="nextSlide()">Next ▶</button>
+      <button class="btn-nav" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <div class="slide-viewport">
+
+    <!-- SLIDE 1: Title (Dark) -->
+    <div class="slide-canvas theme-dark active" id="slide_1">
+      <div style="margin-top: 40px;">
+        <div class="slide-tag">DEEPGRID SEMI · AUTOMOTIVE & DEFENCE SILICON REFERENCE ARCHITECTURE</div>
+        <h1 style="font-size: 42px; font-weight: 800; line-height: 1.15; margin: 16px 0 20px 0; color: #fff;">
+          DG Software-Defined Vehicle (SDV)<br>
+          <span style="color: var(--cyan-500);">Central Zonal Compute Platform</span>
+        </h1>
+        <p style="font-size: 18px; color: #94a3b8; max-width: 900px; line-height: 1.5;">
+          Triple-Lockstep ASIL-D Safety, EVITA-Full HSM, 64-bit Coherent AXI4 Matrix, and 16x Smart Electronic Fuses.
+        </p>
+      </div>
+
+      <div class="grid-4" style="margin-top: 60px; max-height: 140px;">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">SAFETY INTEGRITY</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">ISO 26262 ASIL-D</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Triple-Core Lockstep (TMR)</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">SECURITY ENCLAVE</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">EVITA-Full / EAL5+</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Hardware Crypto Engine</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">INTERCONNECT QOS</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">64-bit AXI4 Crossbar</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">AXI-REALM Determinism</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">ZONAL SMART POWER</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">16x Smart e-Fuses</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">CAN-XL & Gigabit TSN</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi Pvt Ltd · Hyderabad, India</span>
+        <span>Slide 1 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Paradigm Shift -->
+    <div class="slide-canvas theme-light" id="slide_2">
+      <div class="slide-tag">AUTOMOTIVE PARADIGM SHIFT</div>
+      <div class="slide-title">Consolidating 80+ Legacy ECUs Into High-Density Sovereign Zonal Controllers</div>
+      <div class="slide-sub">Modern vehicles replace kilometers of heavy copper wiring harnesses with 4 zonal nodes and a central SDV compute spine.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">1. The Legacy ECU Crisis</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Traditional vehicles carry 70–100 discrete ECUs from different vendors.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Harness weight exceeds 50 kg; massive assembly labor and point-to-point wiring.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Incompatible proprietary software stacks prevent over-the-air (OTA) feature upgrades.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Chassis reliability suffers from electromechanical relay and physical fuse failures.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">2. The Zonal Compute Vision</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Vehicle partitioned into 4 physical zones (Front-Left, Front-Right, Rear-Left, Rear-Right).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Each zone aggregates local sensors, smart power switching, and motor control.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Backbone connected via deterministic Gigabit Time-Sensitive Networking (TSN).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Harness weight reduced by &gt;40%, cutting vehicle manufacturing cost significantly.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. The DeepGrid Solution</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Unified RISC-V compute platform replacing imported NXP S32G and Infineon Aurix TC4x.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Integrates ASIL-D safety, Linux host, hardware HSM, and zonal I/O on one platform.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 100% auditable open-source RTL eliminates foreign intellectual property royalties.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Compliant with Indian MoRTH AIS-140 and military DAP-2020 IDDM procurement.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 12: SDV Platform</span>
+        <span>Slide 2 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Multi-Domain Architecture -->
+    <div class="slide-canvas theme-light" id="slide_3">
+      <div class="slide-tag">UNIFIED MULTI-DOMAIN ARCHITECTURE</div>
+      <div class="slide-title">Hardware-Isolated Enclaves Guarantee Safe Coexistence Of Linux And Real-Time Control</div>
+      <div class="slide-sub">Physical firewalls and memory protection units prevent non-critical software panics from impacting chassis safety.</div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-badge" style="color: var(--amber-600);">STANDARD: EVITA-FULL</div>
+          <div class="card-title">DG Secure Domain</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Dual-lockstep DGI-RV32 security cores.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> EVITA-Full & Common Criteria EAL5+.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware Crypto: AES-256, SHA-3, SM4.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Secure OTP eFuse array for key vault.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Always-On power island with anti-tamper.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-badge" style="color: var(--red-600);">STANDARD: ASIL-D / SIL-3</div>
+          <div class="card-title">DG Safe Domain</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Triple-Core Lockstep (TMR) DGCV32-RT.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ISO 26262 ASIL-D & IEC 61508 SIL-3.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware majority voting in &le;2 cycles.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Private ISPM & DSPM with SECDED ECC.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Controls steering, braking, and chassis.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div class="card-badge" style="color: var(--cyan-500);">STANDARD: POSIX / LINUX</div>
+          <div class="card-title">DG Host Domain</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Multi-Core 64-bit RV64GCH Linux host.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> POSIX-compliant OS execution environment.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Coherent 1 MB shared L2 cache.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware MMU, FPU, and virtualization.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Manages cloud telemetry, OTA, and fleet UX.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-badge" style="color: var(--green-600);">STANDARD: HARDWARE ACCEL</div>
+          <div class="card-title">DG Accelerators</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Vector Multi-Core (DG RVV 1.0, 512-bit).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Integer Cluster: 4x DGCV32 tiny cores.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Interleaved TCDM scratchpad SRAM banks.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 2D DMA engine for zero-copy streaming.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Real-time sensor fusion & radar perception.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Four Domain Isolation Contract</span>
+        <span>Slide 3 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Chassis Safety Core -->
+    <div class="slide-canvas theme-light" id="slide_4">
+      <div class="slide-tag">CHASSIS SAFETY CORE: ASIL-D TMR</div>
+      <div class="slide-title">Triple-Core Lockstep With 2-Cycle Skew Eliminates Single-Event Upset Failures</div>
+      <div class="slide-sub">Hardware majority voter masks transient bit-flips instantly without stopping vehicle braking or steer-by-wire loops.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">1. Temporal 2-Cycle Skew</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Three identical DGCV32-RT cores execute with temporal stagger: Core 0 (T), Core 1 (T+1), Core 2 (T+2).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Prevents common-mode substrate voltage dips or EMI bursts from corrupting all cores simultaneously.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero performance penalty: deterministic execution clocked at 300 MHz.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Each core has private instruction/data scratchpad SRAM with ECC.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">2. Hardware Majority Voter</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Combinational majority voting circuit samples output buses on every clock cycle.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> If 1 core deviates due to an alpha particle or voltage dip, voter outputs 2-out-of-3 majority value.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero execution stall: critical steer-by-wire and braking commands proceed without delay.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Voting logic latches disagreement state in under 2 clock cycles.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. Fault Control Unit (FCCU)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Captures core discrepancy telemetry and logs precise cycle and instruction counter.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Autonomous hardware reset of corrupted core without interrupting vehicle operation.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Directly drives external hardware safety pin (FAULTn) to trigger secondary safe-state if needed.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Full compliance with ISO 26262 ASIL-D and IEC 61508 SIL-3 automotive standards.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 5 & 12: ASIL-D Safety</span>
+        <span>Slide 4 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: AXI-REALM QoS -->
+    <div class="slide-canvas theme-light" id="slide_5">
+      <div class="slide-tag">CENTRAL FABRIC & AXI-REALM QOS</div>
+      <div class="slide-title">64-Bit Coherent AXI4 Crossbar Delivers Bounded Latency For Chassis Control</div>
+      <div class="slide-sub">AXI-REALM bandwidth regulator guarantees that high-volume Linux data streams never starve critical ASIL-D safety packets.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div class="card-title">1. 64-bit Non-Blocking Crossbar</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Clocked at 400 MHz providing aggregate interconnect bandwidth exceeding 50 GB/s.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Full multi-master / multi-slave non-blocking crossbar topology.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware-enforced memory protection units (MPUs) isolate security and safety address spaces.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero-wait-state access to tightly coupled scratchpad memories.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-title">2. AXI-REALM QoS Shaper</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Monitors bus credit allocation across all bus masters in real time.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Throttles Linux host memory thrashing during heavy cloud logging or video streaming.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Grants preemptive, zero-arbitration priority to ASIL-D chassis safety frames (&lt;2.5 ns latency).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Mathematical Worst-Case Response Time (WCRT) bounded to &le;12.5 ns across the crossbar.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. Domain Firewall</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Enforces ARM TrustZone-equivalent isolation across open RISC-V bus transactions.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Malicious or compromised Linux driver cannot read or overwrite safety SRAM registers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Direct hardware fault trap asserted if non-secure master attempts secure enclave access.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Enables mixed-criticality workload consolidation on a single physical SoC.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Interconnect Determinism</span>
+        <span>Slide 5 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Zonal I/O & e-Fuses -->
+    <div class="slide-canvas theme-light" id="slide_6">
+      <div class="slide-tag">ZONAL ACTUATION & SMART SOLID-STATE POWER</div>
+      <div class="slide-title">16 Integrated Electronic Fuses Eliminate Mechanical Relays And Copper Bulk</div>
+      <div class="slide-sub">DeepGrid's 180nm BCD power switches deliver sub-microsecond short-circuit protection and intelligent current monitoring.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--purple-600);"></div>
+          <div class="card-title">1. 16x Smart e-Fuses (48V / 12V)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Integrated 180nm BCD power switches handling up to 25A continuous per channel.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Sub-microsecond (&lt;1 µs) short-circuit trip eliminates wiring harness thermal damage.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Programmable digital I²t thermal profiling replaces physical sacrificial melting fuses.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Real-time digital current sensing enables predictive failure diagnostics on motors/heaters.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div class="card-title">2. Gigabit TSN Ethernet</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> 4-port Ethernet switch complying with IEEE 802.1Qbv Time-Aware Traffic Shapers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Deterministic time slots guaranteed for raw radar/camera perception streams.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Ultra-low latency audio/video bridging (AVB) for zonal infotainment and speakers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Immune to Ethernet network congestion under intense vehicle sensor traffic.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. CAN-XL & Legacy Buses</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> 4 dedicated CAN-XL controllers delivering up to 20 Mbps with 2048-byte payloads.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Backward compatible with CAN-FD and classic CAN on all vehicle body networks.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Integrated LIN transceivers for smart mirrors, window lifters, and ambient lighting.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Thick-oxide LDMOS I/O buffers rated for ±15 kV HBM electrostatic discharge.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 10: SKU-9 Zonal Gateway</span>
+        <span>Slide 6 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Accelerators & Fusion -->
+    <div class="slide-canvas theme-light" id="slide_7">
+      <div class="slide-tag">VECTOR DSP & HETEROGENEOUS ACCELERATORS</div>
+      <div class="slide-title">Hardware Vector Extensions Accelerate Real-Time 4D Radar & Vision Sensor Fusion</div>
+      <div class="slide-sub">RISC-V Vector 1.0 architecture with 512-bit ALUs processes point-clouds with zero cache-miss latency.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-title">1. DG RVV Vector Compute Core</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> RISC-V Vector Extension 1.0 compliant microarchitecture with 512-bit vector registers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Optimized for FFT and matrix transforms used in 77 GHz 4D imaging radar signal processing.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Achieves 8x throughput advantage over scalar DSPs at equivalent clock frequency.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Dedicated hardware pipeline for point-cloud clustering and Doppler velocity extraction.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div class="card-title">2. TCDM Scratchpad Memory (SPM)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> 512 KB multi-bank interleaved tightly coupled data memory (TCDM).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Logarithmic interconnect allows simultaneous zero-contention access across cores.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Eliminates cache invalidation and flushing overhead during multi-sensor data fusion.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 2D DMA engine automatically stages sensor tensors from host DRAM into SPM.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. Real-Time Perception Pipeline</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Fuses front 77 GHz radar (SKU-7) with surround ultrasonic and camera streams in &lt;10 ms.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Executes automated emergency braking (AEB) and blind-spot detection with zero false triggers.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Operates within a strict 6W thermal power envelope suitable for passive zonal enclosures.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Proven resilience against dirty sensor lenses and harsh monsoon weather conditions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Autonomous Perception Engine</span>
+        <span>Slide 7 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Packaging Specs -->
+    <div class="slide-canvas theme-light" id="slide_8">
+      <div class="slide-tag">SYSTEM-IN-PACKAGE COMPOSITION</div>
+      <div class="slide-title">Multi-Die Organic Substrate Packaging Eliminates Advanced Packaging NRE</div>
+      <div class="slide-sub">Heterogeneous integration of 28nm high-speed compute with 130nm/180nm BCD mature dies in a 25x25 mm BGA.</div>
+
+      <div class="grid-2x3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">PACKAGE FORMAT</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">25 x 25 mm BGA Substrate</div>
+          <div style="font-size: 11px; color: var(--text-muted);">4-layer high-reliability organic laminate with 1.0 mm ball pitch for robust soldering</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">COMPUTE DIE (FLIP-CHIP)</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">28nm CMOS @ 1.2 GHz</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Houses RV64 Linux host, coherent L2 cache, and AXI4 crossbar attached via copper pillars</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SAFETY & POWER DIES</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">130nm / 180nm BCD Wire-Bonded</div>
+          <div style="font-size: 11px; color: var(--text-muted);">ASIL-D TMR safety island and 16x smart e-Fuses fabricated on proven mature nodes</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">INTER-DIE INTERCONNECT</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">Substrate Trace Routing</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Standardized on-substrate SPI, differential UART, and parallel buses — Avoiding UCIe</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">AUTOMOTIVE RATING</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">AEC-Q100 Grade 0 (-40°C to +150°C)</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Engineered for harsh under-hood and chassis environments with high thermal tolerance</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">NRE & YIELD ADVANTAGE</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">90% Cost Reduction</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Packaging tooling under $45,000 vs &gt;$1.5M for TSMC CoWoS silicon interposers</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 13: SiP Integration</span>
+        <span>Slide 8 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Sovereign Supply Chain -->
+    <div class="slide-canvas theme-light" id="slide_9">
+      <div class="slide-tag">SOVEREIGN SUPPLY CHAIN ROADMAP</div>
+      <div class="slide-title">Three-Factory Manufacturing Topology Insulates Indian Automotive Tier-1s</div>
+      <div class="slide-sub">Initial commercial foundry runs on open-PDK shuttles transition directly to SCL Mohali domestic defence lines.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div class="card-badge" style="color: var(--cyan-500);">STATUS: PROVEN</div>
+          <div class="card-title">Phase 1: Open-Source EDA & MPWs</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Digital implementation executed entirely on OpenLane, Yosys, and OpenROAD toolchains.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Eliminates multi-million-dollar Synopsys/Cadence EDA license taxes.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Rapid MPW prototyping on SkyWater 130nm ($14.3K shuttle runs).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 77 GHz radar AFE verified on IHP SG13G2 SiGe BiCMOS (Germany).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-badge" style="color: var(--amber-600);">STATUS: TRANSFER</div>
+          <div class="card-title">Phase 2: SCL Mohali Domestic Fab</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Retargets BCD power switches, supervisor ICs, and ASIL-D safe cores to SCL Mohali 180nm.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Establishes 100% domestic silicon manufacturing immune to international export controls.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Fully satisfies Indian Ministry of Defence DAP-2020 Make-II indigenization rules.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> In-house automated test equipment (ATE) screening line established in Hyderabad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-badge" style="color: var(--green-600);">STATUS: QUALIFIED</div>
+          <div class="card-title">Phase 3: Tier-1 Commercialization</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Integration testing with Indian commercial vehicle leaders (Tata Motors, Ashok Leyland).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Drop-in zonal controller kits for electric buses and heavy-duty commercial haulage.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Full ISO 26262 functional safety and ARAI automotive homologation.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Long-term 15-year automotive lifecycle availability guarantee.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 7: Three Factories</span>
+        <span>Slide 9 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Financial Impact (Dark) -->
+    <div class="slide-canvas theme-dark" id="slide_10">
+      <div class="slide-tag">FINANCIAL MODEL & COMMERCIAL IMPACT</div>
+      <div class="slide-title">Capturing The Indian Automotive Zonal Revolution At 1/10th The Silicon Cost</div>
+      <div class="slide-sub">Open-source EDA, mature foundry nodes, and organic packaging compound into 68%+ gross margins.</div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">TARGET MARKET</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">₹4,200 Cr / Year</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Indian commercial and passenger vehicle market migrating to zonal architectures by 2028.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> MoRTH regulatory mandates for ADAS and electronic safety on commercial vehicles.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Average silicon BOM content expanding from $180 to $650 per vehicle chassis.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--amber-600);">UNIT ECONOMICS</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">$38 BOM / $140 ASP</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Mature-node silicon and organic packaging keep unit manufacturing cost under $38.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Target average selling price (ASP) of $120–$160 delivers &gt;68% gross margin.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Replaces over $400 worth of fragmented foreign ECUs and electromechanical fuse boxes.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--green-600);">CAPITAL EFFICIENCY</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">10x Advantage</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero Synopsys/Cadence license costs ($1.5M saved per tapeout).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Shuttle-based rapid iteration loop every 198 days across 3 domestic/international fabs.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹10 Cr use of funds buys complete silicon qualification and commercial production.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">SOVEREIGN MOAT</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">Zero Foreign Lock-in</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> 100% domestic IP ownership protected under Indian patent and semiconductor layout acts.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Permanent immunity from foreign export bans, ITAR restrictions, or kill-switches.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Scalable architectural platform powering 10 SKUs toward ₹1,000 Cr FY31 revenue.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 13: Financial Model</span>
+        <span>Slide 10 of 10</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function updateSlide() {
+      for (let i = 1; i <= totalSlides; i++) {
+        const el = document.getElementById('slide_' + i);
+        if (el) {
+          if (i === currentSlide) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      }
+      document.getElementById('slide_num').innerText = `${currentSlide} / ${totalSlides}`;
+      document.getElementById('btn_prev').disabled = (currentSlide === 1);
+      document.getElementById('btn_next').disabled = (currentSlide === totalSlides);
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.querySelector('.slide-viewport').requestFullscreen().catch(err => {
+          alert(`Error entering fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

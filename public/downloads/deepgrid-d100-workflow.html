@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGrid D100 Drone SoC — Interactive Architecture Explorer</title>
+  <style>
+    :root {
+      --bg-base: #0a0f1d;
+      --bg-panel: rgba(15, 23, 42, 0.85);
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(148, 163, 184, 0.15);
+      --border-active: #06b6d4;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan-accent: #06b6d4;
+      --teal-accent: #0e7490;
+      --green-accent: #10b981;
+      --amber-accent: #f59e0b;
+      --red-accent: #ef4444;
+      --blue-accent: #3b82f6;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: rgba(10, 15, 29, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-sovereign {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan-accent);
+      border: 1px solid var(--cyan-accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .brand-h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Mode Controls */
+    .mode-pills {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pill-btn.active {
+      background: var(--teal-accent);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(14, 116, 144, 0.5);
+    }
+    .pill-btn.danger-pill.active {
+      background: var(--red-accent);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+    }
+
+    /* Main Content Layout */
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      flex: 1;
+      height: calc(100vh - 65px);
+    }
+
+    /* Diagram Canvas Container */
+    .canvas-area {
+      position: relative;
+      overflow: auto;
+      padding: 24px;
+      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.2) 0%, rgba(10, 15, 29, 0.9) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Silicon Subsystem Clusters */
+    .cluster-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      backdrop-filter: blur(8px);
+      transition: border 0.3s;
+    }
+    .cluster-card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+    .cluster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+    }
+    .cluster-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--cyan-accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .node-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+    }
+
+    /* Interactive Node Component */
+    .arch-node {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .arch-node:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan-accent);
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2);
+    }
+    .arch-node.selected {
+      border-color: var(--cyan-accent);
+      background: rgba(6, 182, 212, 0.12);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+    }
+    .arch-node.failsafe-node {
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+    .arch-node.failsafe-node:hover {
+      border-color: var(--red-accent);
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+    }
+    .arch-node.failsafe-node.selected {
+      border-color: var(--red-accent);
+      background: rgba(239, 68, 68, 0.15);
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+    }
+
+    .node-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .node-spec {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+    .node-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+    }
+
+    /* Live Data Bus Status */
+    .bus-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-accent);
+      box-shadow: 0 0 8px var(--green-accent);
+      animation: pulse 2s infinite;
+    }
+    .status-dot.danger {
+      background: var(--red-accent);
+      box-shadow: 0 0 8px var(--red-accent);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    /* Telemetry Detail Sidebar */
+    .detail-sidebar {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .inspector-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 14px;
+    }
+    .inspector-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .inspector-subtitle {
+      font-size: 12px;
+      color: var(--cyan-accent);
+      font-family: monospace;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+    }
+    .stat-label { color: var(--text-muted); }
+    .stat-val { color: #fff; font-weight: 600; font-family: monospace; }
+
+    .detail-card {
+      background: rgba(10, 15, 29, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .detail-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    .detail-text {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .alert-box {
+      background: rgba(239, 68, 68, 0.12);
+      border-left: 3px solid var(--red-accent);
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #fca5a5;
+      line-height: 1.5;
+    }
+
+    /* Legend */
+    .legend-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 10px; height: 10px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <header>
+    <div class="brand-title">
+      <span class="badge-sovereign">DAP-2020 IDDM</span>
+      <div>
+        <div class="brand-h1">DeepGrid D100 Tactical Drone SoC</div>
+        <div class="brand-sub">Heterogeneous Multi-Die System-in-Package (15x15 mm 4-Layer BGA)</div>
+      </div>
+    </div>
+
+    <!-- Interactive Simulation Mode Switcher -->
+    <div class="mode-pills">
+      <button class="pill-btn active" onclick="setFlightMode('nominal')">Normal Flight Loop</button>
+      <button class="pill-btn" onclick="setFlightMode('gps_denied')">GPS-Denied 30Hz VIO</button>
+      <button class="pill-btn danger-pill" onclick="setFlightMode('ew_failsafe')">Electronic Warfare Failsafe</button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <div class="app-container">
+
+    <!-- LEFT DIAGRAM CANVAS -->
+    <div class="canvas-area">
+
+      <!-- Real-Time State Banner -->
+      <div class="bus-indicator" id="bus_banner">
+        <span class="status-dot" id="status_dot"></span>
+        <span id="banner_text">SYSTEM STATE: NOMINAL · Dual DGridRiscV Lockstep @ 200 MHz · Attitude Loop Latency: 0.82 ms</span>
+      </div>
+
+      <!-- ZONE 1: HETEROGENEOUS MATURE DIES (ORGANIC SiP) -->
+      <div class="cluster-card">
+        <div class="cluster-header">
+          <div class="cluster-title">
+            <span>⚡ Zone A: Heterogeneous Support Dies (130nm / 180nm BCD Wire-Bonded)</span>
+          </div>
+          <span class="node-spec">Organic 4-Layer Substrate (No UCIe)</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('pmic')" id="node_pmic">
+            <div class="node-tag">180nm BCD</div>
+            <div class="node-title">SKU-3 Hi-Rel PMIC</div>
+            <div class="node-spec">5V–120V LiPo -> 1.2V/1.8V/3.3V</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('supervisor')" id="node_supervisor">
+            <div class="node-tag">180nm CMOS</div>
+            <div class="node-title">SKU-6 Supervisor</div>
+            <div class="node-spec">Chopper Comp / 8µs Deglitch</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('transceiver')" id="node_transceiver">
+            <div class="node-tag">130nm HV</div>
+            <div class="node-title">SKU-5 Tactical XCVR</div>
+            <div class="node-spec">CAN-FD / RS-485 ±15kV ESD</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('radar')" id="node_radar">
+            <div class="node-tag">IHP SG13G2</div>
+            <div class="node-title">SKU-7 mmWave Radar</div>
+            <div class="node-spec">77 GHz MIMO BiCMOS 350GHz</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 2: HARDWARE FAILSAFE ISLAND (THE WEDGE) -->
+      <div class="cluster-card" style="border-color: rgba(239, 68, 68, 0.3);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--red-accent);">
+            <span>🛡️ Zone B: Hardware Failsafe Island (100% Isolated Pure RTL)</span>
+          </div>
+          <span class="node-spec" style="color: var(--red-accent);">Zero-Software Airframe Recovery</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node failsafe-node" onclick="inspectNode('link_mon')" id="node_link_mon">
+            <div class="node-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">RTL Core</div>
+            <div class="node-title">EW & Link Monitor</div>
+            <div class="node-spec">RC Loss / GPS Jamming Detect</div>
+          </div>
+          <div class="arch-node failsafe-node" onclick="inspectNode('safe_fsm')" id="node_safe_fsm">
+            <div class="node-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Isolated Clock</div>
+            <div class="node-title">Safe-State FSM</div>
+            <div class="node-spec">Emergency Hover / Descent Logic</div>
+          </div>
+          <div class="arch-node failsafe-node" onclick="inspectNode('hw_mux')" id="node_hw_mux">
+            <div class="node-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Pad Boundary</div>
+            <div class="node-title">Direct Actuator MUX</div>
+            <div class="node-spec">BYPASSES Main CPU to ESCs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 3: REAL-TIME FLIGHT CONTROL & GEOMETRIC VIO -->
+      <div class="cluster-card">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--green-accent);">
+            <span>✈️ Zone C: Hard Real-Time Flight & 30Hz Geometric VIO</span>
+          </div>
+          <span class="node-spec">SkyWater 130nm @ 200 MHz</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('riscv_core')" id="node_riscv_core">
+            <div class="node-tag">RV32IM_Safety</div>
+            <div class="node-title">Dual DGridRiscV Cores</div>
+            <div class="node-spec">2-Cycle Temporal Skew Lockstep</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('ecc_sram')" id="node_ecc_sram">
+            <div class="node-tag">512 KB ECC</div>
+            <div class="node-title">Zero-Wait SRAM</div>
+            <div class="node-spec">Zero-Jitter Cacheless Store</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('isp_engine')" id="node_isp_engine">
+            <div class="node-tag">1080p60</div>
+            <div class="node-title">Hardware ISP Pipeline</div>
+            <div class="node-spec">FAST Corner & Keypoint Stream</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('ekf_vio')" id="node_ekf_vio">
+            <div class="node-tag">30 Hz Matrix</div>
+            <div class="node-title">6-DoF Hardware EKF</div>
+            <div class="node-spec">&lt;1% Drift/km in GPS Blackouts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 4: MISSION COMPUTE & 128-BIT AXI4 MATRIX -->
+      <div class="cluster-card">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--blue-accent);">
+            <span>🧠 Zone D: Mission Perception & High-Speed Compute</span>
+          </div>
+          <span class="node-spec">28nm Flip-Chip / 128-bit AXI4 Crossbar</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('npu')" id="node_npu">
+            <div class="node-tag">10-TOPS INT8</div>
+            <div class="node-title">Edge AI Accelerator</div>
+            <div class="node-spec">YOLOv8 Real-Time Target Track</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('axi_matrix')" id="node_axi_matrix">
+            <div class="node-tag">25 GB/s</div>
+            <div class="node-title">128-bit AXI4 Crossbar</div>
+            <div class="node-spec">Non-Blocking QoS Matrix</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('lpddr4')" id="node_lpddr4">
+            <div class="node-tag">32-bit PHY</div>
+            <div class="node-title">LPDDR4 Controller</div>
+            <div class="node-spec">Up to 2GB Host Memory</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('secure_ro_t')" id="node_secure_ro_t">
+            <div class="node-tag">MIL-Spec</div>
+            <div class="node-title">Secure Enclave RoT</div>
+            <div class="node-spec">Encrypted Video & Key Vault</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEGEND BAR -->
+      <div class="legend-bar">
+        <div class="legend-item"><div class="legend-color" style="background: var(--teal-accent);"></div> 130/180nm BCD Mature Dies</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--red-accent);"></div> Isolated Failsafe Island</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--green-accent);"></div> Hard Real-Time Flight & VIO</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--blue-accent);"></div> 28nm AI Compute & AXI4</div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT INSPECTOR SIDEBAR -->
+    <div class="detail-sidebar" id="sidebar">
+      <div class="inspector-header">
+        <div class="inspector-title" id="ins_title">Dual DGridRiscV Cores</div>
+        <div class="inspector-subtitle" id="ins_sub">RV32IM_Safety · 200 MHz · SKY130 CMOS</div>
+      </div>
+
+      <!-- Quick Metrics Table -->
+      <div class="detail-card">
+        <div class="detail-card-title">Technical Telemetry</div>
+        <div class="stat-row"><span class="stat-label">Process Node:</span><span class="stat-val" id="st_node">130nm CMOS</span></div>
+        <div class="stat-row"><span class="stat-label">Clock Rate:</span><span class="stat-val" id="st_clock">200 MHz Fixed</span></div>
+        <div class="stat-row"><span class="stat-label">Voltage Rails:</span><span class="stat-val" id="st_voltage">1.2V Core / 3.3V IO</span></div>
+        <div class="stat-row"><span class="stat-label">Power Draw:</span><span class="stat-val" id="st_power">180 mW</span></div>
+        <div class="stat-row"><span class="stat-label">Redundancy:</span><span class="stat-val" id="st_safety">2-Cycle Skew Lockstep</span></div>
+      </div>
+
+      <!-- Engineering Thesis & Defense Rationale -->
+      <div class="detail-card">
+        <div class="detail-card-title">Architectural Rationale</div>
+        <p class="detail-text" id="ins_desc">
+          Executes the hard real-time PX4 / ArduPilot flight loop out of zero-wait-state ECC SRAM. By strictly avoiding instruction and data caches, the core guarantees deterministic Worst-Case Execution Time (WCET) under aggressive drone attitude maneuvers.
+        </p>
+      </div>
+
+      <!-- Failure Mode & Falsification Criteria -->
+      <div class="detail-card">
+        <div class="detail-card-title">Failure Mode Hardening</div>
+        <p class="detail-text" id="ins_failure">
+          If electromagnetic interference (EMI) or power transients induce a bit-flip in Core A, the 2-cycle lockstep comparator asserts FAULTn within ≤2 cycles, halting corrupt PWM output and handing authority to the Failsafe Island.
+        </p>
+      </div>
+
+      <!-- Dynamic Contextual Alert -->
+      <div class="alert-box" id="ins_alert">
+        <strong>SOVEREIGN DEFENCE COMPLIANCE:</strong> Fully owned open-source RTL synthesized through OpenLane/Yosys/OpenROAD. 100% IDDM compliant under DAP-2020.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Subsystem Database
+    const nodes = {
+      riscv_core: {
+        title: "Dual DGridRiscV Cores",
+        sub: "RV32IM_Safety · 200 MHz · SKY130 CMOS",
+        node: "130nm CMOS (SkyWater 130)",
+        clock: "200 MHz Fixed",
+        voltage: "1.2V Core / 3.3V IO",
+        power: "180 mW",
+        safety: "2-Cycle Skew Lockstep (ASIL-D / DAL-A)",
+        desc: "Executes the hard real-time PX4 / ArduPilot flight control loop out of zero-wait-state ECC SRAM. Eliminating instruction and data caches guarantees deterministic worst-case execution time (WCET) without cache-miss latency spikes.",
+        failure: "Temporal 2-cycle skew prevents common-mode substrate voltage dips from altering both cores identically. Mismatch triggers FAULTn in ≤2 clock cycles.",
+        alert: "SOVEREIGN STATUS: 100% owned RISC-V RTL. Zero foreign IP royalties or kill-switch vulnerabilities."
+      },
+      ekf_vio: {
+        title: "6-DoF Hardware EKF VIO Engine",
+        sub: "30 Hz Matrix Engine · GPS-Denied Combat Navigation",
+        node: "130nm Digital RTL",
+        clock: "200 MHz Fixed",
+        voltage: "1.2V Digital Core",
+        power: "125 mW",
+        safety: "Continuous Covariance Health Check",
+        desc: "Hardwired matrix math accelerator executing the 6-DoF Extended Kalman Filter equations at 30 Hz. Fuses 1080p60 optical FAST corners with 1 kHz IMU gyro and accelerometer measurements.",
+        failure: "If electronic warfare jams GPS completely, the geometric VIO maintains airframe positioning with <0.8% drift per kilometer, enabling autonomous return-to-base without satellite lock.",
+        alert: "COMBAT MOAT: Immune to front-line Russian/Chinese GPS spoofing pods deployed along active borders."
+      },
+      link_mon: {
+        title: "EW & Link Loss Monitor",
+        sub: "Isolated Hardware Wedge · Pure RTL Logic",
+        node: "130nm Isolated Silicon Island",
+        clock: "Independent Internal Ring Osc",
+        voltage: "Dedicated Internal LDO",
+        power: "15 mW",
+        safety: "100% Decoupled from Main CPU",
+        desc: "Continuously monitors RF telemetry packets, SBUS/CRSF receiver signals, and GNSS satellite health. Completely independent of the main flight processor and operating system.",
+        failure: "If RF link is jammed or the main CPU encounters an unexpected firmware lockup, the monitor automatically fires an emergency override signal within 200 ms.",
+        alert: "CRITICAL WEDGE: Built directly in hardware RTL. Cannot be corrupted by flight software stack overflow."
+      },
+      safe_fsm: {
+        title: "Safe-State Emergency FSM",
+        sub: "Autonomous Airframe Recovery State Machine",
+        node: "130nm Pure RTL FSM",
+        clock: "Independent Ring Oscillator",
+        voltage: "Dedicated Internal LDO",
+        power: "18 mW",
+        safety: "Deterministic State Transition Grid",
+        desc: "A pure digital state machine containing hardcoded recovery procedures. Determines whether to initiate an emergency steady hover or execute a controlled gradual rotor descent based on last barometric altitude.",
+        failure: "Operates with zero software intervention. Guarantees the drone does not tumble out of the sky or fly away when communications are severed.",
+        alert: "DGCA CERTIFICATION: Meets DGCA civil airworthiness and military failsafe landing mandates."
+      },
+      hw_mux: {
+        title: "Direct Actuator Multiplexer",
+        sub: "Silicon Pad Boundary Actuator Gate",
+        node: "130nm High-Drive Pad Ring",
+        clock: "Asynchronous Combinational",
+        voltage: "3.3V Tactical Output",
+        power: "8 mW",
+        safety: "Hardware-Enforced Priority",
+        desc: "Physical multiplexer situated directly before the silicon output pads. Under normal flight, it passes PX4 PWM/DShot signals from the DGridRiscV core to the ESCs. Under emergency override, it severs the CPU bus and passes FSM recovery signals.",
+        failure: "Guarantees that even if the main CPU outputs lock high (frozen PWM rail), the hardware MUX physically disconnects the signal and drives safe recovery timing to the motors.",
+        alert: "ZERO COMPROMISE: Physical hardware bypass makes rogue software commands impossible."
+      },
+      pmic: {
+        title: "SKU-3 Hi-Rel PMIC Die",
+        sub: "180nm BCD · Brokaw Bandgap · Direct LiPo Rail",
+        node: "180nm BCD (SCL Mohali / X-FAB)",
+        clock: "1.2 MHz Switching Frequency",
+        voltage: "5V–120V Input -> 1.2V/1.8V/3.3V",
+        power: "92% Efficiency across loads",
+        safety: "Over-Voltage & DICE FSM Protection",
+        desc: "Integrated high-voltage power management die wire-bonded directly onto the 4-layer organic substrate. Converts raw drone battery power down into low-noise rails for core logic and analog front-ends.",
+        failure: "Survives high-voltage inductive spikes from heavy brushless motor acceleration without burning out downstream digital silicon.",
+        alert: "PACKAGING EFFICIENCY: Eliminates 3 bulky external DC-DC converter boards from the drone fuselage."
+      },
+      supervisor: {
+        title: "SKU-6 Voltage Supervisor",
+        sub: "Chopper Reference · 8µs Deglitch · Master RESETn",
+        node: "180nm CMOS",
+        clock: "Continuous Analog Monitoring",
+        voltage: "Monitors 1.2V, 1.8V, 3.3V Rails",
+        power: "45 µW Ultra-Low Power",
+        safety: "8 µs Deglitch Filter",
+        desc: "Monitors all on-package power rails using a chopper-stabilized bandgap comparator with 1.2% threshold precision. Asserts master system RESETn within 8 microseconds of an undervoltage condition.",
+        failure: "Prevents silicon latch-up and corrupted register states during severe battery brownouts caused by punch-out throttle climbs.",
+        alert: "MIL-STD-883: Key qualification pathfinder for thermal and electrical environmental screening."
+      },
+      npu: {
+        title: "10-TOPS Edge AI Accelerator",
+        sub: "28nm Flip-Chip · INT8/INT4 MAC Matrix",
+        node: "28nm High-Density CMOS",
+        clock: "800 MHz Tensor Core",
+        voltage: "0.8V Core / 1.2V SRAM",
+        power: "3.8 W @ Full Inference",
+        safety: "AXI-QoS Subordinate Priority",
+        desc: "2D systolic array with 2 MB of tightly coupled low-leakage SRAM. Runs YOLOv8-Nano at >60 FPS for target tracking, convoy identification, and GPS-independent visual landmark matching.",
+        failure: "Traffic on the 128-bit AXI crossbar is strictly arbitrated: flight control packets have absolute priority, ensuring heavy AI inference bursts never starve critical motor control loops.",
+        alert: "MODULAR SiP: Die can be added or omitted based on tactical mission profile without redesigning package substrate."
+      }
+    };
+
+    function inspectNode(nodeKey) {
+      // Highlight selected node
+      document.querySelectorAll('.arch-node').forEach(el => el.classList.remove('selected'));
+      const activeEl = document.getElementById('node_' + nodeKey);
+      if (activeEl) activeEl.classList.add('selected');
+
+      const data = nodes[nodeKey];
+      if (!data) return;
+
+      document.getElementById('ins_title').innerText = data.title;
+      document.getElementById('ins_sub').innerText = data.sub;
+      document.getElementById('st_node').innerText = data.node;
+      document.getElementById('st_clock').innerText = data.clock;
+      document.getElementById('st_voltage').innerText = data.voltage;
+      document.getElementById('st_power').innerText = data.power;
+      document.getElementById('st_safety').innerText = data.safety;
+      document.getElementById('ins_desc').innerText = data.desc;
+      document.getElementById('ins_failure').innerText = data.failure;
+      document.getElementById('ins_alert').innerHTML = `<strong>DEFENCE ANALYSIS:</strong> ${data.alert}`;
+    }
+
+    function setFlightMode(mode) {
+      document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+      const banner = document.getElementById('bus_banner');
+      const dot = document.getElementById('status_dot');
+      const text = document.getElementById('banner_text');
+
+      if (mode === 'nominal') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot';
+        text.innerHTML = 'SYSTEM STATE: <strong>NOMINAL FLIGHT</strong> · Dual DGridRiscV Lockstep Active · Attitude Loop: 1.0 kHz · Zero Jitter';
+        inspectNode('riscv_core');
+      } else if (mode === 'gps_denied') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot';
+        text.innerHTML = 'SYSTEM STATE: <strong>GPS-DENIED VIO NAVIGATION</strong> · Satellite Jamming Active · 30Hz Geometric EKF Tracking (<1% drift/km)';
+        inspectNode('ekf_vio');
+      } else if (mode === 'ew_failsafe') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot danger';
+        text.innerHTML = 'SYSTEM STATE: <strong>ELECTRONIC WARFARE FAILSAFE</strong> · Control Link Severed · Hardware Failsafe MUX Engaged Directly to ESCs';
+        inspectNode('safe_fsm');
+      }
+    }
+
+    // Default inspection on load
+    window.addEventListener('DOMContentLoaded', () => {
+      inspectNode('riscv_core');
+    });
+  </script>
+</body>
+</html>

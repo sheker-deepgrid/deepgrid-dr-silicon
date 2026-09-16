@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGrid D100 Drone SoC — 10-Slide Executive Architecture Deck</title>
+  <style>
+    :root {
+      --bg-space: #07090e;
+      --bg-slide-dark: #0a192f;
+      --bg-slide-light: #f8fafc;
+      --navy-900: #0f172a;
+      --navy-800: #1e293b;
+      --navy-700: #334155;
+      --card-white: #ffffff;
+      --cyan-500: #06b6d4;
+      --cyan-600: #0891b2;
+      --teal-700: #0e7490;
+      --amber-600: #d97706;
+      --red-600: #dc2626;
+      --green-600: #16a34a;
+      --blue-900: #1e3a8a;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-space);
+      color: #e2e8f0;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top Navigation Toolbar */
+    .deck-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(10, 25, 47, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .deck-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .brand-tag {
+      background: rgba(6, 182, 212, 0.2);
+      color: var(--cyan-500);
+      border: 1px solid var(--cyan-500);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-nav {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-nav:hover:not(:disabled) {
+      background: var(--teal-700);
+      border-color: var(--cyan-500);
+    }
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .slide-counter {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--cyan-500);
+      min-width: 70px;
+      text-align: center;
+    }
+
+    /* 16:9 Slide Stage Viewport */
+    .slide-viewport {
+      width: 1280px;
+      height: 720px;
+      margin-top: 56px;
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    /* Slide Frame */
+    .slide-canvas {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+      transform: scale(0.98);
+      display: flex;
+      flex-direction: column;
+      padding: 40px 50px;
+    }
+    .slide-canvas.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      z-index: 10;
+    }
+
+    /* Dark Slide Style (Slides 1 & 10) */
+    .slide-canvas.theme-dark {
+      background: var(--bg-slide-dark);
+      color: #fff;
+    }
+    /* Light Slide Style (Slides 2 to 9) */
+    .slide-canvas.theme-light {
+      background: var(--bg-slide-light);
+      color: var(--text-dark);
+    }
+
+    /* Slide Header Components */
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .theme-light .slide-tag { color: var(--teal-700); }
+    .theme-dark .slide-tag { color: var(--cyan-500); }
+
+    .slide-title {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .theme-light .slide-title { color: var(--text-dark); }
+    .theme-dark .slide-title { color: #ffffff; }
+
+    .slide-sub {
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+    .theme-light .slide-sub { color: var(--text-muted); }
+    .theme-dark .slide-sub { color: #94a3b8; }
+
+    /* Slide Body Grid Layouts */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+    .grid-2x3 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 14px;
+      flex: 1;
+    }
+
+    /* Cards */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+    .theme-dark .card {
+      background: #0f1e38;
+      border-color: #1e3a64;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .card-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+    .theme-light .card-title { color: var(--text-dark); }
+    .theme-dark .card-title { color: #ffffff; }
+
+    .card-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bullet-item {
+      font-size: 12px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .theme-light .bullet-item { color: #475569; }
+    .theme-dark .bullet-item { color: #cbd5e1; }
+    .bullet-dot {
+      color: var(--teal-700);
+      font-size: 14px;
+      line-height: 1;
+    }
+    .theme-dark .bullet-dot { color: var(--cyan-500); }
+
+    /* Footer Meta */
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .theme-dark .slide-footer {
+      border-top-color: rgba(255, 255, 255, 0.08);
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DECK TOP BAR -->
+  <div class="deck-nav">
+    <div class="deck-brand">
+      <span class="brand-tag">DEEPGRID SEMI</span>
+      <span>D100 Tactical Drone SoC · Architecture Deck (10 Slides)</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-nav" id="btn_prev" onclick="prevSlide()">◀ Previous</button>
+      <span class="slide-counter" id="slide_num">1 / 10</span>
+      <button class="btn-nav" id="btn_next" onclick="nextSlide()">Next ▶</button>
+      <button class="btn-nav" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- 16:9 PRESENTATION STAGE -->
+  <div class="slide-viewport">
+
+    <!-- SLIDE 1: Title Slide (Dark) -->
+    <div class="slide-canvas theme-dark active" id="slide_1">
+      <div style="margin-top: 40px;">
+        <div class="slide-tag">DEEPGRID SEMI · ARCHITECTURAL SPECIFICATION & DEFENCE DOSSIER</div>
+        <h1 style="font-size: 42px; font-weight: 800; line-height: 1.15; margin: 16px 0 20px 0; color: #fff;">
+          D100 Tactical UAV Drone SoC<br>
+          <span style="color: var(--cyan-500);">Multi-Die System-in-Package (SiP)</span>
+        </h1>
+        <p style="font-size: 18px; color: #94a3b8; max-width: 900px; line-height: 1.5;">
+          Sovereign Flight Control, 30 Hz Optical EKF VIO, and Hardware Failsafe Recovery for Contested Airspaces.
+        </p>
+      </div>
+
+      <div class="grid-4" style="margin-top: 60px; max-height: 140px;">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">PROCESS NODE</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">130nm CMOS + 180nm BCD</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">+ 28nm Compute Flip-Chip</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">PACKAGING FORMAT</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">15x15 mm 4-Layer BGA</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Deliberately NOT UCIe</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">SOVEREIGN STANDARDS</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">MIL-STD-810H / DAP-2020</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">DGCA Type Certification Path</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">FOUNDRY SUPPLY CHAIN</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px;">SkyWater -> IHP SiGe</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">-> SCL Mohali 180nm Domestic</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi Pvt Ltd · Hyderabad, India</span>
+        <span>Slide 1 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Strategic Context -->
+    <div class="slide-canvas theme-light" id="slide_2">
+      <div class="slide-tag">SOVEREIGN CONTEXT & THREAT VECTOR</div>
+      <div class="slide-title">Foreign Silicon In Indian Tactical UAVs Represents A Single-Point Kill Switch</div>
+      <div class="slide-sub">95%+ of Indian defence drone flight controllers rely on commercial STM32/TI microcontrollers vulnerable to GPS jamming and supply embargoes.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">1. Electronic Warfare Vulnerability</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Contested borders (LoC / LAC) experience aggressive GPS spoofing and multi-band RF denial.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Commercial flight controllers experience catastrophic navigational drift within 60 seconds of GPS denial.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Firmware-level failsafes often lock up during intense RF jamming or bus overload.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Airframe recovery fails when flight software threads deadlock in RTOS.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">2. The $9B Import Reality</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> India imports $23.4B in electronics annually, with $9B concentrated in mature nodes (130nm–180nm).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Drone avionics, ESC drivers, and power regulators are entirely sourced from Western or Chinese vendors.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> DAP-2020 Buy (Indian-IDDM) mandates 50%+ Indigenous Content (IC), impossible with imported chips.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ideaForge, BEL, and Indian military integrators urgently require drop-in sovereign silicon.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. The DeepGrid D100 Mandate</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> 100% sovereign RTL, GDSII, and packaging layout fully owned and auditable in India.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware-isolated Failsafe Island completely decouples recovery logic from the main CPU.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Geometric 30 Hz EKF VIO provides autonomous zero-GPS navigation with &lt;1% drift/km.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Drop-in 15x15 mm BGA replacement that consolidates 4 discrete PCBs into 1 sovereign package.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Master Whitepaper v3</span>
+        <span>Slide 2 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: System-in-Package Innovation -->
+    <div class="slide-canvas theme-light" id="slide_3">
+      <div class="slide-tag">SYSTEM-IN-PACKAGE INNOVATION</div>
+      <div class="slide-title">Heterogeneous Multi-Die SiP Combines 6 Mature Dies With 1 Compute Die</div>
+      <div class="slide-sub">DeepGrid deliberately rejects expensive UCIe and silicon interposers in favor of 4-layer organic BGA packaging.</div>
+
+      <div class="grid-2" style="max-height: 220px; margin-bottom: 16px;">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">6 Mature Dies Wire-Bonded (130nm / 180nm)</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> SKU-3 Hi-Rel PMIC: Direct 5V–120V battery rail down-conversion to 1.2V/1.8V/3.3V.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> SKU-6 Supervisor: Chopper-stabilized voltage monitoring with 8 µs deglitch protection.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> SKU-5 Tactical Transceiver: CAN-FD (5 Mbps) & RS-485 with ±15 kV HBM ESD protection.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Analog Front-End (AFE): High-precision sensor digitization for avionics.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-900);"></div>
+          <div class="card-title">1 High-Speed Compute Die Flip-Chip Attached</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Fabricated in high-density digital node (28nm CMOS flip-chip attached via copper pillars).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Contains Dual DGridRiscV cores, Hardware 30 Hz EKF VIO, and optional 10-TOPS NPU.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 128-bit AXI4 crossbar interconnect running at 200 MHz non-blocking throughput.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Tightly coupled to 512 KB zero-wait-state ECC SRAM.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="flex: 1;">
+        <div class="card-bar" style="background: var(--green-600);"></div>
+        <div class="card-title">Why 'Deliberately Not UCIe': The Mature-Node Cost Advantage</div>
+        <ul class="bullet-list">
+          <li class="bullet-item"><span class="bullet-dot">•</span> UCIe & TSMC CoWoS require sub-micron silicon interposers, micro-bumps, and offshore foundries (Taiwan/USA).</li>
+          <li class="bullet-item"><span class="bullet-dot">•</span> Organic 4-layer laminate substrate (FR4/BT core) slashes packaging NRE from &gt;$1.5M down to &lt;$35,000.</li>
+          <li class="bullet-item"><span class="bullet-dot">•</span> Substrate-level trace routing (high-speed SPI, differential UART, GPIO power trees) achieves &gt;99% assembly yield.</li>
+          <li class="bullet-item"><span class="bullet-dot">•</span> Enables rapid assembly across domestic Indian ATMP facilities without foreign export licenses or ITAR restrictions.</li>
+        </ul>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 13: SiP Integration</span>
+        <span>Slide 3 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Flight Computer Core -->
+    <div class="slide-canvas theme-light" id="slide_4">
+      <div class="slide-tag">DETERMINISTIC FLIGHT COMPUTER</div>
+      <div class="slide-title">Dual DGridRiscV Cores Deliver Zero-Jitter Real-Time Flight Control</div>
+      <div class="slide-sub">Cacheless Harvard microarchitecture eliminates branch prediction vulnerabilities and non-deterministic cache miss latency.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">1. Cacheless Determinism</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> RV32IM_Safety ISA (Integer arithmetic + hardware multiply/divide).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 2-stage fetch, 6-stage execute strictly deterministic pipeline.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero instruction or data cache: code runs directly from 512 KB ECC SRAM.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Eliminates worst-case execution time (WCET) jitter in PX4 attitude control loops.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">2. Dual-Core Lockstep Safety</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Two identical DGridRiscV cores execute simultaneously with 2-cycle temporal skew.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Temporal skew prevents common-mode EMI and power rail transient corruptions.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware comparator inspects output buses on every cycle.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Latches FAULTn output within ≤2 clock cycles upon divergence.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-900);"></div>
+          <div class="card-title">3. Avionics Interface Engine</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Dedicated hardware timer blocks generating up to 8x DShot600 / PWM ESC signals.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> High-speed SPI buses polling dual IMUs, magnetometer, and barometer at 1 kHz.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero-copy DMA transfers flight telemetry into SRAM without CPU intervention.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Direct interrupt vectoring with sub-50ns interrupt service latency.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 8: DGridRiscV Core</span>
+        <span>Slide 4 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Geometric VIO Engine -->
+    <div class="slide-canvas theme-light" id="slide_5">
+      <div class="slide-tag">ELECTRONIC WARFARE RESILIENT NAVIGATION</div>
+      <div class="slide-title">30 Hz Hardware EKF VIO Maintains &lt;1% Drift/km In Total GPS Blackouts</div>
+      <div class="slide-sub">Fuses MIPI CSI-2 optical feature tracking with high-rate IMU telemetry completely in dedicated digital RTL.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">1. Hardware ISP & Features</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Direct 2-lane MIPI CSI-2 receiver handling 1080p60 downward/forward optical streams.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Hardware debayering, tone-mapping, and high-frequency edge enhancement.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> FAST corner detector engine extracts up to 500 optical keypoints per frame.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> KLT optical flow hardware engine tracks feature vectors across frames in real time.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-title">2. 6-DoF Extended Kalman Filter</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Dedicated matrix math accelerator computing state propagation and covariance updates.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Tight-coupling with 1 kHz IMU gyro and accelerometer measurements.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Delivers 30 Hz full 6-DoF vehicle pose vector (position, velocity, attitude).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Bounded error drift: &lt;0.8% of total distance traversed without satellite lock.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">3. Border Combat Advantage</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Immune to Russian/Chinese GPS spoofing pods deployed along active borders.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Eliminates dependency on magnetic compasses that fail near heavy metal bridges or power lines.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Guarantees autonomous return-to-launch (RTL) navigation under zero-RF conditions.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero cloud or pre-loaded satellite map dependency: purely local geometric odometry.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 11: D100 Track B</span>
+        <span>Slide 5 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Hardware Failsafe Wedge -->
+    <div class="slide-canvas theme-light" id="slide_6">
+      <div class="slide-tag">THE HARDWARE FAILSAFE WEDGE</div>
+      <div class="slide-title">Dedicated Hardware Island Guarantees Airframe Recovery During System Lockup</div>
+      <div class="slide-sub">Completely bypasses main processors, VIO, and AI to directly control motor ESCs during critical command link loss.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--red-600);"></div>
+          <div class="card-title">1. 100% Isolated Island</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Fabricated with dedicated internal LDO regulator and independent on-chip ring oscillator.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero firmware or software execution: implemented strictly as pure combinational/synchronous RTL.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Independent watchdog counter resets automatically on verified telemetry heartbeat.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Survives full main processor lockup, memory fault, or firmware panic.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-title">2. Threat & Jamming Detection</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Continuously samples RF telemetry signal quality, SBUS/CRSF links, and GNSS integrity.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Detects RF desensitization and electronic jamming within 200 ms.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Monitors core rail voltages through SKU-6 supervisor for brownout precursors.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Triggers automated emergency mode if control commands cease for &gt;500 ms.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">3. Hardwired Actuator MUX</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Physical silicon MUX located directly adjacent to the output pad ring.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Instantly severs main flight controller outputs upon fault confirmation.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Drives pre-programmed safe rotor RPM profile directly to motor ESCs.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Executes steady-state hover and controlled descent to prevent catastrophic airframe crash.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Hardware Wedge Architecture</span>
+        <span>Slide 6 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Edge AI Perception -->
+    <div class="slide-canvas theme-light" id="slide_7">
+      <div class="slide-tag">TACTICAL EDGE AI PERCEPTION</div>
+      <div class="slide-title">Optional 10-TOPS NPU Accelerates Real-Time Object Tracking & Guidance</div>
+      <div class="slide-sub">128-bit AXI4 crossbar connects high-throughput sensor streams without starving flight control cycles.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--blue-900);"></div>
+          <div class="card-title">1. 10-TOPS INT8/INT4 NPU Core</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Massive 2D systolic MAC array optimized for convolution and matrix multiplication.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 2 MB on-chip ultra-low-power SRAM eliminates high-frequency external DRAM access.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Runs YOLOv8-Nano at &gt;60 FPS for target detection, perimeter defense, and convoy tracking.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Energy efficiency: &gt;2.5 TOPS/Watt within an ultra-low 4W thermal envelope.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-title">2. 128-bit Non-Blocking AXI4</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> High-speed crossbar matrix clocked at 200 MHz providing &gt;25 GB/s aggregate bandwidth.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Strict quality-of-service (AXI-QoS) prioritizes flight control traffic over AI data.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Zero-copy DMA channels stream camera frames directly from ISP to NPU SRAM.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> LPDDR4 memory controller interface supports up to 2 GB external DRAM.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-title">3. Multi-Sensor Tactical Ingestion</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> SKU-7 mmWave Radar fusion via high-speed SPI for micro-Doppler moving object detection.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Thermal FLIR camera ingestion over secondary MIPI CSI-2 channel.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Secure Enclave provides hardware Root-of-Trust (RoT) for encrypted video transmission.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Automated terminal homing and GPS-independent precision landing marker detection.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Tactical Perception Subsystem</span>
+        <span>Slide 7 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Electrical & Physical Specs -->
+    <div class="slide-canvas theme-light" id="slide_8">
+      <div class="slide-tag">PHYSICAL & ELECTRICAL ENVELOPE</div>
+      <div class="slide-title">Engineered For Harsh Aerospace Environments: -55°C to +125°C Operation</div>
+      <div class="slide-sub">Consolidates discrete power supplies, supervisor ICs, and compute into a ruggedized 15x15 mm package.</div>
+
+      <div class="grid-2x3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">PACKAGE DIMENSIONS</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">15 x 15 mm BGA</div>
+          <div style="font-size: 11px; color: var(--text-muted);">0.8 mm ball pitch, 324-ball grid array, 4-layer organic laminate substrate</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">INPUT POWER RAIL</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">5V to 120V Raw Battery</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Direct connection to drone LiPo packs via SKU-3 BCD PMIC without external bucks</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">INTERNAL POWER TREE</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">1.2V / 1.8V / 3.3V</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Low-noise rails for core digital logic, high-speed MIPI, and rugged 3.3V tactical I/O</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">THERMAL DISSIPATION</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">4.8W Nom / 7.2W Peak</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Integrated top copper slug allows direct thermal conduction to drone carbon-fiber chassis</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">OPERATING RANGE</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">-55°C to +125°C</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Full military temperature range compliance; tested under extreme desert heat (+55°C)</div>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">ESD & TRANSIENT MOAT</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 2px 0;">±15 kV HBM ESD</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Thick-oxide LDMOS I/O buffers protect against tactical lightning and static discharge</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 4 & 10: Physics & Qualification</span>
+        <span>Slide 8 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Production & Qualification Roadmap -->
+    <div class="slide-canvas theme-light" id="slide_9">
+      <div class="slide-tag">QUALIFICATION & SOVEREIGN FAB MIGRATION</div>
+      <div class="slide-title">Three-Factory Sovereignty Roadmap Ensures Zero Foreign Supply Disruption</div>
+      <div class="slide-sub">Initial fabrication on commercial open-source shuttles transitions directly to SCL Mohali domestic foundry lines.</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div class="card-badge" style="color: var(--teal-700);">STATUS: PROVEN TRACTION</div>
+          <div class="card-title">Phase 1: SkyWater & IHP</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> OpenLane / Yosys / OpenROAD automated physical design flow eliminates $1M EDA license fees.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Prototyping on SkyWater 130nm (MPW shuttles at $14,300 per run).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> 77 GHz mmWave front-end validated on IHP SG13G2 BiCMOS (Germany).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Pre-ASIC FPGA validation complete on Xilinx Artix-7 at 81.25 MHz.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div class="card-badge" style="color: var(--amber-600);">STATUS: MIGRATION PATH</div>
+          <div class="card-title">Phase 2: SCL Mohali Transfer</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Direct retargeting of DGridRiscV and BCD power IP to Semi-Conductor Laboratory (SCL) Mohali.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Secures 100% sovereign domestic fabrication immune to US ITAR or European export restrictions.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Meets DAP-2020 Make-II and Buy (Indian-IDDM) domestic procurement rules.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Dedicated ₹1.2 Cr automated test equipment (ATE) production line established in Hyderabad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div class="card-badge" style="color: var(--green-600);">STATUS: DEFENCE READY</div>
+          <div class="card-title">Phase 3: Military Qualification</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> MIL-STD-810H environmental testing (altitude, shock, propeller vibration profile).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> MIL-STD-461G compliance for electromagnetic compatibility and EW resistance.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> DGCA Type Certification path for commercial and dual-use aerospace deployment.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Approved Vendor List (AVL) inclusion with DRDO, BEL, and Indian Army MCEME.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 7 & 10: Three Factories</span>
+        <span>Slide 9 of 10</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Financial & Commercial Plan (Dark) -->
+    <div class="slide-canvas theme-dark" id="slide_10">
+      <div class="slide-tag">FINANCIAL MODEL & COMMERCIAL DEPLOYMENT</div>
+      <div class="slide-title">Transforming A $1.2B Indian Drone Market Into A ₹1,000 Cr Silicon Business</div>
+      <div class="slide-sub">₹10 Cr use of funds buys complete silicon qualification, ATE lines, and commercial scale to FY31.</div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-bar" style="background: var(--cyan-500);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--cyan-500);">CONTRACTED TRACTION</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">₹2.88 Cr Pre-ASIC</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Live contracted revenue with Indian Army MCEME (₹1.01 Cr order).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Infinis and Axitech commercial validation partners.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Replaces multi-board STM32/TI imports in active tactical drones.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--amber-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--amber-600);">MARKET EXPANSION</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">$1.2B -> $3.2B</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Indian UAV hardware market expanding at 22%+ CAGR toward 2032.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> SoC ASP band ranges from $100 (basic UAV) to $800 (tactical autonomous drone).</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ideaForge alone guides 340–450 units/quarter in target classes.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--green-600);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--green-600);">USE OF ₹10 CR FUNDS</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">10x Capital Moat</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹3.6 Cr: Foundry fabrication and MPW shuttles.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹2.4 Cr: Core engineering and physical design team.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹1.8 Cr: MIL-883 / DGCA testing and certification.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> ₹1.2 Cr: Dedicated high-throughput ATE screening line.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-bar" style="background: var(--teal-700);"></div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--teal-700);">FY31 REVENUE TARGET</div>
+          <div style="font-size: 18px; font-weight: 800; color: #fff; margin: 4px 0 10px 0;">₹1,000 Cr Scale</div>
+          <ul class="bullet-list">
+            <li class="bullet-item"><span class="bullet-dot">•</span> Scale-up driven by 50 mature-node building blocks across 10 SKUs.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Gross margins &gt;68% enabled by open-source EDA and mature fab nodes.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> High switching costs once integrated into sovereign defence programs.</li>
+            <li class="bullet-item"><span class="bullet-dot">•</span> Protected by DAP-2020 Make-II and Positive Indigenisation Lists.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>DeepGrid Semi · Chapter 13: Financial Model</span>
+        <span>Slide 10 of 10</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function updateSlide() {
+      for (let i = 1; i <= totalSlides; i++) {
+        const el = document.getElementById('slide_' + i);
+        if (el) {
+          if (i === currentSlide) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      }
+      document.getElementById('slide_num').innerText = `${currentSlide} / ${totalSlides}`;
+      document.getElementById('btn_prev').disabled = (currentSlide === 1);
+      document.getElementById('btn_next').disabled = (currentSlide === totalSlides);
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.querySelector('.slide-viewport').requestFullscreen().catch(err => {
+          alert(`Error entering fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard navigation (Arrow keys & Space)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

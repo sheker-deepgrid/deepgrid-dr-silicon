@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGrid — Three-Factory Sovereignty & Portability Cockpit</title>
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-panel: rgba(15, 23, 42, 0.85);
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(148, 163, 184, 0.15);
+      --cyan-accent: #06b6d4;
+      --teal-accent: #0e7490;
+      --blue-accent: #2563eb;
+      --green-accent: #16a34a;
+      --amber-accent: #f59e0b;
+      --red-accent: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(10, 15, 29, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+    .brand-title { display: flex; align-items: center; gap: 12px; }
+    .badge-sovereign {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red-accent);
+      border: 1px solid var(--red-accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .brand-h1 { font-size: 18px; font-weight: 700; color: #fff; }
+    .brand-sub { font-size: 12px; color: var(--text-muted); }
+
+    .mode-pills {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pill-btn.active { background: var(--teal-accent); color: #fff; }
+    .pill-btn.blue-pill.active { background: var(--blue-accent); }
+    .pill-btn.green-pill.active { background: var(--green-accent); }
+    .pill-btn.red-pill.active { background: var(--red-accent); }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      flex: 1;
+      height: calc(100vh - 65px);
+    }
+
+    .canvas-area {
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.2) 0%, rgba(10, 15, 29, 0.9) 100%);
+    }
+
+    .bus-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-accent);
+      box-shadow: 0 0 8px var(--green-accent);
+    }
+    .status-dot.blue { background: var(--blue-accent); box-shadow: 0 0 8px var(--blue-accent); }
+    .status-dot.red { background: var(--red-accent); box-shadow: 0 0 8px var(--red-accent); }
+
+    .cluster-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      backdrop-filter: blur(8px);
+    }
+    .cluster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+    }
+    .cluster-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .node-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .arch-node {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .arch-node:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan-accent);
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2);
+    }
+    .arch-node.selected {
+      border-color: var(--cyan-accent);
+      background: rgba(6, 182, 212, 0.12);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+    }
+    .arch-node.active-foundry {
+      border-color: var(--green-accent) !important;
+      background: rgba(22, 163, 74, 0.15) !important;
+    }
+
+    .node-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .node-spec { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+    .node-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+    }
+
+    .detail-sidebar {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .inspector-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 14px;
+    }
+    .inspector-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .inspector-subtitle { font-size: 12px; color: var(--cyan-accent); font-family: monospace; }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+    }
+    .stat-label { color: var(--text-muted); }
+    .stat-val { color: #fff; font-weight: 600; font-family: monospace; }
+
+    .detail-card {
+      background: rgba(10, 15, 29, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .detail-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .detail-text { font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+
+    .alert-box {
+      background: rgba(6, 182, 212, 0.12);
+      border-left: 3px solid var(--cyan-accent);
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #a5f3fc;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span class="badge-sovereign">DAP-2020 IDDM</span>
+      <div>
+        <div class="brand-h1">One Method, Three Factories Architecture Cockpit</div>
+        <div class="brand-sub">Sequential Foundry Topology · SkyWater 130nm -> IHP 130nm SiGe -> SCL Mohali 180nm</div>
+      </div>
+    </div>
+
+    <div class="mode-pills">
+      <button class="pill-btn blue-pill active" onclick="setFoundry('skywater')">Factory 1: SkyWater (USA)</button>
+      <button class="pill-btn green-pill" onclick="setFoundry('ihp')">Factory 2: IHP (Germany)</button>
+      <button class="pill-btn red-pill" onclick="setFoundry('scl')">Factory 3: SCL Mohali (India)</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+
+    <div class="canvas-area">
+
+      <div class="bus-indicator" id="bus_banner">
+        <span class="status-dot blue" id="status_dot"></span>
+        <span id="banner_text">ACTIVE FOUNDRY: <strong>SKYWATER TECHNOLOGY (USA)</strong> · Prototyping Mode · $14,300 MPW Runs · Validated Silicon</span>
+      </div>
+
+      <!-- FOUNDRY CAPABILITIES CLUSTER -->
+      <div class="cluster-card" style="border-color: rgba(37, 99, 235, 0.4);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--blue-accent);">
+            <span>🏭 Factory 1: Commercial Rapid Prototyping (SkyWater SKY130)</span>
+          </div>
+          <span class="node-spec">130nm Planar CMOS · 200 MHz Fixed</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('sky_core')" id="node_sky_core">
+            <div class="node-tag">Validated</div>
+            <div class="node-title">DGridRiscV Processor</div>
+            <div class="node-spec">RV32IM_Safety @ 200 MHz</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('sky_eda')" id="node_sky_eda">
+            <div class="node-tag">OpenLane</div>
+            <div class="node-title">OpenROAD Synthesis</div>
+            <div class="node-spec">Zero $1M Tool License Tax</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('sky_mpw')" id="node_sky_mpw">
+            <div class="node-tag">$14.3K / Run</div>
+            <div class="node-title">MPW Shuttle Loop</div>
+            <div class="node-spec">CI2609 & CI2612 Calendars</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FACTORY 2 CLUSTER -->
+      <div class="cluster-card" style="border-color: rgba(22, 163, 74, 0.4);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--green-accent);">
+            <span>📡 Factory 2: Ultra-High Frequency Radar (IHP Leibniz SG13G2)</span>
+          </div>
+          <span class="node-spec">130nm SiGe:C BiCMOS · fT = 350 GHz</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('ihp_radar')" id="node_ihp_radar">
+            <div class="node-tag">350 GHz fT</div>
+            <div class="node-title">SKU-7 mmWave Radar</div>
+            <div class="node-spec">77 GHz MIMO Front-End</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('ihp_physics')" id="node_ihp_physics">
+            <div class="node-tag">HBT Device</div>
+            <div class="node-title">Heterojunction Physics</div>
+            <div class="node-spec">DO-160G Airborne Profile</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FACTORY 3 CLUSTER -->
+      <div class="cluster-card" style="border-color: rgba(220, 38, 38, 0.4);">
+        <div class="cluster-header">
+          <div class="cluster-title" style="color: var(--red-accent);">
+            <span>🇮🇳 Factory 3: Sovereign Military Manufacturing (SCL Mohali)</span>
+          </div>
+          <span class="node-spec">180nm Military CMOS / BCD · Buy(Indian-IDDM)</span>
+        </div>
+        <div class="node-grid">
+          <div class="arch-node" onclick="inspectNode('scl_sovereign')" id="node_scl_sovereign">
+            <div class="node-tag">100% IDDM</div>
+            <div class="node-title">SCL Retargeted Core</div>
+            <div class="node-spec">DAP-2020 Monopoly Status</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('scl_bcd')" id="node_scl_bcd">
+            <div class="node-tag">5–120V HV</div>
+            <div class="node-title">High-Voltage BCD Line</div>
+            <div class="node-spec">SKU-3 PMIC & SKU-6 Sup</div>
+          </div>
+          <div class="arch-node" onclick="inspectNode('scl_ate')" id="node_scl_ate">
+            <div class="node-tag">₹1.2 Cr ATE</div>
+            <div class="node-title">Hyderabad Test Line</div>
+            <div class="node-spec">MIL-STD-883 Screening</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="detail-sidebar">
+      <div class="inspector-header">
+        <div class="inspector-title" id="ins_title">DGridRiscV Processor</div>
+        <div class="inspector-subtitle" id="ins_sub">RV32IM_Safety · 130nm CMOS · SkyWater SKY130</div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-card-title">Foundry Specifications</div>
+        <div class="stat-row"><span class="stat-label">Foundry:</span><span class="stat-val" id="st_foundry">SkyWater Technology (USA)</span></div>
+        <div class="stat-row"><span class="stat-label">Process Node:</span><span class="stat-val" id="st_node">130 nm Planar CMOS</span></div>
+        <div class="stat-row"><span class="stat-label">Substrate / Gate:</span><span class="stat-val" id="st_gate">5-Metal Layer Stack</span></div>
+        <div class="stat-row"><span class="stat-label">Procurement Tier:</span><span class="stat-val" id="st_legal">DAP-2020 Buy (Indian)</span></div>
+        <div class="stat-row"><span class="stat-label">Porting Status:</span><span class="stat-val" id="st_status">Validated on Physical Silicon</span></div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-card-title">Foundry Strategic Role</div>
+        <p class="detail-text" id="ins_desc">
+          Serves as DeepGrid's rapid commercial digital proving ground. Utilizing low-cost open-source MPW shuttles ($14,300 per slot), DeepGrid validates processor cores, timers, and digital IP blocks in physical working silicon before committing to domestic defense transfer.
+        </p>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-card-title">The Honest Porting Reality</div>
+        <p class="detail-text" id="ins_port">
+          Digital Verilog/SystemVerilog RTL ports seamlessly to SCL Mohali via automated OpenROAD scripts by swapping standard-cell Liberty (.lib) timing files. Zero RTL rewrite required.
+        </p>
+      </div>
+
+      <div class="alert-box" id="ins_alert">
+        <strong>SOVEREIGN PROGRESSION:</strong> SkyWater proves digital logic cheaply; IHP enables 77 GHz radar physics; SCL Mohali locks in sovereign defense monopoly contracts.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const threeFoundryNodes = {
+      sky_core: {
+        title: "DGridRiscV Processor",
+        sub: "RV32IM_Safety · 130nm CMOS · SkyWater SKY130",
+        foundry: "SkyWater Technology (USA)",
+        node: "130 nm Planar CMOS",
+        gate: "5-Metal Layer Stack",
+        legal: "DAP-2020 Buy (Indian)",
+        status: "Validated on Physical Silicon",
+        desc: "Serves as DeepGrid's rapid commercial digital proving ground. Utilizing low-cost open-source MPW shuttles ($14,300 per slot), DeepGrid validates processor cores, timers, and digital IP blocks in physical working silicon before committing to domestic defense transfer.",
+        port: "Digital Verilog/SystemVerilog RTL ports seamlessly to SCL Mohali via automated OpenROAD scripts by swapping standard-cell Liberty (.lib) timing files. Zero RTL rewrite required.",
+        alert: "PROVEN SILICON: 81.25 MHz FPGA prototype validated; silicon executed on SKY130 shuttles."
+      },
+      sky_eda: {
+        title: "OpenROAD Scripted Synthesis",
+        sub: "Yosys + OpenLane + OpenROAD · Zero Tool Tax",
+        foundry: "Local Engineering (Hyderabad)",
+        node: "Scripted Across All Nodes",
+        gate: "LEF / DEF / Liberty Abstraction",
+        legal: "Unrestricted IP Ownership",
+        status: "Fully Automated Flow",
+        desc: "DeepGrid completely avoids the $1M–$2M proprietary EDA tax imposed by Synopsys and Cadence. Synthesis, floorplanning, placement, clock-tree synthesis, and routing execute via script on local workstations.",
+        port: "Moving between foundries takes under 2 weeks of scripted timing closure rather than months of manual tool recalibration.",
+        alert: "COST DISMANTLING: Eliminates the #1 structural obstacle keeping Indian semiconductor startups dependent on venture subsidies."
+      },
+      sky_mpw: {
+        title: "MPW Shuttle Loop",
+        sub: "198-Day Turnaround · $14,300 per Run",
+        foundry: "SkyWater / Efabless",
+        node: "130 nm MPW Shuttles",
+        gate: "Standardized Wafer Shares",
+        legal: "Commercial Rapid Proof",
+        status: "CI2609 & CI2612 Active",
+        desc: "Multi-Project Wafer (MPW) shared masks slash wafer costs from $1.5M dedicated masks down to $14,300. Enables DeepGrid to spin silicon every 198 days (30d digital sprint + 168d foundry fab).",
+        port: "Validates 1,000 silicon building blocks that compound into 50 approved production SKUs.",
+        alert: "SPEED ADVANTAGE: Spins silicon 3x faster than traditional defense aerospace design cycles."
+      },
+      ihp_radar: {
+        title: "SKU-7 77GHz MIMO Radar",
+        sub: "SiGe:C BiCMOS · fT = 350 GHz · IHP Leibniz",
+        foundry: "IHP Leibniz (Germany)",
+        node: "SG13G2 (130 nm SiGe BiCMOS)",
+        gate: "Heterojunction Bipolar Transistor (HBT)",
+        legal: "Commercial / Aerospace Dual-Use",
+        status: "Planned Radar Tapeout",
+        desc: "Delivers the ultra-high frequency physics required for 77 GHz 4D automotive and airborne drone imaging radar. With fT = 350 GHz and fmax = 450 GHz, silicon germanium handles mmWave frequencies impossible on standard planar CMOS.",
+        port: "RF front-end dies are wire-bonded directly alongside digital compute dies on DeepGrid's 4-layer organic SiP substrate.",
+        alert: "PHYSICS BOUNDARY: 130nm SiGe provides higher breakdown voltage and lower phase noise than 7nm pure CMOS for radar."
+      },
+      ihp_physics: {
+        title: "Heterojunction Bipolar Physics",
+        sub: "Germanium-Carbon Base · DO-160G Profile",
+        foundry: "IHP Leibniz (Germany)",
+        node: "SG13G2 Substrate",
+        gate: "SiGe:C Epitaxial Base",
+        legal: "European Research Agreement",
+        status: "Physics Characterized",
+        desc: "Integrating carbon into the silicon-germanium base layer suppresses boron out-diffusion, creating ultra-thin base widths that enable electron transit times in the sub-picosecond regime.",
+        port: "Analog RF blocks are physically married to the foundry line and cannot be retargeted without a new silicon run.",
+        alert: "DIFFERENTIATION: Gives DeepGrid radar capabilities on par with Infineon and NXP at a fraction of the cost."
+      },
+      scl_sovereign: {
+        title: "SCL Retargeted Core",
+        sub: "180nm CMOS · Semi-Conductor Laboratory (Mohali)",
+        foundry: "SCL Mohali (Punjab, India)",
+        node: "180 nm Military CMOS",
+        gate: "Radiation-Hardened by Design",
+        legal: "DAP-2020 Buy (Indian-IDDM)",
+        status: "Planned Defense Transfer",
+        desc: "Retargeted DGridRiscV core synthesized to SCL Mohali's 180nm standard cells. Unlocks absolute statutory monopoly priority under Indian defense procurement rules: foreign bids are legally excluded.",
+        port: "Digital RTL ported from SkyWater via OpenROAD Liberty (.lib) swap in under 14 days.",
+        alert: "SOVEREIGN MONOPOLY: Fulfills Make-II and Positive Indigenisation List requirements for the Indian Armed Forces."
+      },
+      scl_bcd: {
+        title: "SCL High-Voltage BCD Line",
+        sub: "5V–120V LDMOS · SKU-3 PMIC & SKU-6 Supervisor",
+        foundry: "SCL Mohali (Punjab, India)",
+        node: "180 nm BCD High-Voltage",
+        gate: "Thick-Oxide LDMOS Power Stage",
+        legal: "Buy (Indian-IDDM) Compliant",
+        status: "Manual Layout Recalibration",
+        desc: "Houses DeepGrid's power management and supervisory circuits. Generates on-chip 28V/5V/1.2V rails directly from drone and vehicle battery packs with Brokaw bandgap 12 ppm/°C temperature stability.",
+        port: "Requires manual analog re-engineering of LDMOS drift regions and bandgap trimming across 1–2 calibration shuttles.",
+        alert: "SANCTION PROOF: 100% domestic fabrication, packaging, and test immune to international embargoes."
+      },
+      scl_ate: {
+        title: "Hyderabad ATE Testing Line",
+        sub: "₹1.2 Cr Dedicated Production Line · MIL-STD-883",
+        foundry: "DeepGrid Facility (Hyderabad)",
+        node: "Production Screening & Probe",
+        gate: "Automated Wafer & BGA Sockets",
+        legal: "In-House Quality Control",
+        status: "Operational in Hyderabad",
+        desc: "Dedicated automated test equipment (ATE) line screening bare dies and packaged multi-die SiPs across -55°C to +125°C thermal envelopes before customer shipment.",
+        port: "Guarantees Known Good Die (KGD) screening before multi-die packaging, keeping assembly yields above 99%.",
+        alert: "PRODUCTION MOAT: Bridges working prototype silicon into military-grade approved vendor list (AVL) hardware."
+      }
+    };
+
+    function inspectNode(key) {
+      document.querySelectorAll('.arch-node').forEach(el => el.classList.remove('selected'));
+      const activeEl = document.getElementById('node_' + key);
+      if (activeEl) activeEl.classList.add('selected');
+
+      const data = threeFoundryNodes[key];
+      if (!data) return;
+
+      document.getElementById('ins_title').innerText = data.title;
+      document.getElementById('ins_sub').innerText = data.sub;
+      document.getElementById('st_foundry').innerText = data.foundry;
+      document.getElementById('st_node').innerText = data.node;
+      document.getElementById('st_gate').innerText = data.gate;
+      document.getElementById('st_legal').innerText = data.legal;
+      document.getElementById('st_status').innerText = data.status;
+      document.getElementById('ins_desc').innerText = data.desc;
+      document.getElementById('ins_port').innerText = data.port;
+      document.getElementById('ins_alert').innerHTML = `<strong>ANALYSIS:</strong> ${data.alert}`;
+    }
+
+    function setFoundry(f) {
+      document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+      const dot = document.getElementById('status_dot');
+      const text = document.getElementById('banner_text');
+
+      if (f === 'skywater') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot blue';
+        text.innerHTML = 'ACTIVE FOUNDRY: <strong>SKYWATER TECHNOLOGY (USA)</strong> · Prototyping Mode · $14,300 MPW Runs · Validated Silicon';
+        inspectNode('sky_core');
+      } else if (f === 'ihp') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot';
+        text.innerHTML = 'ACTIVE FOUNDRY: <strong>IHP LEIBNIZ (GERMANY)</strong> · High-Frequency Radar Mode · 350 GHz fT SiGe BiCMOS · SKU-7 Front-End';
+        inspectNode('ihp_radar');
+      } else if (f === 'scl') {
+        event.target.classList.add('active');
+        dot.className = 'status-dot red';
+        text.innerHTML = 'ACTIVE FOUNDRY: <strong>SCL MOHALI (INDIA)</strong> · Sovereign Defense Mode · Buy(Indian-IDDM) Monopoly Priority · 180nm BCD';
+        inspectNode('scl_sovereign');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      inspectNode('sky_core');
+    });
+  </script>
+</body>
+</html>
