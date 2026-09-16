@@ -18,6 +18,7 @@ jobs:
       # github.io project site for now. For dr.deepgridsemi.com set PAGES_BASE: / and PAGES_DOMAIN: dr.deepgridsemi.com
       PAGES_BASE: /deepgrid-dr-silicon/
       PAGES_DOMAIN: ''
+      NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4

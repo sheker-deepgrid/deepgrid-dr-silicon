@@ -256,7 +256,7 @@ export async function streamGeminiRAG(
 
   const prompt = `User Query: "${query}"\n\nVerified Subgraph Context:\n${context}\n\nKey Graph Relationships:\n${edgeContext}\n\nProvide an authoritative, executive engineering response:`;
 
-  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 
   for (const model of modelsToTry) {
     try {
