@@ -4,7 +4,7 @@ import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText
+  FileText, Compass, HelpCircle
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
@@ -49,11 +49,25 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     return set;
   }, [selectedNodeId]);
 
+  // Helper to check if a catalog item or node matches a category filter
+  const doesItemMatchCategory = (cat: string, itemCategory?: string, nodeCategory?: string) => {
+    if (cat === 'all') return true;
+    if (itemCategory === cat || nodeCategory === cat) return true;
+    if (cat === 'defense' && (itemCategory === 'defense' || nodeCategory === 'moat')) return true;
+    if (cat === 'strategy' && (itemCategory === 'strategy' || nodeCategory === 'foundry')) return true;
+    if (cat === 'finance' && (itemCategory === 'finance' || nodeCategory === 'governance')) return true;
+    if (cat === 'loop' && (itemCategory === 'loop' || nodeCategory === 'architecture')) return true;
+    if (cat === 'ai' && (itemCategory === 'ai' || nodeCategory === 'ai')) return true;
+    if (cat === 'sku' && (itemCategory === 'sku' || nodeCategory === 'sku')) return true;
+    if (cat === 'architecture' && (itemCategory === 'architecture' || nodeCategory === 'architecture')) return true;
+    return false;
+  };
+
   // Filter catalog items
   const results = useMemo(() => {
     const raw = searchDeepGridKnowledge(query);
     if (activeCategory === 'all') return raw;
-    return raw.filter(item => item.category === activeCategory);
+    return raw.filter(item => doesItemMatchCategory(activeCategory, item.category));
   }, [query, activeCategory]);
 
   // Document filter for quick queries
@@ -69,14 +83,16 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   // Handle Query Selection with Category Auto-Selection & Graph Binding
   const handleQuerySelect = (promptQuery: string) => {
     setQuery(promptQuery);
+    if (!promptQuery.trim()) return;
     const matches = searchDeepGridKnowledge(promptQuery);
     if (matches.length > 0) {
       const matchedItem = matches[0];
       const targetNodeId = catalogToNodeMap[matchedItem.id] || matchedItem.id;
       setSelectedNodeId(targetNodeId);
 
+      const targetNode = graphNodes.find(n => n.id === targetNodeId);
       // Category auto-selection: if category filter would hide the matched node, clear restriction
-      if (activeCategory !== 'all' && activeCategory !== matchedItem.category) {
+      if (activeCategory !== 'all' && !doesItemMatchCategory(activeCategory, matchedItem.category, targetNode?.category)) {
         setActiveCategory('all');
       }
     }
@@ -85,22 +101,23 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   // Handle Node Click with Category Auto-Selection
   const handleNodeSelect = (nodeId: string) => {
     setSelectedNodeId(nodeId);
+    const targetNode = graphNodes.find(n => n.id === nodeId);
     const catalogId = nodeToCatalogMap[nodeId] || nodeId;
     const item = deepGridCatalog.find(i => i.id === catalogId);
-    if (item && activeCategory !== 'all' && activeCategory !== item.category) {
+    if (activeCategory !== 'all' && !doesItemMatchCategory(activeCategory, item?.category, targetNode?.category)) {
       setActiveCategory('all');
     }
   };
 
   const categories = [
-    { id: 'all', label: 'All Portfolio' },
-    { id: 'ai', label: 'Edge AI (30 Tasks)' },
-    { id: 'sku', label: 'SKUs (10 Chips)' },
-    { id: 'strategy', label: 'Three-Factory Roadmap' },
-    { id: 'loop', label: '198-Day Loop & EDA' },
-    { id: 'defense', label: 'DAP-2020 & Defense Moats' },
+    { id: 'all', label: 'All Domains' },
+    { id: 'ai', label: 'Edge AI & Diagnostics' },
+    { id: 'sku', label: '10-Chip SKU Compendium' },
+    { id: 'strategy', label: 'Three-Factory Sovereignty' },
+    { id: 'loop', label: '198-Day Fast Loop & EDA' },
+    { id: 'defense', label: 'Defense Moats & DAP-2020' },
     { id: 'architecture', label: 'Silicon Architecture & RTL' },
-    { id: 'finance', label: 'Finance & Risk Audits' }
+    { id: 'finance', label: 'Capital & Financial Audits' }
   ];
 
   // Dragging logic for graph nodes
@@ -174,20 +191,59 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           )}
         </div>
 
-        {/* Document-Aware Quick Queries Explorer */}
-        <div className="dr-doc-selector-container">
-          <div className="dr-doc-selector-header">
-            <div className="dr-doc-selector-title">
-              <FileText size={15} className="dr-doc-icon" />
-              <span>FILTER BY SOURCE DOCUMENT:</span>
+        {/* Structured Executive Intelligence Control Deck: Category-Titled Layers */}
+        <div className="dr-deck-container">
+          {/* Layer 1: Strategic Technology Domain */}
+          <div className="dr-deck-section">
+            <div className="dr-deck-header">
+              <Compass size={15} className="dr-doc-icon" />
+              <span className="dr-deck-title">1. STRATEGIC TECHNOLOGY DOMAIN:</span>
             </div>
-            <div className="dr-doc-badges-strip" role="tablist" aria-label="Filter queries by document">
+            <div className="dr-deck-strip" role="tablist" aria-label="Filter by technology domain">
+              {categories.map(c => (
+                <button
+                  key={c.id}
+                  role="tab"
+                  aria-selected={activeCategory === c.id}
+                  className={`dr-deck-pill ${activeCategory === c.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveCategory(c.id);
+                    if (c.id === 'ai') {
+                      setSelectedNodeId('dg32-30-usecases');
+                    } else if (c.id === 'sku') {
+                      setSelectedNodeId('sku-1');
+                    } else if (c.id === 'strategy') {
+                      setSelectedNodeId('fab-scl');
+                    } else if (c.id === 'loop') {
+                      setSelectedNodeId('arch-198loop');
+                    } else if (c.id === 'defense') {
+                      setSelectedNodeId('moat-dap2020');
+                    } else if (c.id === 'architecture') {
+                      setSelectedNodeId('arch-lockstep');
+                    } else if (c.id === 'finance') {
+                      setSelectedNodeId('fin-munger');
+                    }
+                  }}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Layer 2: Authoritative Evidence Source */}
+          <div className="dr-deck-section">
+            <div className="dr-deck-header">
+              <FileText size={15} className="dr-doc-icon" />
+              <span className="dr-deck-title">2. FILTER BY AUTHORITATIVE EVIDENCE SOURCE:</span>
+            </div>
+            <div className="dr-deck-strip" role="tablist" aria-label="Filter queries by document">
               {documentSources.map(doc => (
                 <button
                   key={doc.id}
                   role="tab"
                   aria-selected={selectedDocId === doc.id}
-                  className={`dr-doc-pill ${selectedDocId === doc.id ? 'active' : ''}`}
+                  className={`dr-deck-pill ${selectedDocId === doc.id ? 'active' : ''}`}
                   onClick={() => setSelectedDocId(doc.id)}
                   title={doc.title}
                 >
@@ -196,79 +252,66 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* Active document context banner */}
-          <div className="dr-doc-active-banner">
-            <div className="dr-doc-active-left">
-              <span className="dr-doc-active-badge">{activeDoc.badge}</span>
-              <div className="dr-doc-active-info">
-                <span className="dr-doc-active-title">{activeDoc.title}</span>
-                <span className="dr-doc-active-sub">{activeDoc.subtitle}</span>
+            {/* Active Document Context Banner */}
+            <div className="dr-doc-active-banner">
+              <div className="dr-doc-active-left">
+                <span className="dr-doc-active-badge">{activeDoc.badge}</span>
+                <div className="dr-doc-active-info">
+                  <span className="dr-doc-active-title">{activeDoc.title}</span>
+                  <span className="dr-doc-active-sub">{activeDoc.subtitle}</span>
+                </div>
+              </div>
+              <div className="dr-doc-active-right">
+                <span className="dr-doc-active-file">AUTHORITATIVE REF: {activeDoc.fileReference}</span>
               </div>
             </div>
-            <div className="dr-doc-active-right">
-              <span className="dr-doc-active-file">REF: {activeDoc.fileReference}</span>
+          </div>
+
+          {/* Layer 3: High-Yield Technical Queries */}
+          <div className="dr-deck-section">
+            <div className="dr-deck-header">
+              <HelpCircle size={15} className="dr-doc-icon" />
+              <span className="dr-deck-title">3. HIGH-YIELD TECHNICAL QUERIES ({filteredPrompts.length}):</span>
+            </div>
+            <div className="dr-ask-prompts" aria-label="Quick queries">
+              {filteredPrompts.map(p => (
+                <button
+                  key={p.id}
+                  className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
+                  onClick={() => handleQuerySelect(p.query)}
+                  title={p.query}
+                >
+                  <span className="dr-ask-chip-doc">{p.docBadge}</span>
+                  <span className="dr-ask-chip-text">{p.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Filtered Quick Prompts */}
-          <div className="dr-ask-prompts" aria-label="Quick queries">
-            <span className="dr-ask-prompts-label">FEATURED QUERIES ({filteredPrompts.length}):</span>
-            {filteredPrompts.map(p => (
+          {/* Layer 4: Presentation View Mode */}
+          <div className="dr-deck-section dr-deck-view-section">
+            <div className="dr-deck-header">
+              <LayoutGrid size={15} className="dr-doc-icon" />
+              <span className="dr-deck-title">4. PRESENTATION FORMAT:</span>
+            </div>
+            <div className="dr-ask-view-toggle">
               <button
-                key={p.id}
-                className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
-                onClick={() => handleQuerySelect(p.query)}
-                title={p.query}
+                className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
+                onClick={() => setActiveView('graph')}
+                title="Interactive Silicon Architecture Map"
               >
-                <span className="dr-ask-chip-doc">{p.docBadge}</span>
-                <span className="dr-ask-chip-text">{p.label}</span>
+                <Network size={16} /> <span>System Map</span>
               </button>
-            ))}
+              <button
+                className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
+                onClick={() => setActiveView('cards')}
+                title="Executive Technical Dossiers"
+              >
+                <LayoutGrid size={16} /> <span>Dossiers ({results.length})</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* View Switcher & Category Tabs */}
-      <div className="dr-ask-controls-strip">
-        <div className="dr-ask-filters" role="tablist" aria-label="Filter categories">
-          {categories.map(c => (
-            <button
-              key={c.id}
-              role="tab"
-              aria-selected={activeCategory === c.id}
-              className={`dr-ask-filter-btn ${activeCategory === c.id ? 'active' : ''}`}
-              onClick={() => {
-                setActiveCategory(c.id);
-                if (c.id === 'ai') {
-                  setSelectedNodeId('dg32-30-usecases');
-                } else if (c.id !== 'all') {
-                  const first = deepGridCatalog.find(item => item.category === c.id);
-                  if (first) setSelectedNodeId(first.id);
-                }
-              }}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="dr-ask-view-toggle">
-          <button
-            className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
-            onClick={() => setActiveView('graph')}
-            title="Interactive Silicon Architecture Map"
-          >
-            <Network size={16} /> <span>System Map</span>
-          </button>
-          <button
-            className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
-            onClick={() => setActiveView('cards')}
-            title="Executive Technical Dossiers"
-          >
-            <LayoutGrid size={16} /> <span>Dossiers ({results.length})</span>
-          </button>
         </div>
       </div>
 
@@ -325,7 +368,20 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   const pTo = nodePositions[e.to] || { x: 50, y: 50 };
                   const isHighlighted = e.from === selectedNodeId || e.to === selectedNodeId;
                   const isNeighborConnection = activeConnectedNodeIds.has(e.from) && activeConnectedNodeIds.has(e.to);
-                  const edgeOpacity = isHighlighted ? 1 : (isNeighborConnection ? 0.35 : 0.08);
+
+                  const fromNode = graphNodes.find(n => n.id === e.from);
+                  const toNode = graphNodes.find(n => n.id === e.to);
+                  const fromCatMatch = doesItemMatchCategory(activeCategory, deepGridCatalog.find(i => i.id === (nodeToCatalogMap[e.from] || e.from))?.category, fromNode?.category);
+                  const toCatMatch = doesItemMatchCategory(activeCategory, deepGridCatalog.find(i => i.id === (nodeToCatalogMap[e.to] || e.to))?.category, toNode?.category);
+
+                  let edgeOpacity = isHighlighted ? 1 : (isNeighborConnection ? 0.42 : 0.08);
+                  if (activeCategory !== 'all' && !isHighlighted) {
+                    if (!fromCatMatch || !toCatMatch) {
+                      edgeOpacity = 0.03;
+                    } else {
+                      edgeOpacity = 0.35;
+                    }
+                  }
 
                   return (
                     <g key={idx} className={`dr-edge-group ${isHighlighted ? 'highlighted' : ''}`} style={{ opacity: edgeOpacity, transition: 'opacity 0.25s ease' }}>
@@ -376,17 +432,20 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   const isSelected = selectedNodeId === node.id;
                   const isConnected = activeConnectedNodeIds.has(node.id);
                   const color = getNodeColor(node.category);
-                  const isCategoryMatch = activeCategory === 'all' || node.category === activeCategory;
+                  
+                  const catalogId = nodeToCatalogMap[node.id] || node.id;
+                  const catalogItem = deepGridCatalog.find(item => item.id === catalogId);
+                  const isCategoryMatch = doesItemMatchCategory(activeCategory, catalogItem?.category, node.category);
 
                   // True Subgraph Dimming:
-                  // Selected: 1.0, 1st-degree connected: 0.88, non-connected: 0.20 (or 0.12 if category filter)
-                  let nodeOpacity = 0.20;
+                  // Selected: 1.0, 1st-degree connected: 0.90, category-match: 0.75, non-category: 0.08
+                  let nodeOpacity = 0.28;
                   if (isSelected) {
                     nodeOpacity = 1.0;
                   } else if (isConnected) {
-                    nodeOpacity = 0.88;
+                    nodeOpacity = 0.90;
                   } else if (activeCategory !== 'all') {
-                    nodeOpacity = isCategoryMatch ? 0.45 : 0.12;
+                    nodeOpacity = isCategoryMatch ? 0.75 : 0.08;
                   }
 
                   return (
@@ -428,8 +487,8 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                         y="4.2"
                         className="dr-node-label"
                         textAnchor="middle"
-                        fill={isSelected ? '#ffffff' : (isConnected ? color : '#7a8880')}
-                        fontWeight={isSelected || isConnected ? "600" : "400"}
+                        fill={isSelected ? '#ffffff' : (isConnected ? color : (isCategoryMatch && activeCategory !== 'all' ? '#ede5d5' : '#7a8880'))}
+                        fontWeight={isSelected || isConnected || (isCategoryMatch && activeCategory !== 'all') ? "600" : "400"}
                         fontSize={isSelected ? "2.6" : (isConnected ? "2.2" : "1.8")}
                         onClick={() => handleNodeSelect(node.id)}
                       >
