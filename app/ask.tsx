@@ -1,10 +1,10 @@
 'use client';
 /* oxlint-disable jsx-a11y/no-noninteractive-element-interactions */
-import {useState, useMemo, useRef, useEffect} from 'react';
+import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText, Sparkles, Cpu, Copy
+  FileText
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
@@ -13,48 +13,6 @@ import {
   graphNodes, graphEdges, DeepGridItem,
   nodeToCatalogMap, catalogToNodeMap
 } from './data/deepgrid-knowledge';
-import {
-  queryGraphify, streamGeminiRAG, GraphSearchResult
-} from './data/deepgrid-graph-search';
-
-function renderMarkdownAnswer(text: string) {
-  if (!text) return null;
-  const lines = text.split('\n');
-  return (
-    <div className="dr-answer-prose">
-      {lines.map((line, i) => {
-        const trimmed = line.trim();
-        if (!trimmed) return <div key={i} className="dr-ans-space" />;
-        
-        if (trimmed.startsWith('### ')) {
-          return (
-            <h4 key={i} className="dr-ans-heading">
-              {trimmed.replace('### ', '')}
-            </h4>
-          );
-        }
-        if (trimmed.startsWith('• ')) {
-          const bulletContent = trimmed.replace('• ', '');
-          const parts = bulletContent.split('**');
-          return (
-            <div key={i} className="dr-ans-bullet">
-              <span className="dr-ans-dot">•</span>
-              <span className="dr-ans-bullet-text">
-                {parts.map((p, pIdx) => (pIdx % 2 === 1 ? <strong key={pIdx}>{p}</strong> : p))}
-              </span>
-            </div>
-          );
-        }
-        const parts = trimmed.split('**');
-        return (
-          <p key={i} className="dr-ans-paragraph">
-            {parts.map((p, pIdx) => (pIdx % 2 === 1 ? <strong key={pIdx}>{p}</strong> : p))}
-          </p>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [query, setQuery] = useState('');
@@ -63,11 +21,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [activeView, setActiveView] = useState<'graph' | 'cards'>('graph');
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
   const [selectedItem, setSelectedItem] = useState<DeepGridItem | null>(null);
-  const [copied, setCopied] = useState(false);
   
-  // Path 2 Live AI state (Background Gemini 2.5 Flash RAG)
-  const [aiStreamText, setAiStreamText] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
   const [nodePositions, setNodePositions] = useState<Record<string, {x: number; y: number}>>(() => {
     const initial: Record<string, {x: number; y: number}> = {};
     graphNodes.forEach(n => {
@@ -101,34 +55,6 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     if (activeCategory === 'all') return raw;
     return raw.filter(item => item.category === activeCategory);
   }, [query, activeCategory]);
-
-  // Path 1 Graphify BFS Traversal computed dynamically for ANY user query
-  const graphifyResult: GraphSearchResult = useMemo(() => {
-    return queryGraphify(query);
-  }, [query]);
-
-  // Path 2: Auto-trigger background dynamic RAG synthesis on query change
-  useEffect(() => {
-    if (!query.trim()) {
-      setAiStreamText('');
-      setIsStreaming(false);
-      return;
-    }
-    let active = true;
-    setIsStreaming(true);
-    const timer = setTimeout(() => {
-      streamGeminiRAG(query, graphifyResult, chunk => {
-        if (active) setAiStreamText(chunk);
-      }).finally(() => {
-        if (active) setIsStreaming(false);
-      });
-    }, 150);
-
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [query, graphifyResult]);
 
   // Document filter for quick queries
   const filteredPrompts = useMemo(() => {
@@ -237,17 +163,12 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             type="text"
             className="dr-ask-input"
             value={query}
-            onChange={e => {
-              setQuery(e.target.value);
-              if (activeView === 'graph' && e.target.value) {
-                handleQuerySelect(e.target.value);
-              }
-            }}
+            onChange={e => handleQuerySelect(e.target.value)}
             placeholder="Ask about SKUs (1–10), D100, lockstep latency, 198-day loop, 3-factory sovereignty, DAP-2020..."
             aria-label="Search DeepGrid knowledge"
           />
           {query && (
-            <button className="dr-ask-clear" onClick={() => setQuery('')} aria-label="Clear query">
+            <button className="dr-ask-clear" onClick={() => handleQuerySelect('')} aria-label="Clear query">
               <X size={18} />
             </button>
           )}
@@ -303,69 +224,6 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               >
                 <span className="dr-ask-chip-doc">{p.docBadge}</span>
                 <span className="dr-ask-chip-text">{p.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Executive Answer Card (Standard Clean UX) */}
-      <div className="dr-answer-card">
-        <div className="dr-answer-card-header">
-          <div className="dr-answer-header-left">
-            <span className="dr-answer-badge-icon">
-              <Sparkles size={16} />
-            </span>
-            <div className="dr-answer-titles">
-              <h3 className="dr-answer-main-title">DeepGrid Intelligence Response</h3>
-              {query && <span className="dr-answer-query-sub">Grounded Analysis for &ldquo;{query}&rdquo;</span>}
-            </div>
-          </div>
-          <div className="dr-answer-header-right">
-            <span className="dr-answer-grounded-pill">
-              <ShieldCheck size={13} />
-              <span>{isStreaming ? 'Synthesizing...' : 'Verified Spec Grounded'}</span>
-            </span>
-            <button
-              className="dr-answer-copy-action"
-              onClick={() => {
-                const textToCopy = aiStreamText || graphifyResult.instantSynthesis;
-                navigator.clipboard?.writeText(textToCopy);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }}
-              title="Copy Answer to Clipboard"
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="dr-answer-card-body">
-          {renderMarkdownAnswer(aiStreamText || graphifyResult.instantSynthesis)}
-        </div>
-
-        {/* Clean Grounded Sources Strip */}
-        <div className="dr-answer-sources-strip">
-          <div className="dr-sources-label">
-            <BookOpen size={13} />
-            <span>VERIFIED SOURCE DOCUMENTS:</span>
-          </div>
-          <div className="dr-sources-pills">
-            {activeDetailItem?.citation && (
-              <span className="dr-source-chip primary" title={activeDetailItem.citation}>
-                {activeDetailItem.citation}
-              </span>
-            )}
-            {documentSources.filter(d => d.id !== 'all').slice(0, 3).map(doc => (
-              <button
-                key={doc.id}
-                className="dr-source-chip"
-                onClick={() => setSelectedDocId(doc.id)}
-                title={`Filter by ${doc.title}`}
-              >
-                {doc.badge} · {doc.title.split('(')[0].trim()}
               </button>
             ))}
           </div>
@@ -749,7 +607,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                 domain (<code>198-day loop</code>, <code>radar</code>, <code>SCL Mohali</code>, <code>DAP-2020</code>), 
                 or click one of the quick query chips above.
               </p>
-              <button className="primary" onClick={() => setQuery('')}>
+              <button className="primary" onClick={() => handleQuerySelect('')}>
                 Reset Search Filter
               </button>
             </div>
