@@ -4,7 +4,7 @@ import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText
+  FileText, Sparkles, Layers, Key, Send, Cpu
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import {
@@ -13,14 +13,29 @@ import {
   graphNodes, graphEdges, DeepGridItem,
   nodeToCatalogMap, catalogToNodeMap
 } from './data/deepgrid-knowledge';
+import {
+  queryGraphify, streamGeminiRAG, GraphSearchResult, GraphifyNode
+} from './data/deepgrid-graph-search';
 
 export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [query, setQuery] = useState('');
   const [selectedDocId, setSelectedDocId] = useState<string>('all');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [activeView, setActiveView] = useState<'graph' | 'cards'>('graph');
+  const [activeView, setActiveView] = useState<'graph' | 'cards' | 'deepgraph'>('graph');
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
   const [selectedItem, setSelectedItem] = useState<DeepGridItem | null>(null);
+  
+  // Path 2 Live AI state
+  const [geminiKey, setGeminiKey] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('dg_gemini_key') || '';
+    }
+    return '';
+  });
+  const [showKeyInput, setShowKeyInput] = useState(false);
+  const [aiStreamText, setAiStreamText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [aiError, setAiError] = useState('');
   const [nodePositions, setNodePositions] = useState<Record<string, {x: number; y: number}>>(() => {
     const initial: Record<string, {x: number; y: number}> = {};
     graphNodes.forEach(n => {
@@ -54,6 +69,35 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     if (activeCategory === 'all') return raw;
     return raw.filter(item => item.category === activeCategory);
   }, [query, activeCategory]);
+
+  // Path 1 Graphify BFS Traversal computed dynamically for ANY user query
+  const graphifyResult: GraphSearchResult = useMemo(() => {
+    return queryGraphify(query);
+  }, [query]);
+
+  // Path 2 Live AI Stream Handler
+  const handleLiveAIStream = async () => {
+    if (!query) return;
+    if (!geminiKey) {
+      setShowKeyInput(true);
+      return;
+    }
+    try {
+      setIsStreaming(true);
+      setAiError('');
+      setAiStreamText('');
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('dg_gemini_key', geminiKey);
+      }
+      await streamGeminiRAG(query, graphifyResult, geminiKey, chunk => {
+        setAiStreamText(chunk);
+      });
+    } catch (err: any) {
+      setAiError(err.message || 'Failed to stream from Gemini API');
+    } finally {
+      setIsStreaming(false);
+    }
+  };
 
   // Document filter for quick queries
   const filteredPrompts = useMemo(() => {
@@ -234,6 +278,114 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         </div>
       </div>
 
+      {/* Path 1 + Path 2: Graphify BFS Subgraph & AI RAG Synthesis Panel */}
+      <div className="dr-graphify-rag-panel">
+        <div className="dr-graphify-rag-header">
+          <div className="dr-graphify-title-wrap">
+            <h3 className="dr-graphify-title">
+              <Sparkles size={17} style={{color: 'var(--copper)'}} />
+              <span>DeepGrid Silicon Intelligence (Path 1 + Path 2 RAG)</span>
+            </h3>
+          </div>
+          <div className="dr-graphify-meta-pills">
+            <span className="dr-pill-tag accent">
+              <Cpu size={12} /> BFS Traversal: {graphifyResult.subgraphNodes.length} Nodes
+            </span>
+            <span className="dr-pill-tag">
+              {graphifyResult.subgraphLinks.length} Relations
+            </span>
+            <span className="dr-pill-tag cyan">
+              {graphifyResult.communities.length} Clusters
+            </span>
+          </div>
+        </div>
+
+        {/* Traversed Node Chips (Path 1) */}
+        {graphifyResult.subgraphNodes.length > 0 && (
+          <div className="dr-graphify-traversed-strip">
+            <span className="dr-traversed-label">TRAVERSED SUBGRAPH ENTITIES (CLICK TO QUERY):</span>
+            <div className="dr-traversed-chips">
+              {graphifyResult.subgraphNodes.map(node => (
+                <button
+                  key={node.id}
+                  className={`dr-node-chip ${graphifyResult.seedNodes.some(s => s.id === node.id) ? 'seed' : ''}`}
+                  onClick={() => handleQuerySelect(node.label)}
+                  title={`Source: ${node.source_file || 'spec'} (${node.source_location || 'L1'})`}
+                >
+                  <span>{node.label}</span>
+                  {node.source_location && <span className="chip-loc">#{node.source_location}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AI Synthesis Box (Path 2) */}
+        <div className="dr-ai-synthesis-box">
+          <div className="dr-ai-synthesis-head">
+            <span className="dr-ai-badge">
+              <ShieldCheck size={14} /> ZERO-HALLUCINATION GROUNDED SYNTHESIS
+            </span>
+            <div className="dr-ai-actions">
+              <button
+                className="dr-btn-ai-stream"
+                onClick={handleLiveAIStream}
+                disabled={isStreaming}
+                title="Stream live generative synthesis via Gemini 1.5 Flash"
+              >
+                <Sparkles size={14} />
+                <span>{isStreaming ? 'Streaming AI...' : 'Live AI Stream'}</span>
+              </button>
+              <button
+                className="text-link"
+                style={{fontSize: '0.78rem', color: '#93a582'}}
+                onClick={() => setShowKeyInput(!showKeyInput)}
+              >
+                <Key size={13} /> {geminiKey ? 'Key Configured' : 'Configure API Key'}
+              </button>
+            </div>
+          </div>
+
+          {showKeyInput && (
+            <div className="dr-ai-key-input-row">
+              <input
+                type="password"
+                className="dr-ai-key-input"
+                value={geminiKey}
+                onChange={e => setGeminiKey(e.target.value)}
+                placeholder="Enter Gemini API key for live browser streaming (stored in session only)..."
+              />
+              <button
+                className="primary"
+                style={{padding: '6px 12px', fontSize: '0.78rem'}}
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('dg_gemini_key', geminiKey);
+                  }
+                  setShowKeyInput(false);
+                }}
+              >
+                Save Key
+              </button>
+            </div>
+          )}
+
+          {aiError && (
+            <div style={{color: '#ff8a80', fontSize: '0.82rem', fontFamily: 'monospace'}}>
+              {aiError}
+            </div>
+          )}
+
+          <div className="dr-ai-content">
+            {aiStreamText ? (
+              <div style={{whiteSpace: 'pre-wrap'}}>{aiStreamText}</div>
+            ) : (
+              <div style={{whiteSpace: 'pre-wrap'}}>{graphifyResult.instantSynthesis}</div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* View Switcher & Category Tabs */}
       <div className="dr-ask-controls-strip">
         <div className="dr-ask-filters" role="tablist" aria-label="Filter categories">
@@ -265,6 +417,13 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             title="Interactive Knowledge Graph Topology"
           >
             <Network size={16} /> <span>Graph Matrix</span>
+          </button>
+          <button
+            className={`dr-ask-toggle-btn ${activeView === 'deepgraph' ? 'active' : ''}`}
+            onClick={() => setActiveView('deepgraph')}
+            title="280-Node Graphify BFS Explorer"
+          >
+            <Layers size={16} /> <span>DeepGraph ({graphifyResult.subgraphNodes.length})</span>
           </button>
           <button
             className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
@@ -616,6 +775,85 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* View 3: 280-Node Graphify BFS Explorer */}
+      {activeView === 'deepgraph' && (
+        <div className="dr-deepgraph-container">
+          <div className="dr-deepgraph-card">
+            <h3>Traversed Knowledge Nodes ({graphifyResult.subgraphNodes.length})</h3>
+            <div style={{overflowX: 'auto'}}>
+              <table className="dr-deepgraph-table">
+                <thead>
+                  <tr>
+                    <th>Node Symbol</th>
+                    <th>Subsystem Cluster</th>
+                    <th>Source Document / Module</th>
+                    <th>Line</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {graphifyResult.subgraphNodes.map(n => (
+                    <tr key={n.id}>
+                      <td>
+                        <button 
+                          className="text-link" 
+                          style={{fontSize: '0.82rem', textAlign: 'left'}}
+                          onClick={() => handleQuerySelect(n.label)}
+                        >
+                          {n.label}
+                        </button>
+                      </td>
+                      <td>
+                        <span className="dr-pill-tag">{n.community_name || 'General'}</span>
+                      </td>
+                      <td style={{fontFamily: 'monospace', color: '#93a582', fontSize: '0.76rem'}}>
+                        {n.source_file || 'spec'}
+                      </td>
+                      <td style={{fontFamily: 'monospace', color: 'var(--copper)'}}>
+                        {n.source_location || 'L1'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="dr-deepgraph-card">
+            <h3>Traversed Relationships ({graphifyResult.subgraphLinks.length})</h3>
+            <div style={{overflowX: 'auto'}}>
+              <table className="dr-deepgraph-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Relation</th>
+                    <th>Target</th>
+                    <th>Confidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {graphifyResult.subgraphLinks.slice(0, 25).map((l, idx) => {
+                    const src = typeof l.source === 'string' ? l.source : (l.source as any).label || (l.source as any).id;
+                    const tgt = typeof l.target === 'string' ? l.target : (l.target as any).label || (l.target as any).id;
+                    return (
+                      <tr key={idx}>
+                        <td style={{fontFamily: 'monospace', fontSize: '0.78rem'}}>{src}</td>
+                        <td>
+                          <span className="dr-pill-tag accent">--[{l.relation}]--&gt;</span>
+                        </td>
+                        <td style={{fontFamily: 'monospace', fontSize: '0.78rem'}}>{tgt}</td>
+                        <td style={{fontSize: '0.74rem', color: '#93a582'}}>
+                          {l.confidence || 'EXTRACTED'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
