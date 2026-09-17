@@ -15,7 +15,7 @@ export type AppCardData = {
 };
 
 export default function AppCard({app}: {app: AppCardData}) {
-  const [is3D, setIs3D] = useState(false);
+  const [is3D, setIs3D] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({rx: 0, ry: 0});
   const rafRef = useRef<number | null>(null);

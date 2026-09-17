@@ -2,7 +2,6 @@
 import {useRef} from 'react';
 import {ArrowUpRight,Layers,ShieldCheck,Cpu,Gauge,Activity,Cable} from 'lucide-react';
 import Silicon from './silicon';
-import MotionImage3D from './motion-image-3d';
 import {blocks} from './content';
 import {Eyebrow,Sec,ExplainedGrid,Steps,Flows,DataTable,Callout,Stats,Diagram} from './detail';
 import {litePremises,liteDecisions,groupMembers,liteFlows,faultPath,isolationInvariant,domPremises,enginePipeline,engineParts,engineCost,engineLimits,domFlows,domTiming,domDecisions,tapeinStats,tapeinSections,padPlan,signoffGates,whyConnectivityGate} from './detail-content';
@@ -44,12 +43,6 @@ function Lite({block,reduced,setReduced,exploded,setExploded,update,go}:Props){
   <Diagram src="./diagrams/dg32-lite-architecture.svg" title="DG32-LITE system architecture" width={1518} height={1045} drawio="./downloads/dg32-lite-architecture.drawio" guide="./downloads/dg32-lite-architecture-guide.md"
    alt="DG32-LITE system architecture diagram: safety core, memory and boot, supervision, on-chip bus, motor drive, sensing and math, connectivity and test, with the numbered current-control loop and the hardware fault path"
    caption={<>Numbered circles trace one current-control loop: ① the PWM fires the ADC sample, ② phase current goes to the CORDIC, ③ the transforms go to the CPU, ④ the PI output sets the PWM duty. The dashed red line is the hardware fault trip from the fault latch to the gate driver. Dashed boxes are off-chip.</>}/>
-
-  <Sec kicker="SUBSYSTEM INTEGRATION & TRACEABILITY" title="Hardware Subsystem Floorplan" em="and Interconnect Topography" copy="Micro-architectural layout and bus topology connecting the dual-core lockstep monitor, memory controllers, and peripheral IP blocks.">
-   <div style={{marginTop: '24px'}}>
-    <MotionImage3D src="./media/lines_image3.png" aspectRatio="16/9" badge="DG32-LITE FLOORPLAN" caption="Subsystem Micro-Architecture & Bus Interconnect Topography" glowColor="#38bdf8" />
-   </div>
-  </Sec>
 
   <Sec kicker="THE BLOCK GROUPS & ROLES" title="What do the six hardware groups do," em="and why does each block exist?" copy="Select a group to highlight it on the illustrative die and read what every block inside it does, and why it was built that way.">
    <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-LITE / 3D SILICON MODEL</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon variant="lite" selected={block} exploded={exploded} reduced={reduced} label={'Interactive 3D model of DG32-LITE with the '+g.name+' group highlighted. Drag to rotate; use the block list for details.'}/><div className="stage-bottom"><span>DRAG TO ROTATE · NOT A MASK LAYOUT</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded} aria-label={exploded?'Seat the die':'Lift the die'}><Layers size={14} aria-hidden="true"/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
@@ -116,12 +109,6 @@ function Dom({go,update,reduced,setReduced,exploded,setExploded}:Props){
    <DataTable caption="Timing, die and cost" head={['Item','Value','Status']} rows={domTiming}/>
   </Sec>
 
-  <Sec kicker="DUAL-DOMAIN SUBSYSTEM LAYOUT" title="Asynchronous CDC Bridges & Attention Pipeline" em="Hardware Floorplan" copy="Subsystem breakdown and data movement between the 50 MHz control core and the 114 MHz INT8 Attention Engine.">
-   <div style={{marginTop: '24px'}}>
-    <MotionImage3D src="./media/lines_image2.png" aspectRatio="16/9" badge="114 MHZ COMPUTE DOMAIN" caption="INT8 Attention Engine Subsystem Floorplan & Isolation Bridges" glowColor="#38bdf8" />
-   </div>
-  </Sec>
-
   <Sec kicker="3D DUAL-DOMAIN DIE & PACKAGE" title="How is the 3.4 × 4.5 mm dual-domain die structured" em="inside the QFN-64 package?" copy="The 50 MHz control core and peripherals occupy the primary die floorplan, while the 114 MHz INT8 Attention Engine and asynchronous CDC bridges expand the die width by 0.5 mm without altering the 44-signal QFN-64 pinout.">
    <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-2DOM / 3D DUAL-DOMAIN DIE</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon variant="2dom" selected={6} exploded={exploded} reduced={reduced} label="Interactive 3D model of DG32-2DOM with the 114 MHz attention engine and CDC isolation bridge highlighted."/><div className="stage-bottom"><span>DRAG TO ROTATE · ARROW KEYS TO PITCH/YAW</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded} aria-label={exploded?'Seat the die':'Lift the die'}><Layers size={14} aria-hidden="true"/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
     <aside className="domain-panel"><Eyebrow>DUAL-DOMAIN ARCHITECTURE</Eyebrow>
@@ -165,12 +152,6 @@ function TapeIn({go,update}:{go:(hash:string)=>void;update:Update}){
 
   <Sec kicker="AS-BUILT SPECIFICATIONS" title="How is each die subsystem configured" em="for the SkyWater 130 nm shuttle?">
    <ExplainedGrid items={tapeinSections}/>
-  </Sec>
-
-  <Sec kicker="PHYSICAL ARTIFACT" title="Monolithic Silicon Die Micrograph" em="and Substrate Floorplan" copy="Physical micrograph of the monolithic silicon die showing compute tiles, high-speed memory interfaces, power distribution mesh, and peripheral I/O pad ring before encapsulation.">
-   <div style={{marginTop: '24px'}}>
-    <MotionImage3D src="./media/deepgrid_soc2_die.jpg" aspectRatio="16/9" badge="28NM / 130NM FABRICATED DIE" caption="Monolithic Silicon Die Micrograph & Pad Ring" glowColor="#f59e0b" />
-   </div>
   </Sec>
 
   <Sec kicker="PAD RING ALLOCATION" title="How are the 44 active pads allocated" em="across power, motor control, and test?" copy="The wrapper’s pad plan, grouped by function and drawn to scale.">
