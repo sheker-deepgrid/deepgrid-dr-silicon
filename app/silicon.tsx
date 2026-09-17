@@ -35,13 +35,18 @@ const regions=REGIONS.map(r=>{const m=new THREE.MeshStandardMaterial({color:r.to
 // 16 dual-port SRAM macros.
 for(let row=0;row<4;row++)for(let col=0;col<4;col++){const m=new THREE.MeshStandardMaterial({color:'#7c8488',metalness:.7,roughness:.3,emissive:'#c07a36',emissiveIntensity:0});regions.push({mesh:box(.2,.08,.24,.62+col*.22-.05,.13,-1.3-row*.28+.2,m,die),m,r:{group:1,w:.2,d:.24,x:0,z:0,tone:''}});}
 let frame=0,last=0,angle=-.5,drag=false,px=0;const down=(e:PointerEvent)=>{drag=true;px=e.clientX;el.setPointerCapture(e.pointerId)};const move=(e:PointerEvent)=>{if(drag){angle+=(e.clientX-px)*.008;px=e.clientX}};const up=()=>{drag=false};
+const onKeyDown=(e:KeyboardEvent)=>{
+  if(e.key==='ArrowLeft'){angle-=0.1;e.preventDefault();}
+  else if(e.key==='ArrowRight'){angle+=0.1;e.preventDefault();}
+};
 el.addEventListener('pointerdown',down);el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+el.addEventListener('keydown',onKeyDown);
 let lw=0,lh=0;const resize=()=>{const w=el.clientWidth,h=el.clientHeight;if(!w||!h||(w===lw&&h===lh))return;lw=w;lh=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};resize();const observer=new ResizeObserver(resize);observer.observe(el);
 const active={value:true};const visibility=new IntersectionObserver(([e])=>{active.value=e.isIntersecting});visibility.observe(el);
 const tick=(t:number)=>{frame=requestAnimationFrame(tick);if(!active.value||document.hidden||t-last<32)return;last=t;const s=state.current,k=s.reduced?1:.12;if(!s.reduced&&!drag)angle+=.0012;group.rotation.y=angle;
 die.position.y=THREE.MathUtils.lerp(die.position.y,s.exploded?.9:0,k);wireLines.material.opacity=THREE.MathUtils.lerp(wireLines.material.opacity,s.exploded?.08:.45,k);
 regions.forEach(({mesh,m,r})=>{const on=r.group===s.selected;mesh.position.y=THREE.MathUtils.lerp(mesh.position.y,s.exploded?.25+r.group*.09:.13,k);m.emissiveIntensity=THREE.MathUtils.lerp(m.emissiveIntensity,on?.6:0,k);});
 renderer.render(scene,camera)};tick(0);
-return()=>{cancelAnimationFrame(frame);observer.disconnect();visibility.disconnect();el.removeEventListener('pointerdown',down);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);scene.traverse(o=>{if(o instanceof THREE.Mesh||o instanceof THREE.LineSegments){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});renderer.dispose();renderer.domElement.remove();};},[]);
-return <div className="silicon-canvas" ref={host} role="img" aria-label={label}/>;
+return()=>{cancelAnimationFrame(frame);observer.disconnect();visibility.disconnect();el.removeEventListener('pointerdown',down);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);el.removeEventListener('keydown',onKeyDown);scene.traverse(o=>{if(o instanceof THREE.Mesh||o instanceof THREE.LineSegments){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});renderer.dispose();renderer.domElement.remove();};},[]);
+return <div className="silicon-canvas" ref={host} role="region" tabIndex={0} aria-label={`${label} Use Left and Right arrow keys to rotate the 3D model.`}/>;
 }

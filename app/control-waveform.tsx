@@ -139,6 +139,11 @@ export default function ControlWaveform({khz = 100}: WaveformProps) {
 
   // Scroll scrub listener when not hovering
   useEffect(() => {
+    const isReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) {
+      setProgress(0.5);
+      return;
+    }
     const onScroll = () => {
       if (isHovered || !containerRef.current) return;
       const r = containerRef.current.getBoundingClientRect();

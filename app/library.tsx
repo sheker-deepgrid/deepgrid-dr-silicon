@@ -42,7 +42,7 @@ export default function Library({pkgId,slide,onChange,go}:{pkgId:string;slide:nu
   {pkg.diagram&&<section className="dr-lib-diagram" aria-label={`${pkg.name} architecture diagram`}>
    <div><p className="dr-lib-kicker">ARCHITECTURE DIAGRAM · DRAW.IO</p><h2>The whole {pkg.name} system on one page</h2><p>Component-flow diagram behind the deck, with the numbered data path. Open the source in draw.io to edit it.</p>
     <div className="dr-lib-links"><a className="text-link" href={pkg.diagram} target="_blank" rel="noreferrer">Open full size <ArrowUpRight size={16}/></a>{pkg.drawio&&<a className="text-link" href={pkg.drawio} download>Diagram source (.drawio) <Download size={15}/></a>}{pkg.guide&&<a className="text-link" href={pkg.guide} download>Architecture guide (.md) <Download size={15}/></a>}</div></div>
-   <div className="figure-scroll"><img src={pkg.diagram} alt={`${pkg.name} system architecture diagram`} loading="lazy"/></div>
+   <div className="figure-scroll"><img src={pkg.diagram} alt={`${pkg.name} system architecture diagram`} loading="lazy" width={1600} height={900}/></div>
   </section>}
 
   <GroundedDocumentsHub go={go} />
