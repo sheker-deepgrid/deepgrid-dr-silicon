@@ -4,9 +4,10 @@ import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText, Compass, HelpCircle, Download, Copy
+  FileText, Compass, HelpCircle, Download, Copy, Users
 } from 'lucide-react';
 import {SectionHead} from './detail';
+import CouncilView from './council-view';
 import {
   deepGridCatalog, searchDeepGridKnowledge, quickPrompts, 
   documentSources, DocumentSource,
@@ -122,7 +123,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [query, setQuery] = useState('');
   const [selectedDocId, setSelectedDocId] = useState<string>('all');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [activeView, setActiveView] = useState<'graph' | 'cards'>('graph');
+  const [activeView, setActiveView] = useState<'council' | 'graph' | 'cards'>('council');
   const [selectedNodeId, setSelectedNodeId] = useState<string>('dg32-lite');
   const [selectedItem, setSelectedItem] = useState<DeepGridItem | null>(null);
   const [readingDocContent, setReadingDocContent] = useState<{title: string; text: string} | null>(null);
@@ -435,6 +436,13 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             </div>
             <div className="dr-ask-view-toggle">
               <button
+                className={`dr-ask-toggle-btn ${activeView === 'council' ? 'active' : ''}`}
+                onClick={() => setActiveView('council')}
+                title="Multi-Agent Specialist Council Deliberation"
+              >
+                <Users size={16} /> <span>Agent Council</span>
+              </button>
+              <button
                 className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
                 onClick={() => setActiveView('graph')}
                 title="Interactive Silicon Architecture Map"
@@ -456,14 +464,25 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
       {/* Results Count & Grounding Badge */}
       <div className="dr-ask-meta-strip">
         <span className="mono">
-          {activeView === 'graph' 
-            ? `SILICON ARCHITECTURE MAP · SELECT ANY MODULE TO INSPECT SPECIFICATIONS`
-            : `EXECUTIVE SPECIFICATION DOSSIERS (${results.length} VERIFIED ENTRIES)${query ? ` · FILTER: "${query.toUpperCase()}"` : ''}`}
+          {activeView === 'council'
+            ? `MULTI-AGENT SPECIALIST COUNCIL · 3 GRAPH-GROUNDED AGENTS DELIBERATING`
+            : activeView === 'graph' 
+              ? `SILICON ARCHITECTURE MAP · SELECT ANY MODULE TO INSPECT SPECIFICATIONS`
+              : `EXECUTIVE SPECIFICATION DOSSIERS (${results.length} VERIFIED ENTRIES)${query ? ` · FILTER: "${query.toUpperCase()}"` : ''}`}
         </span>
         <span className="dr-ask-badge-verified">
           <ShieldCheck size={14} /> 100% SPEC-VERIFIED
         </span>
       </div>
+
+      {/* View 0: Multi-Agent Council Deliberation */}
+      {activeView === 'council' && (
+        <CouncilView 
+          query={query} 
+          onSelectQuery={handleQuerySelect} 
+          go={go} 
+        />
+      )}
 
       {/* View 1: Interactive Knowledge Graph View */}
       {activeView === 'graph' && (
