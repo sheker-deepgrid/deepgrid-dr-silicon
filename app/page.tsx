@@ -15,7 +15,7 @@ import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
 import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,applications} from './content';
 import {Eyebrow,SectionHead,Sec,ExplainedGrid,DataTable,Callout,Stats} from './detail';
-import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard,platformSections} from './detail-content';
+import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard,platformSections,useCaseDomains,productEssence} from './detail-content';
 
 const titles:Record<string,string>={overview:'Overview',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout & package',roadmap:'Position & roadmap',library:'Documents & media',ask:'Ask DeepGrid'};
 const PRE_SILICON='Pre-silicon. Figures are design values verified in simulation and static timing, not measurements on fabricated parts, unless marked otherwise.';
@@ -84,6 +84,106 @@ export default function Home(){
           </div>
         </article>
       ))}
+    </div>
+  </section>
+
+  {/* Product Essence & Architectural Foundations (The Gist of What DG32 Is) */}
+  <section className="content-section dr-gist-section">
+    <div className="section-label">
+      <Eyebrow>PRODUCT ESSENCE</Eyebrow>
+      <span>FOUR FOUNDATIONAL PILLARS OF DEEPGRID DG32 SILICON</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>Deterministic control.<br/><em>Hardwired safety.</em></h2>
+      <div>
+        <p>DG32 re-architects entry-level motor control by replacing error-prone software loops with deterministic hardware accelerators and an autonomous lockstep safety monitor. The result is an uncompromising silicon platform purpose-built for automotive drives, tactical drones, and precision robotics.</p>
+      </div>
+    </div>
+
+    <div className="dr-gist-grid">
+      {productEssence.map(e => (
+        <article key={e.label} className="dr-gist-card">
+          <div className="dr-gist-card-top">
+            <span className="mono dr-gist-label">{e.label}</span>
+            <span className="dr-gist-metric">{e.metric}</span>
+          </div>
+          <h3>{e.headline}</h3>
+          <p>{e.detail}</p>
+          <div className="dr-gist-bottom">
+            <button className="text-link" onClick={()=>navigate(e.targetView)}>
+              Explore details <ArrowUpRight size={15} />
+            </button>
+            <span className="mono dr-gist-ref">{e.reference}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* 30 Industrial Use Cases & Capability Envelope (Doc #1 & Technical Annex) */}
+  <section className="content-section dr-usecases-section">
+    <div className="section-label">
+      <Eyebrow>FIELD-PROVEN USE CASES</Eyebrow>
+      <span>30 INDUSTRIAL & MISSION-CRITICAL DEPLOYMENTS (DOC #1)</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>Thirty mission-critical tasks.<br/><em>Standard silicon envelope.</em></h2>
+      <div>
+        <p>Beyond motor commutation, DG32 runs edge diagnostics directly on the motor-control SoC without an external coprocessor. By leveraging hardware transforms and 82% unburdened CPU headroom, 24 of 30 industrial use cases execute above 1 kHz sample rates.</p>
+        <div className="dr-usecase-header-actions">
+          <button className="primary" onClick={()=>go('library?pkg=lite')}>
+            Download 30-Use-Cases Whitepaper (PDF) <Download size={16} />
+          </button>
+          <button className="text-link" onClick={()=>go('ask')}>
+            Query Use Cases in Ask DeepGrid <ArrowUpRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div className="dr-usecases-grid">
+      {useCaseDomains.map(d => (
+        <article key={d.id} className="dr-usecase-card">
+          <div className="dr-usecase-card-head">
+            <div className="dr-usecase-header-meta">
+              <span className="mono dr-usecase-tasks">{d.tasksCount}</span>
+              <span className="dr-usecase-standards">{d.standards}</span>
+            </div>
+            <h3>{d.title}</h3>
+            <p className="dr-usecase-sub">{d.subtitle}</p>
+          </div>
+
+          <div className="dr-usecase-tasks-list">
+            <span className="mono dr-usecase-list-label">FIELD-PROVEN CAPABILITIES:</span>
+            <ul>
+              {d.examples.map(ex => (
+                <li key={ex}><Check size={14} aria-hidden="true" /><span>{ex}</span></li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="dr-usecase-card-footer">
+            <div className="dr-usecase-timing">
+              <span className="mono">LATENCY:</span>
+              <strong>{d.timing}</strong>
+            </div>
+            <div className="dr-usecase-benefit">
+              <span className="mono">EXECUTIVE VALUE:</span>
+              <p>{d.businessBenefit}</p>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div className="dr-usecases-footer-bar">
+      <div className="dr-usecases-callout">
+        <strong>Whitepaper Proof:</strong> Verified across CWRU bearing dataset benchmarks, Goertzel broken rotor bar filters, and ISO 13373 vibration standards.
+      </div>
+      <div className="dr-usecases-links">
+        <button className="text-link" onClick={()=>navigate('control')}>Inspect 100 kHz Control Headroom <ArrowUpRight size={16}/></button>
+        <button className="text-link" onClick={()=>navigate('family')}>DG32-LITE vs DG32-2DOM Comparison <ArrowUpRight size={16}/></button>
+      </div>
     </div>
   </section>
 

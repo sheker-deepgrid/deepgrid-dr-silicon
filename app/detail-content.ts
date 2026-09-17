@@ -374,7 +374,7 @@ export const platformSections: PlatformSectionHub[] = [
   {
     num: '02',
     tag: '02 / PRODUCT FAMILY',
-    chip: 'ONE FOOTPRINT · TWO SOliverS',
+    chip: 'ONE FOOTPRINT · TWO SoCs',
     title: 'DG32-LITE & DG32-2DOM',
     summary: 'Drop-in pin-compatible SoCs sharing 44 signals. A single board layout serves standard drives or on-chip bearing-fault condition monitoring.',
     action: 'Explore Product Family',
@@ -440,5 +440,127 @@ export const platformSections: PlatformSectionHub[] = [
     action: 'Ask Grounded Intelligence',
     hash: 'ask',
     sub: 'Get verified answers with downloadable primary whitepapers'
+  }
+];
+
+// ---------- Industrial Use Cases & Product Essence (Doc #1 & Compendium) ----------
+
+export interface UseCaseDomain {
+  id: string;
+  title: string;
+  subtitle: string;
+  standards: string;
+  tasksCount: string;
+  examples: string[];
+  timing: string;
+  businessBenefit: string;
+}
+
+export const useCaseDomains: UseCaseDomain[] = [
+  {
+    id: 'rotating',
+    title: 'Rotating Machinery & Bearings',
+    subtitle: 'Vibration envelope demodulation & severity grading',
+    standards: 'ISO 13373 · ISO 20816',
+    tasksCount: '8 Mission-Critical Tasks',
+    examples: [
+      'Bearing race fault classification (BPFI/BPFO at 890 Hz)',
+      'Gearbox gear mesh wear & tooth spalling detection',
+      'Pump impeller cavitation & hydraulic turbulence',
+      'Shaft unbalance, misalignment & mechanical looseness'
+    ],
+    timing: '0.06 – 0.89 ms inference',
+    businessBenefit: 'Detects mechanical wear weeks before motor seizure, eliminating catastrophic production downtime.'
+  },
+  {
+    id: 'electrical',
+    title: 'Electrical & Current Signature (MCSA)',
+    subtitle: 'Stator, rotor & winding insulation health tracking',
+    standards: 'ISO 20958 · IEC 60034',
+    tasksCount: '8 Mission-Critical Tasks',
+    examples: [
+      'Broken rotor bar detection via Goertzel filter (replaces 8MB FFT)',
+      'Stator winding inter-turn short-circuit detection',
+      'Static & dynamic air-gap eccentricity tracking',
+      'Arc-fault discharge & DC-bus power quality analysis'
+    ],
+    timing: 'Continuous 10 kHz – 100 kHz sample rate',
+    businessBenefit: 'Identifies electrical insulation breakdown from phase current without needing external accelerometers.'
+  },
+  {
+    id: 'motion',
+    title: 'Precision Motion & Control',
+    subtitle: 'Zero-jitter vector transforms & adaptive dynamics',
+    standards: 'AEC-Q100 · DShot-bidir',
+    tasksCount: '8 Mission-Critical Tasks',
+    examples: [
+      'Sensorless Extended Kalman Filter (EKF) position (0.05 ms)',
+      'Learned sensor plausibility & cross-core signal voting',
+      'Dynamic friction feedforward & anti-cogging torque suppression',
+      'Motor stall, rotor lock & runaway speed trip'
+    ],
+    timing: 'Deterministic 300 cycles (~6 µs)',
+    businessBenefit: 'Delivers microsecond-exact control for agile drone ESCs, collaborative robots, and EV traction inverters.'
+  },
+  {
+    id: 'degradation',
+    title: 'Degradation & Remaining Useful Life',
+    subtitle: 'Temporal drift regression & fleet condition monitoring',
+    standards: 'CWRU Audited · IEEE PHM',
+    tasksCount: '6 Mission-Critical Tasks',
+    examples: [
+      'Remaining Useful Life (RUL) degradation regression',
+      'Autoencoder baseline drift & thermal runaway warning',
+      'Lightweight GRU temporal forecasting (270 Hz)',
+      '1D-CNN raw vibration pattern classification (79 Hz)'
+    ],
+    timing: 'Executes in 82% free CPU headroom',
+    businessBenefit: 'Transforms reactive warranty costs into profitable predictive maintenance service level agreements (SLAs).'
+  }
+];
+
+// ---------- Executive Product Essence (Gist of Everything) ----------
+
+export interface ProductEssence {
+  label: string;
+  headline: string;
+  detail: string;
+  metric: string;
+  reference: string;
+  targetView: string;
+}
+
+export const productEssence: ProductEssence[] = [
+  {
+    label: 'HARDWARE LOCKSTEP SAFETY',
+    headline: 'Sub-Microsecond Fail-Safe Protection',
+    detail: 'A trailing checker core audits every committed CPU store with 2-cycle latency. Mismatches disengage the PWM bridge in 39 cycles (780 ns) without waiting for software interrupt handlers.',
+    metric: '< 1 µs Fault Trip',
+    reference: 'Doc #1 & #6: ASIL-D Dual-Core Lockstep Specification',
+    targetView: 'architecture'
+  },
+  {
+    label: 'DETERMINISTIC 100 kHz LOOP',
+    headline: 'Hardwired Vector Control Acceleration',
+    detail: 'ADC sampling, Clarke/Park vector transforms, and PWM generation execute in dedicated hardware blocks (~300 cycles total), leaving 82% of core CPU cycles free for user diagnostics.',
+    metric: '82% Free Headroom',
+    reference: 'Doc #3: 100 kHz Deterministic Control Loop Timing',
+    targetView: 'control'
+  },
+  {
+    label: 'SINGLE-PCB DUAL-SoC PLATFORM',
+    headline: 'Zero-Redesign Upgrade Architecture',
+    detail: 'DG32-LITE and DG32-2DOM share the identical 9 × 9 mm QFN-64 footprint and 44 signal pins. Upgrade from standard motor control to on-chip condition monitoring on the exact same PCB.',
+    metric: '100% Pin Compatible',
+    reference: 'Doc #4 & #6: QFN-64 Electrical & Packaging Datasheet',
+    targetView: 'family'
+  },
+  {
+    label: 'SOVEREIGN MATURE SUPPLY',
+    headline: 'Domestic Supply Chain & Geopolitical Security',
+    detail: 'Fabricated on mature 130 nm/180 nm CMOS with dual-foundry qualification (SkyWater + SCL Mohali). Completely insulated from export bans, meeting DAP-2020 Make-II defense mandates.',
+    metric: '198-Day Shuttle',
+    reference: 'Doc #2 & #5: Sovereign Silicon Roadmap & Import Substitution',
+    targetView: 'roadmap'
   }
 ];
