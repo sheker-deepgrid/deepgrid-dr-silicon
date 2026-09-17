@@ -49,12 +49,20 @@ export default function FaultTrace({steps,intro}:{steps:Step[];intro:React.React
 function Trace({step,onJump,steps}:{step:number;onJump:(i:number)=>void;steps:[string,string][]}){
  const on=(n:number)=>step>=n?' on':'';
  const active=(n:number)=>step===n?' is-active-node':'';
- const onMove=(e:React.PointerEvent<HTMLDivElement>)=>{
-   const r=e.currentTarget.getBoundingClientRect();
-   e.currentTarget.style.setProperty('--mx',`${e.clientX-r.left}px`);
-   e.currentTarget.style.setProperty('--my',`${e.clientY-r.top}px`);
+ const rectRef = useRef<DOMRect | null>(null);
+ const onEnter = (e: React.PointerEvent<HTMLDivElement>) => {
+   rectRef.current = e.currentTarget.getBoundingClientRect();
  };
- return <div className="dr-trace" aria-label="Cycle-accurate hardware fault trace schematic" onPointerMove={onMove}>
+ const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+   if (!rectRef.current) rectRef.current = e.currentTarget.getBoundingClientRect();
+   const r = rectRef.current;
+   e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
+   e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
+ };
+ const onLeave = () => {
+   rectRef.current = null;
+ };
+ return <div className="dr-trace" aria-label="Cycle-accurate hardware fault trace schematic" onPointerEnter={onEnter} onPointerMove={onMove} onPointerLeave={onLeave}>
   <div className="sr-only" aria-live="polite" aria-atomic="true">
    {`Active hardware fault stage: Step ${step + 1} of 5. ${steps[step]?.[0]}: ${steps[step]?.[1]}`}
   </div>

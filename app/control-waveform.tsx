@@ -144,14 +144,20 @@ export default function ControlWaveform({khz = 100}: WaveformProps) {
       setProgress(0.5);
       return;
     }
+    let ticking = false;
     const onScroll = () => {
-      if (isHovered || !containerRef.current) return;
-      const r = containerRef.current.getBoundingClientRect();
-      const viewH = window.innerHeight;
-      if (r.bottom > 0 && r.top < viewH) {
-        const p = Math.max(0, Math.min(1, (viewH - r.top) / (viewH + r.height)));
-        setProgress(p);
-      }
+      if (isHovered || !containerRef.current || ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        if (!containerRef.current) return;
+        const r = containerRef.current.getBoundingClientRect();
+        const viewH = window.innerHeight;
+        if (r.bottom > 0 && r.top < viewH) {
+          const p = Math.max(0, Math.min(1, (viewH - r.top) / (viewH + r.height)));
+          setProgress(p);
+        }
+      });
     };
     const onResize = () => draw(progress);
 

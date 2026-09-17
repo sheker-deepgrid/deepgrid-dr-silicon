@@ -16,7 +16,7 @@ const REGIONS:Region[]=[
 
 export default function Silicon({selected=-1,exploded=false,reduced=false,label='Interactive 3D model of the DG32 package and die. Drag to rotate.'}:{selected?:number;exploded?:boolean;reduced?:boolean;label?:string}){
 const host=useRef<HTMLDivElement>(null),state=useRef({selected,exploded,reduced});state.current={selected,exploded,reduced};
-useEffect(()=>{const el=host.current!;let renderer:THREE.WebGLRenderer;try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});}catch{el.classList.add('silicon-fallback');return;}
+useEffect(()=>{const el=host.current!;let renderer:THREE.WebGLRenderer;try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power',precision:'mediump',preserveDrawingBuffer:false});}catch{el.classList.add('silicon-fallback');return;}
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor('#101212',0);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;el.appendChild(renderer.domElement);
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(32,1,.1,100);camera.position.set(7.5,9.5,10.5);camera.lookAt(0,0,0);
 scene.add(new THREE.HemisphereLight('#e2e9ec','#352714',2.3));const key=new THREE.DirectionalLight('#ffcf92',3.8);key.position.set(3,8,4);scene.add(key);const rim=new THREE.DirectionalLight('#afbdce',1.8);rim.position.set(-5,3,-4);scene.add(rim);
