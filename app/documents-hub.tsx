@@ -348,7 +348,7 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
               {loadingContent ? (
                 <div className="dr-reader-loading">
                   <div className="dr-spinner" />
-                  <p>Loading full document specification...</p>
+                  <p>Loading full document specification…</p>
                 </div>
               ) : (
                 <div className="dr-reader-content">

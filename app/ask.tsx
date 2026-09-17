@@ -997,7 +997,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                           title={`Read ${selectedDoc.title} inline`}
                         >
                           <BookOpen size={14} />
-                          <span>{loadingDocContent ? 'Loading...' : 'Read Spec Inline'}</span>
+                          <span>{loadingDocContent ? 'Loading…' : 'Read Spec Inline'}</span>
                         </button>
 
                         <button 
