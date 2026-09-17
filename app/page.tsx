@@ -8,6 +8,7 @@ import Architecture from './architecture';
 import FaultTrace from './fault-trace';
 import AskDeepGrid from './ask';
 import ControlWaveform from './control-waveform';
+import AppCard from './app-card';
 import {useReveal,useScrollVars} from './motion';
 import {useCount,useDraw,useRail} from './devices';
 import {packages,fmtTime} from './library-data';
@@ -60,20 +61,7 @@ export default function Home(){
  <section className="content-section dr-apps-section"><div className="section-label"><Eyebrow>TARGET APPLICATIONS</Eyebrow><span>WHERE DOES DG32 SILICON DEPLOY?</span></div>
   <div className="dr-apps">
    {applications.map((app)=>(
-    <div key={app.title} className="dr-app-card">
-     <div className="dr-app-media">
-      <img src={app.image} alt={app.alt} width={640} height={360} loading="lazy"/>
-      <span className="dr-app-badge">{app.tag}</span>
-     </div>
-     <div className="dr-app-body">
-      <span className="mono">{app.sub}</span>
-      <h3>{app.title}</h3>
-      <p>{app.desc}</p>
-      <div className="dr-app-meta">
-       <span>{app.metric}</span>
-      </div>
-     </div>
-    </div>
+    <AppCard key={app.title} app={app} />
    ))}
   </div>
  </section>

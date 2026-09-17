@@ -223,6 +223,7 @@ export const roadmap = [
 
 export const applications = [
   {
+    type: 'truck',
     title: 'E-Mobility & Heavy Trucks',
     sub: 'COMMERCIAL POWERTRAINS',
     desc: 'Light-EV traction, commercial drive-by-wire steering drives, and AIS-162/188 multi-camera smart mirror sensor fusion.',
@@ -232,6 +233,7 @@ export const applications = [
     tag: 'MANDATE WEDGE'
   },
   {
+    type: 'defence',
     title: 'Autonomous Aerial & Defence',
     sub: 'MISSION-CRITICAL ACTUATORS',
     desc: 'D-HUMR defence robotics, drone ESCs, and eVTOL actuators powered by secure hardware lockstep and root of trust.',
@@ -241,6 +243,7 @@ export const applications = [
     tag: 'SOVEREIGN DEFENCE'
   },
   {
+    type: 'robotics',
     title: 'Industrial Servos & Robotics',
     sub: 'FACTORY AUTOMATION JOINTS',
     desc: 'Precision servo motor drives, factory robot joints, and autonomous warehouse forklift retrofits with ±5cm stopping precision.',
@@ -250,6 +253,7 @@ export const applications = [
     tag: 'LEVEL 4 AUTONOMY'
   },
   {
+    type: 'logistics',
     title: 'Seaport Logistics & AGVs',
     sub: 'HEAVY TERMINAL AUTOMATION',
     desc: 'Autonomous container yard vehicles and port logistics transporters operating 24/7 on electric drivetrains with 92% gross margin.',
