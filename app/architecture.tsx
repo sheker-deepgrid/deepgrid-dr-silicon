@@ -21,7 +21,7 @@ export default function Architecture(props:Props){
   <div className="dr-arch-tabs" role="tablist" aria-label="Architecture to show">{chips.map(([id,name,sub])=><button key={id} role="tab" aria-selected={active===id} className={active===id?'active':''} onClick={()=>choose(id)}><strong>{name}</strong><span>{sub}</span></button>)}</div>
   <div role="tabpanel" aria-label={chips.find(c=>c[0]===active)![1]}>
    {active==='lite'&&<Lite {...props}/>}
-   {active==='2dom'&&<Dom go={props.go} update={props.update}/>}
+   {active==='2dom'&&<Dom {...props}/>}
    {active==='tapein'&&<TapeIn go={props.go} update={props.update}/>}
   </div>
  </div>;
@@ -45,7 +45,7 @@ function Lite({block,reduced,setReduced,exploded,setExploded,update,go}:Props){
    caption={<>Numbered circles trace one current-control loop: ① the PWM fires the ADC sample, ② phase current goes to the CORDIC, ③ the transforms go to the CPU, ④ the PI output sets the PWM duty. The dashed red line is the hardware fault trip from the fault latch to the gate driver. Dashed boxes are off-chip.</>}/>
 
   <Sec kicker="THE BLOCK GROUPS & ROLES" title="What do the six hardware groups do," em="and why does each block exist?" copy="Select a group to highlight it on the illustrative die and read what every block inside it does, and why it was built that way.">
-   <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-LITE / ILLUSTRATIVE MODEL</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon selected={block} exploded={exploded} reduced={reduced} label={'Interactive 3D model of DG32-LITE with the '+g.name+' group highlighted. Drag to rotate; use the block list for details.'}/><div className="stage-bottom"><span>DRAG TO ROTATE · NOT A MASK LAYOUT</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded} aria-label={exploded?'Seat the die':'Lift the die'}><Layers size={14} aria-hidden="true"/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
+   <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-LITE / 3D SILICON MODEL</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon variant="lite" selected={block} exploded={exploded} reduced={reduced} label={'Interactive 3D model of DG32-LITE with the '+g.name+' group highlighted. Drag to rotate; use the block list for details.'}/><div className="stage-bottom"><span>DRAG TO ROTATE · NOT A MASK LAYOUT</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded} aria-label={exploded?'Seat the die':'Lift the die'}><Layers size={14} aria-hidden="true"/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
     <aside className="domain-panel"><Eyebrow>SIX BLOCK GROUPS</Eyebrow>{blocks.map((b,i)=>{const Icon=blockIcons[i];return <button className={block===i?'selected':''} key={b.code} onClick={()=>update({block:String(i)})} aria-pressed={block===i} aria-label={`Select ${b.name} block group`}><Icon size={18} aria-hidden="true"/><div><span>{b.code}<b>0{i+1}</b></span><strong>{b.name}</strong>{block===i&&<p>{b.short}</p>}</div><ArrowUpRight size={16} aria-hidden="true"/></button>})}</aside></div>
    <div className="dr-group" aria-live="polite"><div className="dr-group-head"><div><p className="dr-kicker">GROUP 0{block+1} / {g.code}</p><h3 className="dr-group-name">{g.name}</h3></div><p className="dr-group-why">{g.why}</p></div><ExplainedGrid items={groupMembers[block]}/></div>
    <p className="disclaimer">The 3D model is illustrative: region placement indicates grouping, not the fabricated floorplan.</p>
@@ -74,7 +74,7 @@ function Lite({block,reduced,setReduced,exploded,setExploded,update,go}:Props){
  </>;
 }
 
-function Dom({go,update}:{go:(hash:string)=>void;update:Update}){
+function Dom({go,update,reduced,setReduced,exploded,setExploded}:Props){
  const total=engineCost.reduce((a,[, ,c])=>a+c,0);
  return <>
   <Intro kicker="DG32-2DOM / DUAL-DOMAIN ARCHITECTURE" title="How does DG32-2DOM add an attention engine" em="without compromising safety loop timing?">
@@ -107,6 +107,23 @@ function Dom({go,update}:{go:(hash:string)=>void;update:Update}){
 
   <Sec kicker="POST-ROUTE CLOSURE & DIE" title="How do both clock domains close timing" em="across the 3.4 × 4.5 mm die?" copy="Post-route results on the 130 nm process; silicon measurements follow bring-up.">
    <DataTable caption="Timing, die and cost" head={['Item','Value','Status']} rows={domTiming}/>
+  </Sec>
+
+  <Sec kicker="3D DUAL-DOMAIN DIE & PACKAGE" title="How is the 3.4 × 4.5 mm dual-domain die structured" em="inside the QFN-64 package?" copy="The 50 MHz control core and peripherals occupy the primary die floorplan, while the 114 MHz INT8 Attention Engine and asynchronous CDC bridges expand the die width by 0.5 mm without altering the 44-signal QFN-64 pinout.">
+   <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-2DOM / 3D DUAL-DOMAIN DIE</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon variant="2dom" selected={6} exploded={exploded} reduced={reduced} label="Interactive 3D model of DG32-2DOM with the 114 MHz attention engine and CDC isolation bridge highlighted."/><div className="stage-bottom"><span>DRAG TO ROTATE · ARROW KEYS TO PITCH/YAW</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded} aria-label={exploded?'Seat the die':'Lift the die'}><Layers size={14} aria-hidden="true"/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
+    <aside className="domain-panel"><Eyebrow>DUAL-DOMAIN ARCHITECTURE</Eyebrow>
+     <div style={{padding:'16px',background:'rgba(34,211,238,0.05)',border:'1px solid rgba(34,211,238,0.3)',borderRadius:'8px',marginBottom:'12px'}}>
+      <span className="mono" style={{color:'#22d3ee',fontWeight:600,fontSize:'12px',letterSpacing:'0.05em'}}>114 MHZ DOMAIN</span>
+      <strong style={{display:'block',margin:'6px 0 4px',fontSize:'15px'}}>INT8 Attention Engine</strong>
+      <p style={{fontSize:'12px',color:'var(--ink-2)',lineHeight:1.5,margin:0}}>6-stage attention pipeline computing QKᵀ, softmax and value sum in 3,242 cycles per query row. Bit-exact to the golden software model.</p>
+     </div>
+     <div style={{padding:'16px',background:'rgba(217,119,6,0.05)',border:'1px solid rgba(217,119,6,0.3)',borderRadius:'8px'}}>
+      <span className="mono" style={{color:'#d97706',fontWeight:600,fontSize:'12px',letterSpacing:'0.05em'}}>ISOLATION BARRIER</span>
+      <strong style={{display:'block',margin:'6px 0 4px',fontSize:'15px'}}>CDC Asynchronous Bridges</strong>
+      <p style={{fontSize:'12px',color:'var(--ink-2)',lineHeight:1.5,margin:0}}>Dual-clock asynchronous FIFOs isolate the 50 MHz control core from the 114 MHz accelerator. The attention engine never stalls the motor control loop.</p>
+     </div>
+    </aside>
+   </div>
   </Sec>
 
   <Sec kicker="FROZEN VARIANT DECISIONS" title="Why is DG32-2DOM strictly an additive build," em="preserving the proven control core?">
