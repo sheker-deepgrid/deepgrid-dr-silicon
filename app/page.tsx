@@ -9,6 +9,7 @@ import FaultTrace from './fault-trace';
 import AskDeepGrid from './ask';
 import ControlWaveform from './control-waveform';
 import AppCard from './app-card';
+import MotionImage3D from './motion-image-3d';
 import {useReveal,useScrollVars} from './motion';
 import {useCount,useDraw,useRail} from './devices';
 import {packages,fmtTime} from './library-data';
@@ -52,9 +53,27 @@ export default function Home(){
 
  <section className="content-section"><div className="section-label"><Eyebrow>THE SAFETY IMPERATIVE</Eyebrow><span>WHY DOES ENTRY-LEVEL SILICON NEED A SECOND CORE?</span></div><div className="thesis-heading"><h2>A silent CPU fault<br/><em>can destroy a bridge.</em></h2><div><p>A motor drive switches power transistors thousands of times a second. If the CPU silently computes a wrong value, it writes a wrong PWM edge, and a wrong edge can short a leg of the power bridge: the power stage fails, not only the code.</p><p>On an entry-level motor-control MCU, faults are caught by watchdogs, brown-out reset and periodic software self-test. Those checks run between faults, not during them. Hardware lockstep, which checks every value as it is committed, has lived in automotive MCUs such as Infineon AURIX, NXP S32K and TI Hercules.</p><p className="muted">DG32 brings a second, checking core to the entry-level tier and gives it one job: catch the first core when it is wrong.</p><button className="text-link" onClick={()=>navigate('roadmap')} aria-label="Compare with STM32G0">Compare with STM32G0 <ArrowUpRight size={18} aria-hidden="true"/></button></div></div>
   <div className="dr-cards">
-   <button className="dr-card" onClick={()=>openBlock(0)}><span className="mono">SAFETY</span><ShieldCheck size={26} aria-hidden="true"/><h3>Two cores <br/>must agree.</h3><p>CHECKER trails MAIN by two cycles on mirrored inputs and compares every committed store. Divergence latches the first cause and drives the FAULT pin.</p><span className="open-product">Safety core <ArrowRight size={16} aria-hidden="true"/></span></button>
-   <button className="dr-card" onClick={()=>navigate('control')}><span className="mono">CONTROL</span><Gauge size={26} aria-hidden="true"/><h3>The loop runs <br/>in hardware.</h3><p>Current sampling, Park transforms and PWM edges run in dedicated blocks, so one loop costs about 300&nbsp;hardware cycles at any rate. The CPU keeps only the two PI regulators.</p><span className="open-product">Loop budget <ArrowRight size={16} aria-hidden="true"/></span></button>
-   <button className="dr-card" onClick={()=>go('architecture?chip=2dom')}><span className="mono">COMPUTE</span><BrainCircuit size={26} aria-hidden="true"/><h3>Monitoring on <br/>the drive chip.</h3><p>DG32-2DOM adds an INT8 attention engine on its own 114&nbsp;MHz clock, behind bridges, with the same pinout and the same frozen control core.</p><span className="open-product">Inside DG32-2DOM <ArrowRight size={16} aria-hidden="true"/></span></button>
+   <div className="dr-card">
+    <MotionImage3D src="./media/cube-poster.png" aspectRatio="16/9" badge="HARDWARE LOCKSTEP" caption="Dual Lockstep Core Architecture" glowColor="#f59e0b" />
+    <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px'}}><span className="mono">SAFETY</span><ShieldCheck size={22} style={{color: 'var(--copper)'}} aria-hidden="true"/></div>
+    <h3>Two cores <br/>must agree.</h3>
+    <p>CHECKER trails MAIN by two cycles on mirrored inputs and compares every committed store. Divergence latches the first cause and drives the FAULT pin.</p>
+    <button className="open-product" onClick={()=>openBlock(0)}>Safety core <ArrowRight size={16} aria-hidden="true"/></button>
+   </div>
+   <div className="dr-card">
+    <MotionImage3D src="./media/mesh-poster.png" aspectRatio="16/9" badge="LOOP IN HARDWARE" caption="Deterministic Bus & FOC Acceleration" glowColor="#38bdf8" />
+    <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px'}}><span className="mono">CONTROL</span><Gauge size={22} style={{color: 'var(--copper)'}} aria-hidden="true"/></div>
+    <h3>The loop runs <br/>in hardware.</h3>
+    <p>Current sampling, Park transforms and PWM edges run in dedicated blocks, so one loop costs about 300&nbsp;hardware cycles at any rate. The CPU keeps only the two PI regulators.</p>
+    <button className="open-product" onClick={()=>navigate('control')}>Loop budget <ArrowRight size={16} aria-hidden="true"/></button>
+   </div>
+   <div className="dr-card">
+    <MotionImage3D src="./media/computebox-poster.png" aspectRatio="16/9" badge="114 MHZ ATTENTION" caption="Dual-Clock-Domain Edge AI" glowColor="#10b981" />
+    <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px'}}><span className="mono">COMPUTE</span><BrainCircuit size={22} style={{color: 'var(--copper)'}} aria-hidden="true"/></div>
+    <h3>Monitoring on <br/>the drive chip.</h3>
+    <p>DG32-2DOM adds an INT8 attention engine on its own 114&nbsp;MHz clock, behind bridges, with the same pinout and the same frozen control core.</p>
+    <button className="open-product" onClick={()=>go('architecture?chip=2dom')}>Inside DG32-2DOM <ArrowRight size={16} aria-hidden="true"/></button>
+   </div>
   </div>
  </section>
 
@@ -66,9 +85,16 @@ export default function Home(){
   </div>
  </section>
 
- <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')} aria-label="Launch Ask DeepGrid Console">Launch Ask DeepGrid Console <ArrowUpRight size={18} aria-hidden="true"/></button></div></div></section>
+ <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')} aria-label="Launch Ask DeepGrid Console">Launch Ask DeepGrid Console <ArrowUpRight size={18} aria-hidden="true"/></button></div></div>
+  <div style={{marginTop: '32px'}}>
+   <MotionImage3D src="./media/sims_image.png" aspectRatio="21/9" badge="AVIP FLIGHT COCKPIT" caption="Real-Time Hardware In-the-Loop Simulation & Telemetry Flight Deck" glowColor="#38bdf8" />
+  </div>
+ </section>
 
  <section id="fault-isolation" className="content-section"><div className="section-label"><Eyebrow>FAULT ISOLATION</Eyebrow><span>HOW DOES HARDWARE TRIP THE BRIDGE IN 39 CYCLES WITHOUT FIRMWARE?</span></div>
+  <div style={{marginBottom: '32px'}}>
+   <MotionImage3D src="./media/problem-poster.png" aspectRatio="21/9" badge="39-CYCLE HARDWARE TRIP" caption="Autonomous Inverter Bridge Disconnect Sequence & Dead-Time Protection" glowColor="#ef4444" />
+  </div>
   <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)} aria-label="Inside the safety core">Inside the safety core <ArrowUpRight size={18} aria-hidden="true"/></button></>}/>
  </section>
 
@@ -93,9 +119,7 @@ export default function Home(){
   <Sec kicker="SILICON FABRICATION & ARCHITECTURE" title="Monolithic Die Micrograph" em="and Cross-Domain Platform Surfaces" copy="DeepGrid's proven silicon methodology pairs mature-node physics (TSMC 28nm monolithic / SkyWater 130nm) with dedicated hardware acceleration, delivering cycle-accurate deterministic motor control, safety lockstep, and condition monitoring.">
    <div className="dr-pkg-cards" style={{marginTop: '28px'}}>
     <article className="dr-pkg-card">
-     <div className="dr-pkg-poster" style={{background: '#000'}}>
-      <img src="./media/deepgrid_soc2_die.jpg" alt="DeepGrid Monolithic Silicon Die Micrograph" width={1280} height={720} loading="lazy" style={{objectFit: 'cover'}}/>
-     </div>
+     <MotionImage3D src="./media/deepgrid_soc2_die.jpg" aspectRatio="16/9" badge="PHYSICAL SILICON ARTIFACT" caption="57 mm² Monolithic Die Micrograph (32,768 MACs)" glowColor="#f59e0b" />
      <div className="dr-pkg-body">
       <span className="mono">PHYSICAL SILICON ARTIFACT · TSMC 28NM MONOLITHIC</span>
       <h3>DeepGrid SoC2 Silicon Die Micrograph</h3>
@@ -106,9 +130,7 @@ export default function Home(){
      </div>
     </article>
     <article className="dr-pkg-card">
-     <div className="dr-pkg-poster" style={{background: '#000'}}>
-      <img src="./media/lines_image.png" alt="DeepGrid Platform Architecture Stack" width={1280} height={720} loading="lazy" style={{objectFit: 'cover'}}/>
-     </div>
+     <MotionImage3D src="./media/lines_image.png" aspectRatio="16/9" badge="PLATFORM ARCHITECTURE" caption="Four Platform Surfaces, Common Silicon Foundation" glowColor="#38bdf8" />
      <div className="dr-pkg-body">
       <span className="mono">CROSS-DOMAIN PLATFORM REUSE · 15 REVENUE LINES</span>
       <h3>Four Platform Surfaces, Common Silicon Foundation</h3>
@@ -146,6 +168,9 @@ export default function Home(){
   <div className="dr-pinout"><PackageDiagram/>
    <div className="table-scroll"><table className="dr-table"><caption>Signal pins by function</caption><thead><tr><th scope="col">Function</th><th scope="col">Signals</th><th scope="col" className="num">Pins</th></tr></thead><tbody>{pinGroups.map(([f,s,n])=><tr key={f}><th scope="row">{f}</th><td>{s}</td><td className="num">{n}</td></tr>)}</tbody><tfoot><tr><th scope="row">Total</th><td>Signal pins</td><td className="num">{pinGroups.reduce((a,[, ,n])=>a+Number(n),0)}</td></tr></tfoot></table></div></div>
   <Stats items={[['QFN-64','PACKAGE'],['9 × 9 mm','BODY'],['0.5 mm','PITCH'],['Ground','EXPOSED PADDLE'],['1.8 V','CORE SUPPLY'],['3.3 V','I/O SUPPLY']]}/>
+  <div style={{marginTop: '28px', marginBottom: '28px'}}>
+   <MotionImage3D src="./media/landscape-poster.png" aspectRatio="21/9" badge="SYSTEM TOPOLOGY" caption="DeepGrid Hardware Architecture & Signal Integrity Landscape" glowColor="#38bdf8" />
+  </div>
   <Sec kicker="POWER, CLOCK AND RESET" title="One rail powers" em="all of the logic." copy="The parts of the datasheet a design commits to first: which supplies exist, the order they come up, and the single clock the whole die runs from.">
    <ExplainedGrid items={powerNotes}/>
   </Sec>
@@ -172,6 +197,9 @@ export default function Home(){
   <Sec kicker="WHY THE DIFFERENCE?" title="Why does each gap exist," em="and why does it close in this order?">
    <ExplainedGrid items={positionNotes} cols={2}/>
   </Sec>
+  <div style={{marginTop: '32px', marginBottom: '32px'}}>
+   <MotionImage3D src="./media/roadmap-poster.png" aspectRatio="21/9" badge="MULTI-SPIN ROADMAP" caption="DeepGrid Silicon Scaling from TSMC 28nm to SkyWater 130nm" glowColor="#f59e0b" />
+  </div>
   <Sec kicker="THE MULTI-SPIN ROADMAP" title="Closing the gaps" em="in deliberate order." copy="Each step has a job: first silicon proves the architecture, the second spin closes the largest gaps, and connectivity follows.">
    <div className="dr-rail"><div className="dr-rail-stage"><div className="dr-rail-track"><ol className="dr-roadmap">{roadmapDetail.map(([when,t,what,proves])=><li key={t}><span className="mono">{when}</span><h3>{t}</h3><p>{what}</p><p className="dr-proves"><span className="mono">WHAT IT DELIVERS</span>{proves}</p></li>)}</ol></div><div className="dr-rail-progress" aria-hidden="true"><i/></div></div></div>
   </Sec>
@@ -218,6 +246,10 @@ function ControlLoop({go}:{go:(hash:string)=>void}){
   <ol className="dr-loop">{loopStages.map(([n,t,d,c])=><li key={n}><span className="dr-loop-n">{n}</span><div><h3>{t}</h3><p>{d}</p></div><strong>{c}</strong></li>)}</ol>
   <ControlWaveform khz={r.khz}/>
   <p className="disclaimer">Cycle costs measured in simulation at the 50 MHz clock, where one cycle is 20 ns.</p>
+
+  <div style={{marginTop: '32px', marginBottom: '32px'}}>
+   <MotionImage3D src="./media/mesh-poster.png" aspectRatio="21/9" badge="HARDWARE MOTOR CONTROL" caption="Hardware FOC Transforms, Current Sampling & Deterministic PWM Mesh" glowColor="#38bdf8" />
+  </div>
 
   <Sec kicker="WHY THE LOOP RUNS IN HARDWARE" title="Why is the CPU fetch-bound," em="and why do peripherals execute the transforms?" copy="The core fetches every instruction over the bus. That one measured constant is what the whole peripheral set is designed around.">
    <div className="dr-factcards">{fetchBound.map(([v,l,d])=><div key={l}><strong>{v}</strong><span className="mono">{l}</span><p>{d}</p></div>)}</div>

@@ -2,6 +2,7 @@
 import {useRef} from 'react';
 import {ArrowUpRight,Layers,ShieldCheck,Cpu,Gauge,Activity,Cable} from 'lucide-react';
 import Silicon from './silicon';
+import MotionImage3D from './motion-image-3d';
 import {blocks} from './content';
 import {Eyebrow,Sec,ExplainedGrid,Steps,Flows,DataTable,Callout,Stats,Diagram} from './detail';
 import {litePremises,liteDecisions,groupMembers,liteFlows,faultPath,isolationInvariant,domPremises,enginePipeline,engineParts,engineCost,engineLimits,domFlows,domTiming,domDecisions,tapeinStats,tapeinSections,padPlan,signoffGates,whyConnectivityGate} from './detail-content';
@@ -109,6 +110,12 @@ function Dom({go,update,reduced,setReduced,exploded,setExploded}:Props){
    <DataTable caption="Timing, die and cost" head={['Item','Value','Status']} rows={domTiming}/>
   </Sec>
 
+  <Sec kicker="DUAL-DOMAIN SUBSYSTEM LAYOUT" title="Asynchronous CDC Bridges & Attention Pipeline" em="Hardware Floorplan" copy="Subsystem breakdown and data movement between the 50 MHz control core and the 114 MHz INT8 Attention Engine.">
+   <div style={{marginTop: '24px'}}>
+    <MotionImage3D src="./media/lines_image2.png" aspectRatio="16/9" badge="114 MHZ COMPUTE DOMAIN" caption="INT8 Attention Engine Subsystem Floorplan & Isolation Bridges" glowColor="#38bdf8" />
+   </div>
+  </Sec>
+
   <Sec kicker="3D DUAL-DOMAIN DIE & PACKAGE" title="How is the 3.4 × 4.5 mm dual-domain die structured" em="inside the QFN-64 package?" copy="The 50 MHz control core and peripherals occupy the primary die floorplan, while the 114 MHz INT8 Attention Engine and asynchronous CDC bridges expand the die width by 0.5 mm without altering the 44-signal QFN-64 pinout.">
    <div className="architecture"><div className="architecture-stage"><div className="stage-top"><span className="mono">DG32-2DOM / 3D DUAL-DOMAIN DIE</span><button aria-pressed={reduced} onClick={()=>setReduced(!reduced)} className="small-button">Motion {reduced?'off':'on'}</button></div><Silicon variant="2dom" selected={6} exploded={exploded} reduced={reduced} label="Interactive 3D model of DG32-2DOM with the 114 MHz attention engine and CDC isolation bridge highlighted."/><div className="stage-bottom"><span>DRAG TO ROTATE · ARROW KEYS TO PITCH/YAW</span><button className="small-button" onClick={()=>setExploded(!exploded)} aria-expanded={exploded} aria-label={exploded?'Seat the die':'Lift the die'}><Layers size={14} aria-hidden="true"/>{exploded?'Seat the die':'Lift the die'}</button></div></div>
     <aside className="domain-panel"><Eyebrow>DUAL-DOMAIN ARCHITECTURE</Eyebrow>
@@ -155,15 +162,8 @@ function TapeIn({go,update}:{go:(hash:string)=>void;update:Update}){
   </Sec>
 
   <Sec kicker="PHYSICAL ARTIFACT" title="Monolithic Silicon Die Micrograph" em="and Substrate Floorplan" copy="Physical micrograph of the monolithic silicon die showing compute tiles, high-speed memory interfaces, power distribution mesh, and peripheral I/O pad ring before encapsulation.">
-   <div className="dr-diagram-body" style={{background: '#131615', border: '1px solid var(--rule)', borderRadius: 'var(--sc-radius-md, 6px)', overflow: 'hidden', padding: 0}}>
-    <img src="./media/deepgrid_soc2_die.jpg" alt="DeepGrid Silicon Die Physical Micrograph" width={1600} height={900} loading="lazy" style={{width: '100%', height: 'auto', display: 'block', maxHeight: '540px', objectFit: 'cover'}}/>
-    <div style={{padding: '16px 22px', borderTop: '1px solid var(--rule)', background: '#101212', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px'}}>
-     <div>
-      <span className="mono" style={{color: 'var(--copper)', display: 'block', fontSize: '0.78rem', letterSpacing: '1px'}}>FABRICATED SILICON FLOORPLAN</span>
-      <strong style={{color: '#eee6d4', fontSize: '1rem'}}>Monolithic ASIC Substrate & Pad Ring</strong>
-     </div>
-     <span className="mono" style={{color: '#93a582', fontSize: '0.78rem'}}>PHYSICAL PHOTOMICROGRAPH · 28NM/130NM</span>
-    </div>
+   <div style={{marginTop: '24px'}}>
+    <MotionImage3D src="./media/deepgrid_soc2_die.jpg" aspectRatio="16/9" badge="28NM / 130NM FABRICATED DIE" caption="Monolithic Silicon Die Micrograph & Pad Ring" glowColor="#f59e0b" />
    </div>
   </Sec>
 

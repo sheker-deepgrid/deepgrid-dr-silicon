@@ -7,6 +7,7 @@ import {
   FileText, Compass, HelpCircle, Download, Copy
 } from 'lucide-react';
 import {SectionHead} from './detail';
+import MotionImage3D from './motion-image-3d';
 import {
   deepGridCatalog, searchDeepGridKnowledge, quickPrompts, 
   documentSources, DocumentSource,
@@ -309,6 +310,16 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         title="Silicon Intelligence & Architecture Navigator" 
         copy="Explore the complete DeepGrid Semi technology portfolio: 10-chip SKU compendium, automotive & defense qualification (AEC-Q100, DAP-2020), sovereign fab manufacturing, and dual-core lockstep benchmarks. All specifications are directly extracted and verified against authoritative engineering whitepapers."
       />
+
+      <div style={{marginTop: '24px', marginBottom: '28px'}}>
+        <MotionImage3D 
+          src="./media/sims_image2.png" 
+          aspectRatio="21/9" 
+          badge="SILICON KNOWLEDGE ENGINE" 
+          caption="Vector-Grounded Spec Verification & Hardware Parameter Audit" 
+          glowColor="#00e5ff" 
+        />
+      </div>
 
       {/* Query Search Bar */}
       <div className="dr-ask-bar">
