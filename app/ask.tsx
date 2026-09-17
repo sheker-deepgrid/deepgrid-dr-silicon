@@ -307,12 +307,43 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     <section className="page-wrap dr-ask-section">
       <SectionHead 
         tag="08 / ASK DEEPGRID" 
-        title="Silicon Intelligence & Architecture Navigator" 
+        title="Silicon Intelligence & Multi-Agent Council" 
         copy="Explore the complete DeepGrid Semi technology portfolio: 10-chip SKU compendium, automotive & defense qualification (AEC-Q100, DAP-2020), sovereign fab manufacturing, and dual-core lockstep benchmarks. All specifications are directly extracted and verified against authoritative engineering whitepapers."
       />
 
+      {/* Top View Selector Strip */}
+      <div className="dr-ask-top-bar">
+        <div className="dr-ask-view-toggle">
+          <button
+            className={`dr-ask-toggle-btn ${activeView === 'council' ? 'active' : ''}`}
+            onClick={() => setActiveView('council')}
+            title="Multi-Agent Specialist Council Deliberation"
+          >
+            <Users size={16} /> <span>Agent Council</span>
+          </button>
+          <button
+            className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
+            onClick={() => setActiveView('graph')}
+            title="Interactive Silicon Architecture Map"
+          >
+            <Network size={16} /> <span>System Map</span>
+          </button>
+          <button
+            className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
+            onClick={() => setActiveView('cards')}
+            title="Executive Technical Dossiers"
+          >
+            <LayoutGrid size={16} /> <span>Dossiers ({results.length})</span>
+          </button>
+        </div>
+
+        <span className="dr-ask-badge-verified">
+          <ShieldCheck size={14} /> 100% SPEC-VERIFIED
+        </span>
+      </div>
+
       {/* Query Search Bar */}
-      <div className="dr-ask-bar">
+      <div className="dr-ask-bar" style={{marginBottom: '18px'}}>
         <div className="dr-ask-input-wrap">
           <Search className="dr-ask-search-icon" size={20} />
           <input 
@@ -320,7 +351,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             className="dr-ask-input"
             value={query}
             onChange={e => handleQuerySelect(e.target.value)}
-            placeholder="Ask about SKUs (1–10), D100, lockstep latency, 198-day loop, 3-factory sovereignty, DAP-2020..."
+            placeholder="Ask the Council about lockstep latency, CDC bridges, 198-day loop, DAP-2020, 10-SKU compendium..."
             aria-label="Search DeepGrid knowledge"
           />
           {query && (
@@ -330,152 +361,23 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           )}
         </div>
 
-        {/* Structured Executive Intelligence Control Deck: Category-Titled Layers */}
-        <div className="dr-deck-container">
-          {/* Layer 1: Strategic Technology Domain */}
-          <div className="dr-deck-section">
-            <div className="dr-deck-header">
-              <Compass size={15} className="dr-doc-icon" />
-              <span className="dr-deck-title">1. STRATEGIC TECHNOLOGY DOMAIN:</span>
-            </div>
-            <div className="dr-deck-strip" role="tablist" aria-label="Filter by technology domain">
-              {categories.map(c => (
-                <button
-                  key={c.id}
-                  role="tab"
-                  aria-selected={activeCategory === c.id}
-                  className={`dr-deck-pill ${activeCategory === c.id ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveCategory(c.id);
-                    if (c.id === 'ai') {
-                      setSelectedNodeId('dg32-30-usecases');
-                    } else if (c.id === 'sku') {
-                      setSelectedNodeId('sku-1');
-                    } else if (c.id === 'strategy') {
-                      setSelectedNodeId('fab-scl');
-                    } else if (c.id === 'loop') {
-                      setSelectedNodeId('arch-198loop');
-                    } else if (c.id === 'defense') {
-                      setSelectedNodeId('moat-dap2020');
-                    } else if (c.id === 'architecture') {
-                      setSelectedNodeId('arch-lockstep');
-                    } else if (c.id === 'finance') {
-                      setSelectedNodeId('fin-munger');
-                    }
-                  }}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Layer 2: Authoritative Evidence Source */}
-          <div className="dr-deck-section">
-            <div className="dr-deck-header">
-              <FileText size={15} className="dr-doc-icon" />
-              <span className="dr-deck-title">2. FILTER BY AUTHORITATIVE EVIDENCE SOURCE:</span>
-            </div>
-            <div className="dr-deck-strip" role="tablist" aria-label="Filter queries by document">
-              {documentSources.map(doc => (
-                <button
-                  key={doc.id}
-                  role="tab"
-                  aria-selected={selectedDocId === doc.id}
-                  className={`dr-deck-pill ${selectedDocId === doc.id ? 'active' : ''}`}
-                  onClick={() => setSelectedDocId(doc.id)}
-                  title={doc.title}
-                >
-                  <span className="dr-doc-pill-badge">{doc.badge}</span>
-                  <span className="dr-doc-pill-label">{doc.id === 'all' ? 'All (34 Queries)' : doc.title.split('(')[0].trim()}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Active Document Context Banner */}
-            <div className="dr-doc-active-banner">
-              <div className="dr-doc-active-left">
-                <span className="dr-doc-active-badge">{activeDoc.badge}</span>
-                <div className="dr-doc-active-info">
-                  <span className="dr-doc-active-title">{activeDoc.title}</span>
-                  <span className="dr-doc-active-sub">{activeDoc.subtitle}</span>
-                </div>
-              </div>
-              <div className="dr-doc-active-right">
-                <span className="dr-doc-active-file">AUTHORITATIVE REF: {activeDoc.fileReference}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Layer 3: High-Yield Technical Queries */}
-          <div className="dr-deck-section">
-            <div className="dr-deck-header">
-              <HelpCircle size={15} className="dr-doc-icon" />
-              <span className="dr-deck-title">3. HIGH-YIELD TECHNICAL QUERIES ({filteredPrompts.length}):</span>
-            </div>
-            <div className="dr-ask-prompts" aria-label="Quick queries">
-              {filteredPrompts.map(p => (
-                <button
-                  key={p.id}
-                  className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
-                  onClick={() => handleQuerySelect(p.query)}
-                  title={p.query}
-                >
-                  <span className="dr-ask-chip-doc">{p.docBadge}</span>
-                  <span className="dr-ask-chip-text">{p.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Layer 4: Presentation View Mode */}
-          <div className="dr-deck-section dr-deck-view-section">
-            <div className="dr-deck-header">
-              <LayoutGrid size={15} className="dr-doc-icon" />
-              <span className="dr-deck-title">4. PRESENTATION FORMAT:</span>
-            </div>
-            <div className="dr-ask-view-toggle">
-              <button
-                className={`dr-ask-toggle-btn ${activeView === 'council' ? 'active' : ''}`}
-                onClick={() => setActiveView('council')}
-                title="Multi-Agent Specialist Council Deliberation"
-              >
-                <Users size={16} /> <span>Agent Council</span>
-              </button>
-              <button
-                className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
-                onClick={() => setActiveView('graph')}
-                title="Interactive Silicon Architecture Map"
-              >
-                <Network size={16} /> <span>System Map</span>
-              </button>
-              <button
-                className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
-                onClick={() => setActiveView('cards')}
-                title="Executive Technical Dossiers"
-              >
-                <LayoutGrid size={16} /> <span>Dossiers ({results.length})</span>
-              </button>
-            </div>
-          </div>
+        {/* Quick High-Yield Technical Queries */}
+        <div className="dr-ask-prompts" style={{marginTop: '10px'}} aria-label="Quick queries">
+          {quickPrompts.slice(0, 6).map(p => (
+            <button
+              key={p.id}
+              className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
+              onClick={() => handleQuerySelect(p.query)}
+              title={p.query}
+            >
+              <span className="dr-ask-chip-doc">{p.docBadge}</span>
+              <span className="dr-ask-chip-text">{p.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Results Count & Grounding Badge */}
-      <div className="dr-ask-meta-strip">
-        <span className="mono">
-          {activeView === 'council'
-            ? `MULTI-AGENT SPECIALIST COUNCIL · 3 GRAPH-GROUNDED AGENTS DELIBERATING`
-            : activeView === 'graph' 
-              ? `SILICON ARCHITECTURE MAP · SELECT ANY MODULE TO INSPECT SPECIFICATIONS`
-              : `EXECUTIVE SPECIFICATION DOSSIERS (${results.length} VERIFIED ENTRIES)${query ? ` · FILTER: "${query.toUpperCase()}"` : ''}`}
-        </span>
-        <span className="dr-ask-badge-verified">
-          <ShieldCheck size={14} /> 100% SPEC-VERIFIED
-        </span>
-      </div>
-
-      {/* View 0: Multi-Agent Council Deliberation */}
+      {/* View 0: Multi-Agent Council Deliberation (Primary View) */}
       {activeView === 'council' && (
         <CouncilView 
           query={query} 
@@ -486,7 +388,32 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
       {/* View 1: Interactive Knowledge Graph View */}
       {activeView === 'graph' && (
-        <div className="dr-graph-container">
+        <>
+          {/* Strategic Technology Domain Filter */}
+          <div className="dr-deck-strip" style={{marginBottom: '16px'}} role="tablist" aria-label="Filter by technology domain">
+            {categories.map(c => (
+              <button
+                key={c.id}
+                role="tab"
+                aria-selected={activeCategory === c.id}
+                className={`dr-deck-pill ${activeCategory === c.id ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveCategory(c.id);
+                  if (c.id === 'ai') setSelectedNodeId('dg32-30-usecases');
+                  else if (c.id === 'sku') setSelectedNodeId('sku-1');
+                  else if (c.id === 'strategy') setSelectedNodeId('fab-scl');
+                  else if (c.id === 'loop') setSelectedNodeId('arch-198loop');
+                  else if (c.id === 'defense') setSelectedNodeId('moat-dap2020');
+                  else if (c.id === 'architecture') setSelectedNodeId('arch-lockstep');
+                  else if (c.id === 'finance') setSelectedNodeId('fin-munger');
+                }}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="dr-graph-container">
           <div className="dr-graph-canvas-wrap">
             <div className="dr-graph-legend">
               <span className="legend-item"><i style={{background: '#00e5ff'}}/> Edge AI (30 Tasks)</span>
@@ -773,11 +700,29 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             </div>
           </aside>
         </div>
+        </>
       )}
 
       {/* View 2: Traditional Intel Dossier Cards Grid */}
       {activeView === 'cards' && (
-        <div className="dr-ask-grid">
+        <>
+          <div className="dr-deck-strip" style={{marginBottom: '16px'}} role="tablist" aria-label="Filter queries by document">
+            {documentSources.map(doc => (
+              <button
+                key={doc.id}
+                role="tab"
+                aria-selected={selectedDocId === doc.id}
+                className={`dr-deck-pill ${selectedDocId === doc.id ? 'active' : ''}`}
+                onClick={() => setSelectedDocId(doc.id)}
+                title={doc.title}
+              >
+                <span className="dr-doc-pill-badge">{doc.badge}</span>
+                <span className="dr-doc-pill-label">{doc.id === 'all' ? 'All (39 Dossiers)' : doc.title.split('(')[0].trim()}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="dr-ask-grid">
           {results.map(item => (
             <article className="dr-ask-card" key={item.id}>
               <div className="dr-ask-card-header">
@@ -879,6 +824,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             </div>
           )}
         </div>
+        </>
       )}
 
 
