@@ -15,7 +15,7 @@ import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
 import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,applications} from './content';
 import {Eyebrow,SectionHead,Sec,ExplainedGrid,DataTable,Callout,Stats} from './detail';
-import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard} from './detail-content';
+import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard,platformSections} from './detail-content';
 
 const titles:Record<string,string>={overview:'Overview',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout & package',roadmap:'Position & roadmap',library:'Documents & media',ask:'Ask DeepGrid'};
 const PRE_SILICON='Pre-silicon. Figures are design values verified in simulation and static timing, not measurements on fabricated parts, unless marked otherwise.';
@@ -87,6 +87,39 @@ export default function Home(){
     </div>
   </section>
 
+  {/* Platform Directory & Section Gateway */}
+  <section className="content-section dr-hub-section">
+    <div className="section-label">
+      <Eyebrow>PLATFORM DIRECTORY</Eyebrow>
+      <span>COMPLETE SECTION DIRECTORY & ARCHITECTURAL GATEWAY</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>One unified platform.<br/><em>Explore all seven sections.</em></h2>
+      <div>
+        <p>This overview anchors the DeepGrid platform. Dive directly into any specialized section below for interactive 3D silicon package inspection, 100 kHz control loop waveform simulation, QFN-64 electrical limits, executive procurement scorecards, or citation-grounded intelligence queries.</p>
+      </div>
+    </div>
+
+    <div className="dr-hub-grid">
+      {platformSections.map(sec => (
+        <article key={sec.hash} className="dr-hub-card">
+          <div className="dr-hub-card-top">
+            <span className="mono dr-hub-tag">{sec.tag}</span>
+            <span className="dr-hub-chip">{sec.chip}</span>
+          </div>
+          <h3>{sec.title}</h3>
+          <p>{sec.summary}</p>
+          <div className="dr-hub-footer">
+            <button className="primary" onClick={()=>navigate(sec.hash)}>
+              {sec.action} <ArrowUpRight size={16} />
+            </button>
+            <span className="dr-hub-sub">{sec.sub}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
  <section className="content-section"><div className="section-label"><Eyebrow>THE SAFETY IMPERATIVE</Eyebrow><span>WHY DOES ENTRY-LEVEL SILICON NEED A SECOND CORE?</span></div><div className="thesis-heading"><h2>A silent CPU fault<br/><em>can destroy a bridge.</em></h2><div><p>A motor drive switches power transistors thousands of times a second. If the CPU silently computes a wrong value, it writes a wrong PWM edge, and a wrong edge can short a leg of the power bridge: the power stage fails, not only the code.</p><p>On an entry-level motor-control MCU, faults are caught by watchdogs, brown-out reset and periodic software self-test. Those checks run between faults, not during them. Hardware lockstep, which checks every value as it is committed, has lived in automotive MCUs such as Infineon AURIX, NXP S32K and TI Hercules.</p><p className="muted">DG32 brings a second, checking core to the entry-level tier and gives it one job: catch the first core when it is wrong.</p><button className="text-link" onClick={()=>navigate('roadmap')} aria-label="Compare with STM32G0">Compare with STM32G0 <ArrowUpRight size={18} aria-hidden="true"/></button></div></div>
   <div className="dr-cards">
    <button className="dr-card" onClick={()=>openBlock(0)}><span className="mono">SAFETY</span><ShieldCheck size={26} aria-hidden="true"/><h3>Two cores <br/>must agree.</h3><p>CHECKER trails MAIN by two cycles on mirrored inputs and compares every committed store. Divergence latches the first cause and drives the FAULT pin.</p><span className="open-product">Safety core <ArrowRight size={16} aria-hidden="true"/></span></button>
@@ -101,17 +134,28 @@ export default function Home(){
     <AppCard key={app.title} app={app} />
    ))}
   </div>
+  <div className="dr-links dr-sec-gap">
+    <button className="text-link" onClick={()=>navigate('family')}>Explore DG32 Product Family <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Budget <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>navigate('roadmap')}>Review Multi-Spin Roadmap <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>go('library')}>Client-Ready Decks & Films <ArrowUpRight size={16}/></button>
+  </div>
  </section>
 
  <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')} aria-label="Launch Ask DeepGrid Console">Launch Ask DeepGrid Console <ArrowUpRight size={18} aria-hidden="true"/></button></div></div></section>
 
  <section id="fault-isolation" className="content-section"><div className="section-label"><Eyebrow>FAULT ISOLATION</Eyebrow><span>HOW DOES HARDWARE TRIP THE BRIDGE IN 39 CYCLES WITHOUT FIRMWARE?</span></div>
-  <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)} aria-label="Inside the safety core">Inside the safety core <ArrowUpRight size={18} aria-hidden="true"/></button></>}/>
+  <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)} aria-label="Inside the safety core">Inside the safety core <ArrowUpRight size={18} aria-hidden="true"/></button> <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Timing <ArrowUpRight size={16}/></button> <button className="text-link" onClick={()=>go('ask')}>Query Safety in Ask DeepGrid <ArrowUpRight size={16}/></button></>}/>
  </section>
 
  <section className="content-section"><div className="section-label"><Eyebrow>VERIFICATION LADDER</Eyebrow><span>WHAT EVIDENCE BACKS EVERY PRE-SILICON SPECIFICATION?</span></div>
   <div className="dr-two"><div><h2 className="dr-h2">Every figure says<br/><em>how it was obtained.</em></h2><p className="dr-lead">DG32 is pre-silicon. Each number on this site comes from one of five kinds of evidence, and first-silicon bring-up turns these design values into measurements.</p></div><div className="dr-ladder">{evidenceLadder.map(e=><div key={e.kind}><span className="mono">{e.kind.toUpperCase()}</span><p>{e.means}</p><small>{e.examples}</small></div>)}</div></div>
   <div className="dr-notclaimed"><p className="dr-kicker">WHAT THIS SITE DOES NOT CLAIM</p><ul>{notClaimed.map(n=><li key={n}>{n}</li>)}</ul></div>
+  <div className="dr-links dr-sec-gap">
+    <button className="text-link" onClick={()=>navigate('roadmap')}>Review Multi-Spin Roadmap & Gaps <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>go('library')}>Download Verified Documents & Whitepapers <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>go('ask')}>Audit Specifications in Ask DeepGrid <ArrowUpRight size={16}/></button>
+  </div>
  </section>
 
  <section className="silicon-teaser"><div><Eyebrow>3D DIE EXPLORER</Eyebrow><h2>How is the 64-pin die structured<br/><em>across six functional block groups?</em></h2><p>Safety core, memory and boot, motor drive, sensing, connectivity and the bus that ties them together. Select a group and see where it sits on the die, what each block does and why.</p><button className="primary" onClick={()=>navigate('architecture')} aria-label="Inside the architecture">Inside the architecture <ArrowUpRight size={19} aria-hidden="true"/></button></div><div className="teaser-canvas"><Silicon variant="lite" reduced={reduced} exploded selected={2}/><span className="canvas-caption">EXPLODED ASSEMBLY · DRAG TO ROTATE & PITCH</span></div></section>

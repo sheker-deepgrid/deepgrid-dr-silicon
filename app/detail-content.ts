@@ -356,3 +356,89 @@ export const procurementScorecard: [dimension: string, deepgrid: string, incumbe
   ['Functional Safety Mechanism', 'Autonomous 39-cycle hardware lockstep trip', 'Software watchdog or costly external monitor MCU', 'Guaranteed fail-safe protection with zero software overhead'],
   ['Inventory Flexibility', 'One PCB footprint supports basic & AI variants', 'Requires redesign across MCU families', 'Reduces inventory carrying costs and requalification overhead']
 ];
+
+// ---------- Platform Section Directory Gateway for Landing Page ----------
+
+export interface PlatformSectionHub {
+  num: string;
+  tag: string;
+  chip: string;
+  title: string;
+  summary: string;
+  action: string;
+  hash: string;
+  sub: string;
+}
+
+export const platformSections: PlatformSectionHub[] = [
+  {
+    num: '02',
+    tag: '02 / PRODUCT FAMILY',
+    chip: 'ONE FOOTPRINT · TWO SOliverS',
+    title: 'DG32-LITE & DG32-2DOM',
+    summary: 'Drop-in pin-compatible SoCs sharing 44 signals. A single board layout serves standard drives or on-chip bearing-fault condition monitoring.',
+    action: 'Explore Product Family',
+    hash: 'family',
+    sub: 'Compare specifications, die sizes & inventory economics'
+  },
+  {
+    num: '03',
+    tag: '03 / ARCHITECTURE',
+    chip: 'LOCKSTEP SAFETY CORE',
+    title: 'Two Chips, One Frozen Core & 3D Die Explorer',
+    summary: 'Dual RV32IM cores in lockstep, SkyWater 130 nm CMOS tape-in specifications, and an interactive 3D silicon package die explorer.',
+    action: 'Inside the Architecture',
+    hash: 'architecture',
+    sub: 'Inspect block diagrams, scan chains & die floorplan'
+  },
+  {
+    num: '04',
+    tag: '04 / CONTROL LOOP',
+    chip: '100 kHz DETERMINISM',
+    title: 'Hardware Control Loop & Waveform Scrubber',
+    summary: 'Constant ~300 hardware cycles (70 ADC + 160 CORDIC + 70 PWM). Zero loop jitter for high-RPM drone ESCs and EV traction drives.',
+    action: 'Scrub 100 kHz Loop',
+    hash: 'control',
+    sub: 'Interact with the 500-cycle timeline & firmware headroom'
+  },
+  {
+    num: '05',
+    tag: '05 / PINOUT & PACKAGE',
+    chip: 'QFN-64 · 9 × 9 MM',
+    title: '44 Signals, Supplies & Electrical Limits',
+    summary: 'Complete pin allocation, exposed ground paddle, 1.8 V core & 3.3 V I/O supply sequencing, and absolute maximum ratings.',
+    action: 'Review QFN-64 Pinout',
+    hash: 'pinout',
+    sub: 'Inspect signal allocations, sequencing & thermal limits'
+  },
+  {
+    num: '06',
+    tag: '06 / POSITION & ROADMAP',
+    chip: '198-DAY SHUTTLE',
+    title: 'Competitive Benchmark & Procurement Scorecard',
+    summary: 'Measured against STM32G0, TI Hercules, and Infineon AURIX. Multi-spin roadmap, domestic content compliance, and sovereign moats.',
+    action: 'View Procurement Scorecard',
+    hash: 'roadmap',
+    sub: 'Evaluate unit BOM costs & 6-year multi-spin scaling'
+  },
+  {
+    num: '07',
+    tag: '07 / DOCUMENTS & MEDIA',
+    chip: 'WHITEPAPERS & FILMS',
+    title: 'Authoritative Documents, Decks & Media',
+    summary: 'Complete publication PDFs, official datasheets, client-ready PowerPoint decks, and narrated video walkthroughs across the DG32 platform.',
+    action: 'Browse Media Library',
+    hash: 'library',
+    sub: 'Download 71-page Master Whitepaper & official slides'
+  },
+  {
+    num: '08',
+    tag: '08 / ASK DEEPGRID',
+    chip: 'GROUNDED INTELLIGENCE',
+    title: 'Verified Silicon Intelligence Console',
+    summary: 'Query DeepGrid technology, manufacturing qualifications, sovereign supply chains, and safety architecture with primary source citations.',
+    action: 'Ask Grounded Intelligence',
+    hash: 'ask',
+    sub: 'Get verified answers with downloadable primary whitepapers'
+  }
+];

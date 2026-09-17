@@ -1590,3 +1590,16 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-exec-impact strong{font-size:.82rem;color:#eee6d4;font-weight:500;line-height:1.4}
 .dr-exec-citation{margin-top:auto;padding-top:10px;border-top:1px solid var(--rule)}
 .dr-exec-citation span{font-size:.72rem;color:#7b8e78}
+
+/* --- Platform Directory Section Hub --- */
+.dr-hub-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:28px}
+.dr-hub-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px 24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 4px 20px #00000033;transition:all .2s ease}
+.dr-hub-card:hover{border-color:var(--copper);transform:translateY(-2px);background:#141817}
+.dr-hub-card-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.dr-hub-tag{font-size:.72rem;color:var(--copper);letter-spacing:.8px}
+.dr-hub-chip{font-size:.68rem;font-family:monospace;color:#93a582;background:#181c1a;border:1px solid var(--rule);padding:2px 7px;border-radius:3px}
+.dr-hub-card h3{margin:0;color:#eee6d4;font:400 1.18rem var(--serif);line-height:1.35}
+.dr-hub-card p{margin:0;font-size:.84rem;color:#8f9c8f;line-height:1.55;flex:1}
+.dr-hub-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:8px}
+.dr-hub-sub{font-size:.75rem;color:#7b8e78;line-height:1.4}
