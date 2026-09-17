@@ -1574,3 +1574,19 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-related-chips{display:flex;flex-wrap:wrap;gap:8px}
 .dr-related-chip{background:#141816;border:1px solid var(--rule);color:#eee6d4;padding:6px 12px;border-radius:4px;font-size:.78rem;cursor:pointer;transition:all .15s;text-align:left}
 .dr-related-chip:hover{border-color:var(--copper);background:#202624}
+
+/* --- Executive Impact & Strategic Pillars Grid --- */
+.dr-exec-pillars-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-exec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:28px}
+.dr-exec-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 20px #00000033;transition:border-color .2s,transform .2s}
+.dr-exec-card:hover{border-color:var(--copper);transform:translateY(-2px)}
+.dr-exec-card-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.dr-exec-kpi{font-size:.72rem;color:var(--copper);letter-spacing:.8px}
+.dr-exec-metric{font-size:.78rem;font-weight:600;color:#10b981;background:#10b98115;border:1px solid #10b98135;padding:2px 8px;border-radius:3px}
+.dr-exec-card h3{margin:0;color:#eee6d4;font:400 1.15rem var(--serif);line-height:1.35}
+.dr-exec-card p{margin:0;font-size:.84rem;color:#8f9c8f;line-height:1.55}
+.dr-exec-impact{background:#0d100f;border:1px solid var(--rule);border-left:3px solid var(--copper);padding:10px 12px;border-radius:2px;display:flex;flex-direction:column;gap:4px}
+.dr-exec-impact span{font-size:.68rem;color:var(--copper);letter-spacing:.6px}
+.dr-exec-impact strong{font-size:.82rem;color:#eee6d4;font-weight:500;line-height:1.4}
+.dr-exec-citation{margin-top:auto;padding-top:10px;border-top:1px solid var(--rule)}
+.dr-exec-citation span{font-size:.72rem;color:#7b8e78}

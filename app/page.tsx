@@ -15,7 +15,7 @@ import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
 import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,applications} from './content';
 import {Eyebrow,SectionHead,Sec,ExplainedGrid,DataTable,Callout,Stats} from './detail';
-import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail} from './detail-content';
+import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard} from './detail-content';
 
 const titles:Record<string,string>={overview:'Overview',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout & package',roadmap:'Position & roadmap',library:'Documents & media',ask:'Ask DeepGrid'};
 const PRE_SILICON='Pre-silicon. Figures are design values verified in simulation and static timing, not measurements on fabricated parts, unless marked otherwise.';
@@ -49,6 +49,43 @@ export default function Home(){
   <div className="hero-copy"><Eyebrow>DG32 / MOTOR-CONTROL SILICON</Eyebrow><h1>Lockstep safety.<br/><em>Entry-level</em><br/>silicon.</h1><p>DG32-LITE puts a RISC-V MCU, the motor-control peripherals and a hardware lockstep safety monitor on one 130&nbsp;nm chip.<br/>First silicon rides the September 2026 shuttle.</p><div className="hero-actions"><button className="primary" onClick={()=>navigate('architecture')} aria-label="Explore the architecture">Explore the architecture <ArrowUpRight size={19} aria-hidden="true"/></button><button className="text-link" onClick={()=>go('library?pkg=lite')} aria-label="Watch the architecture film">Watch the architecture film <ArrowRight size={18} aria-hidden="true"/></button><button className="text-link" onClick={()=>{document.getElementById('fault-isolation')?.scrollIntoView({behavior:'smooth'})}} aria-label="Inspect 39-cycle fault isolation">Inspect 39-cycle fault isolation <ArrowRight size={18} aria-hidden="true"/></button></div></div>
   <div className="hero-annotation"><span className="cross">+</span><div>DG32-LITE<small>QFN-64 · 9 × 9 MM · 130 NM CMOS</small></div></div><p className="image-disclaimer">ILLUSTRATIVE MODEL · NOT A MASK LAYOUT · DRAG TO ROTATE</p><div className="hero-bottom"><span>DEEPGRID SEMI PVT LTD / HYDERABAD, INDIA</span></div></section>
  <section className="metrics-strip">{headline.map(([v,l])=><div key={l}><strong>{v}</strong><span>{l}</span></div>)}<p>Pre-silicon figures.<br/>Design values, not measurements.</p></section>
+
+  {/* Executive Commercial & Strategic Value Matrix */}
+  <section className="content-section dr-exec-pillars-section">
+    <div className="section-label">
+      <Eyebrow>EXECUTIVE IMPACT</Eyebrow>
+      <span>WHAT ARE THE COMMERCIAL & STRATEGIC VALUE DRIVERS?</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>Sovereign economics.<br/><em>Automotive-grade</em> safety.</h2>
+      <div>
+        <p>DeepGrid delivers a domestic mature-node alternative to imported motor-control microcontrollers. By co-locating hardware lockstep safety, hardwired field-oriented control acceleration, and dual-foundry production, OEMs achieve lower bill-of-materials costs while insulating production from geopolitical export restrictions.</p>
+        <button className="primary" onClick={()=>navigate('ask')} aria-label="Query Grounded Answers">
+          Ask Grounded Silicon Intelligence <ArrowUpRight size={18} aria-hidden="true"/>
+        </button>
+      </div>
+    </div>
+
+    <div className="dr-exec-grid">
+      {executivePillars.map((p) => (
+        <article key={p.kpi} className="dr-exec-card">
+          <div className="dr-exec-card-head">
+            <span className="mono dr-exec-kpi">{p.kpi}</span>
+            <span className="dr-exec-metric">{p.metric}</span>
+          </div>
+          <h3>{p.title}</h3>
+          <p>{p.summary}</p>
+          <div className="dr-exec-impact">
+            <span className="mono">EXECUTIVE TAKEAWAY:</span>
+            <strong>{p.businessImpact}</strong>
+          </div>
+          <div className="dr-exec-citation">
+            <span className="mono">{p.citation}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
 
  <section className="content-section"><div className="section-label"><Eyebrow>THE SAFETY IMPERATIVE</Eyebrow><span>WHY DOES ENTRY-LEVEL SILICON NEED A SECOND CORE?</span></div><div className="thesis-heading"><h2>A silent CPU fault<br/><em>can destroy a bridge.</em></h2><div><p>A motor drive switches power transistors thousands of times a second. If the CPU silently computes a wrong value, it writes a wrong PWM edge, and a wrong edge can short a leg of the power bridge: the power stage fails, not only the code.</p><p>On an entry-level motor-control MCU, faults are caught by watchdogs, brown-out reset and periodic software self-test. Those checks run between faults, not during them. Hardware lockstep, which checks every value as it is committed, has lived in automotive MCUs such as Infineon AURIX, NXP S32K and TI Hercules.</p><p className="muted">DG32 brings a second, checking core to the entry-level tier and gives it one job: catch the first core when it is wrong.</p><button className="text-link" onClick={()=>navigate('roadmap')} aria-label="Compare with STM32G0">Compare with STM32G0 <ArrowUpRight size={18} aria-hidden="true"/></button></div></div>
   <div className="dr-cards">
@@ -138,6 +175,11 @@ export default function Home(){
  {view==='roadmap'&&<section className="page-wrap"><SectionHead tag="06 / POSITION & ROADMAP" title="Where DG32 leads, and where it does not yet" copy="Measured against the STM32G0, the incumbent entry-level motor-control MCU. DG32 wins on safety hardware and control acceleration; the G0 wins on analog, memory and maturity."/>
   <div className="table-scroll"><table className="dr-table dr-compare"><caption>DG32-LITE compared with the STM32G0 series</caption><thead><tr><th scope="col">Dimension</th><th scope="col">DG32-LITE</th><th scope="col">STM32G0 series</th><th scope="col">What it means</th></tr></thead><tbody>{comparison.map(([d,a,b,m])=><tr key={d}><th scope="row">{d}</th><td>{a}</td><td>{b}</td><td>{m}</td></tr>)}</tbody></table></div>
   <p className="disclaimer">STM32G0 column: public datasheet values for the STM32G0x1 / G0B1 family (Arm Cortex-M0+). DG32-LITE column: first-silicon design values, verified in simulation and static timing, not yet measured on silicon.</p>
+
+  {/* Executive Procurement Scorecard */}
+  <Sec kicker="EXECUTIVE PROCUREMENT SCORECARD" title="Strategic Sourcing & Sovereignty" em="Benchmarked against imported incumbents." copy="Executive assessment for automotive OEMs, drone manufacturers, and defense procurement teams evaluating DG32 against STM32G0, TI Hercules, and Infineon AURIX.">
+    <DataTable caption="Executive Procurement Scorecard: DeepGrid vs Incumbents" head={['Strategic Dimension', 'DeepGrid Semi', 'Western Incumbents', 'Executive Takeaway']} rows={procurementScorecard} wide/>
+  </Sec>
   <div className="dr-leadgap"><div><Eyebrow>WHERE DG32 LEADS</Eyebrow><ul>{leads.map(l=><li key={l}><Check size={15}/>{l}</li>)}</ul></div><div><Eyebrow>WHERE THE G0 LEADS TODAY</Eyebrow><ul>{gaps.map(l=><li key={l}><span className="dr-dash" aria-hidden="true"/>{l}</li>)}</ul></div></div>
   <Sec kicker="WHY THE DIFFERENCE?" title="Why does each gap exist," em="and why does it close in this order?">
    <ExplainedGrid items={positionNotes} cols={2}/>
