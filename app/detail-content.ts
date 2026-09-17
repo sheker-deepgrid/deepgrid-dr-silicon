@@ -646,3 +646,41 @@ export const productEssence: ProductEssence[] = [
     ]
   }
 ];
+
+// ---------- Sovereign 10-SKU Portfolio Horizon & Primary Whitepapers ----------
+
+export interface SkuRoadmapItem {
+  sku: string;
+  name: string;
+  phase: string;
+  node: string;
+  foundry: string;
+  targetApp: string;
+}
+
+export const sovereignSkuHorizon: SkuRoadmapItem[] = [
+  { sku: 'SKU-1', name: 'DG32-LITE', phase: 'Phase 1 (Sept 2026)', node: '130 nm CMOS', foundry: 'SkyWater', targetApp: 'Lockstep Motor-Control SoC (Drone ESC / EV Actuators)' },
+  { sku: 'SKU-2', name: 'DG32-2DOM', phase: 'Phase 1 (Dec 2026)', node: '130 nm CMOS', foundry: 'SkyWater', targetApp: 'Dual-Domain SoC with INT8 Bearing Condition Engine' },
+  { sku: 'SKU-3', name: 'DG-D100', phase: 'Phase 2 (2027)', node: '65 nm CMOS', foundry: 'SkyWater / TSMC', targetApp: 'Tactical Drone Flight & Vision Mission SoC' },
+  { sku: 'SKU-7', name: 'DG-RADAR-77', phase: 'Phase 2 (2027)', node: '0.13 µm SiGe', foundry: 'IHP Microelectronics', targetApp: '77 GHz Automotive Long-Range Radar Front-End' },
+  { sku: 'SKU-8', name: 'DG-DISP-17', phase: 'Phase 2 (2027)', node: '180 nm BCD', foundry: 'SCL Mohali', targetApp: 'BEL 17" Rugged Armored Vehicle Display Driver' },
+  { sku: 'SKU-9', name: 'DG-SDV-ZONE', phase: 'Phase 3 (2028)', node: '28 nm / 130 nm SiP', foundry: 'Multi-Die Organic SiP', targetApp: 'Software-Defined Vehicle Zonal Body Controller' }
+];
+
+export interface WhitepaperDownload {
+  id: string;
+  docNum: string;
+  title: string;
+  fileName: string;
+  pages: string;
+  desc: string;
+}
+
+export const whitepaperDownloads: WhitepaperDownload[] = [
+  { id: 'doc1', docNum: 'DOC #1', title: 'Thirty Use Cases (No Accelerator)', fileName: 'deepgrid-dg32-ai-30-use-cases.pdf', pages: '14 Pages', desc: '50 MHz scalar edge AI compute envelope, 19 lightweight algorithms & CWRU audit' },
+  { id: 'doc2', docNum: 'DOC #2', title: 'Technical Annex v3 (10 SKUs & Multi-Spin)', fileName: 'deepgrid-sku-compendium-technical-annex-v3.pdf', pages: '14 Pages', desc: '10-chip SKU compendium, D100 drone SoC, and 198-day MPW shuttle execution loop' },
+  { id: 'doc3', docNum: 'DOC #3', title: 'dgrid_dshot_rx RTL Specification', fileName: 'deepgrid-dshot-rx-block-spec.pdf', pages: '18 Pages', desc: 'Hardware DShot RX, bidirectional GCR telemetry reply & 100 kHz deterministic loop' },
+  { id: 'doc4', docNum: 'DOC #4', title: 'DG32-2DOM Dual-Domain Architecture', fileName: 'deepgrid-dg32-2dom-system-architecture.pdf', pages: '22 Pages', desc: 'Dual 50/114 MHz clocks, 4-phase CDC bridges & INT8 attention engine diagnostics' },
+  { id: 'doc5', docNum: 'DOC #5', title: 'Master Whitepaper v3 (Defence Silicon)', fileName: 'deepgrid-mature-node-silicon-master-whitepaper-v3.pdf', pages: '71 Pages', desc: 'Sovereign case: $9B import substitution, 10x NRE dismantling & DAP-2020 Make-II' },
+  { id: 'doc6', docNum: 'DOC #6', title: 'Preliminary Datasheets (QFN-64 Package)', fileName: 'deepgrid-datasheets-qfn64.pdf', pages: '28 Pages', desc: '44-signal pinout, 1.8V/3.3V power sequencing, electrical limits & thermal pad PCB rules' }
+];

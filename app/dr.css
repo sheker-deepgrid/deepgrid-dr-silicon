@@ -1653,3 +1653,34 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-usecases-callout{font-size:.82rem;color:#8f9c8f;line-height:1.5;flex:1}
 .dr-usecases-callout strong{color:var(--copper)}
 .dr-usecases-links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+
+/* --- Procurement Benchmark & Sovereign Horizon --- */
+.dr-procure-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-sovereign-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-sovereign-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:28px}
+.dr-sovereign-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
+.dr-sovereign-card:hover{border-color:var(--copper);background:#131716}
+.dr-sovereign-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.dr-sovereign-sku{font-size:.72rem;color:var(--copper);letter-spacing:.8px}
+.dr-sovereign-phase{font-size:.68rem;font-family:monospace;color:#93a582;background:#181c1a;border:1px solid var(--rule);padding:2px 7px;border-radius:3px}
+.dr-sovereign-card h3{margin:0;color:#eee6d4;font:400 1.12rem var(--serif)}
+.dr-sovereign-card p{margin:0;font-size:.82rem;color:#8f9c8f;line-height:1.5;flex:1}
+.dr-sovereign-meta{margin-top:auto;padding-top:10px;border-top:1px solid var(--rule);font-size:.72rem;color:#7b8e78}
+.dr-sovereign-compliance{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:24px}
+.dr-compliance-badge{background:#141716;border:1px solid var(--rule);border-left:3px solid var(--copper);padding:12px 16px;border-radius:2px;display:flex;flex-direction:column;gap:4px}
+.dr-compliance-badge span{font-size:.68rem;color:var(--copper);letter-spacing:.6px}
+.dr-compliance-badge strong{font-size:.8rem;color:#eee6d4;font-weight:500;line-height:1.35}
+
+/* --- Primary Whitepaper Download Suite --- */
+.dr-docs-suite-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-whitepapers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:28px}
+.dr-whitepaper-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px;display:flex;flex-direction:column;gap:12px;transition:all .2s ease}
+.dr-whitepaper-card:hover{border-color:var(--copper);background:#131716;transform:translateY(-2px)}
+.dr-whitepaper-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.dr-whitepaper-doc{font-size:.72rem;color:var(--copper);letter-spacing:.8px}
+.dr-whitepaper-pages{font-size:.68rem;font-family:monospace;color:#93a582;background:#181c1a;border:1px solid var(--rule);padding:2px 7px;border-radius:3px}
+.dr-whitepaper-card h3{margin:0;color:#eee6d4;font:400 1.15rem var(--serif);line-height:1.35}
+.dr-whitepaper-card p{margin:0;font-size:.83rem;color:#8f9c8f;line-height:1.55;flex:1}
+.dr-whitepaper-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:8px}
+.dr-download-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:.8rem;padding:8px 14px;border-radius:var(--sc-radius-sm,4px);text-decoration:none}
+.dr-whitepaper-file{font-size:.68rem;color:#7b8e78;text-align:center;word-break:break-all}

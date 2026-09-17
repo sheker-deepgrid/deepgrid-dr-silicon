@@ -15,7 +15,7 @@ import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
 import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,applications} from './content';
 import {Eyebrow,SectionHead,Sec,ExplainedGrid,DataTable,Callout,Stats} from './detail';
-import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard,platformSections,useCaseDomains,productEssence} from './detail-content';
+import {faultPath,evidenceLadder,notClaimed,familyCompare,operating,absoluteMax,fetchBound,controlNotes,peripheralLimits,packageSides,powerNotes,fixedVsPreliminary,positionNotes,roadmapDetail,executivePillars,procurementScorecard,platformSections,useCaseDomains,productEssence,sovereignSkuHorizon,whitepaperDownloads} from './detail-content';
 
 const titles:Record<string,string>={overview:'Overview',family:'Product family',architecture:'Architecture',control:'Control loop',pinout:'Pinout & package',roadmap:'Position & roadmap',library:'Documents & media',ask:'Ask DeepGrid'};
 const PRE_SILICON='Pre-silicon. Figures are design values verified in simulation and static timing, not measurements on fabricated parts, unless marked otherwise.';
@@ -234,6 +234,29 @@ export default function Home(){
     </div>
   </section>
 
+  {/* Head-to-Head Procurement Benchmark */}
+  <section className="content-section dr-procure-section">
+    <div className="section-label">
+      <Eyebrow>PROCUREMENT BENCHMARK</Eyebrow>
+      <span>COMMERCIAL & STRATEGIC COMPARISON VS. WESTERN INCUMBENTS</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>DeepGrid vs. Incumbents.<br/><em>Head-to-head scorecard.</em></h2>
+      <div>
+        <p>A structured procurement evaluation across unit BOM pricing, geopolitical export security, defense compliance, turnaround agility, and safety architecture against STM32G0, TI Hercules, and Infineon AURIX.</p>
+        <div className="dr-usecase-header-actions">
+          <button className="primary" onClick={()=>navigate('roadmap')}>
+            View Full Multi-Spin Roadmap <ArrowUpRight size={16} />
+          </button>
+          <button className="text-link" onClick={()=>go('ask')}>
+            Query Competitor Analysis in Ask DeepGrid <ArrowUpRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+    <DataTable caption="Executive Procurement Scorecard: DeepGrid vs Western Incumbents" head={['Strategic Dimension', 'DeepGrid Semi', 'Western Incumbents', 'Executive Takeaway']} rows={procurementScorecard} wide/>
+  </section>
+
   {/* Platform Directory & Section Gateway */}
   <section className="content-section dr-hub-section">
     <div className="section-label">
@@ -261,6 +284,105 @@ export default function Home(){
               {sec.action} <ArrowUpRight size={16} />
             </button>
             <span className="dr-hub-sub">{sec.sub}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* Sovereign 10-SKU Portfolio Horizon */}
+  <section className="content-section dr-sovereign-section">
+    <div className="section-label">
+      <Eyebrow>SOVEREIGN SILICON PORTFOLIO</Eyebrow>
+      <span>$9B DOMESTIC IMPORT SUBSTITUTION HORIZON (DOC #2 & #5)</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>From entry motor drive<br/><em>to automotive zonal compute.</em></h2>
+      <div>
+        <p>DeepGrid’s architectural roadmap targets India’s $9B annual mature chip import deficit across 10 specialized SKUs. All designs adhere to Indian Defence Acquisition Procedure (DAP-2020 Make-II), Positive Indigenisation List (PIL-5), and dual-foundry qualification.</p>
+        <div className="dr-usecase-header-actions">
+          <button className="primary" onClick={()=>navigate('roadmap')}>
+            Explore 6-Year Roadmap <ArrowUpRight size={16} />
+          </button>
+          <button className="text-link" onClick={()=>go('ask')}>
+            Query Sovereign Moats in Ask DeepGrid <ArrowUpRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div className="dr-sovereign-grid">
+      {sovereignSkuHorizon.map(item => (
+        <article key={item.sku} className="dr-sovereign-card">
+          <div className="dr-sovereign-top">
+            <span className="mono dr-sovereign-sku">{item.sku}</span>
+            <span className="dr-sovereign-phase">{item.phase}</span>
+          </div>
+          <h3>{item.name}</h3>
+          <p>{item.targetApp}</p>
+          <div className="dr-sovereign-meta">
+            <span className="mono">{item.node} · {item.foundry}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div className="dr-sovereign-compliance">
+      <div className="dr-compliance-badge">
+        <span className="mono">DAP-2020 MAKE-II</span>
+        <strong>100% Domestic Content Mandate Compliant</strong>
+      </div>
+      <div className="dr-compliance-badge">
+        <span className="mono">MoD PIL-5</span>
+        <strong>Positive Indigenisation List Tender Fast-Track</strong>
+      </div>
+      <div className="dr-compliance-badge">
+        <span className="mono">SCL MOHALI</span>
+        <strong>Sovereign Indian Fab Wafer Qualification</strong>
+      </div>
+      <div className="dr-compliance-badge">
+        <span className="mono">AEC-Q100</span>
+        <strong>Grade 1 (-40 °C to +125 °C) Automotive Target</strong>
+      </div>
+    </div>
+  </section>
+
+  {/* Primary Whitepaper & Specification Suite */}
+  <section className="content-section dr-docs-suite-section">
+    <div className="section-label">
+      <Eyebrow>OFFICIAL SPECIFICATIONS</Eyebrow>
+      <span>PRIMARY WHITEPAPERS, DATASHEETS & DESIGN ANNEXES (DOCS #1–#6)</span>
+    </div>
+    <div className="thesis-heading">
+      <h2>Complete engineering proof.<br/><em>Six primary deliverables.</em></h2>
+      <div>
+        <p>Directly download all six primary engineering publications backing the DG32 platform, including the 71-page Master Whitepaper, 30-Use-Case Playbook, and QFN-64 Datasheet.</p>
+        <div className="dr-usecase-header-actions">
+          <button className="primary" onClick={()=>navigate('library')}>
+            Browse Interactive Decks & Films <ArrowUpRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div className="dr-whitepapers-grid">
+      {whitepaperDownloads.map(doc => (
+        <article key={doc.id} className="dr-whitepaper-card">
+          <div className="dr-whitepaper-head">
+            <span className="mono dr-whitepaper-doc">{doc.docNum}</span>
+            <span className="dr-whitepaper-pages">{doc.pages}</span>
+          </div>
+          <h3>{doc.title}</h3>
+          <p>{doc.desc}</p>
+          <div className="dr-whitepaper-footer">
+            <a
+              className="primary dr-download-btn"
+              href={`./downloads/docs/${doc.fileName}`}
+              download={doc.fileName}
+            >
+              Download PDF <Download size={15} aria-hidden="true" />
+            </a>
+            <span className="mono dr-whitepaper-file">{doc.fileName}</span>
           </div>
         </article>
       ))}
