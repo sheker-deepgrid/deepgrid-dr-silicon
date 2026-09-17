@@ -7,7 +7,9 @@ import Library from './library';
 import Architecture from './architecture';
 import FaultTrace from './fault-trace';
 import AskDeepGrid from './ask';
+import ControlWaveform from './control-waveform';
 import {useReveal,useScrollVars} from './motion';
+import {useCount,useDraw,useRail} from './devices';
 import {packages,fmtTime} from './library-data';
 import {views,useNavigation} from './use-navigation';
 import {headline,parts,blocks,loopStages,loopRates,CLOCK_HZ,HW_FIXED_CYCLES,CYCLES_PER_INSTRUCTION,fmax,pinGroups,comparison,leads,gaps,applications} from './content';
@@ -31,6 +33,8 @@ export default function Home(){
  const openBlock=(i:number)=>{if(view==='architecture')update({block:String(i)});else{go('architecture?block='+i);}};
  useScrollVars();
  useReveal(view+'?'+route.params.toString());
+ const devKey=view+'?'+route.params.toString();
+ useCount(devKey); useDraw(devKey); useRail(devKey);
 
  return <div className={'site-shell view-'+view}>
  <a className="skip-link" href="#main" onClick={e=>{e.preventDefault();document.getElementById('main')?.focus();document.getElementById('main')?.scrollIntoView()}}>Skip to content</a>
@@ -41,7 +45,7 @@ export default function Home(){
 
  {view==='overview'&&<>
  <section className="hero dr-hero"><div className="hero-canvas"><Silicon reduced={reduced} selected={0}/></div><div className="hero-shade"/>
-  <div className="hero-copy"><Eyebrow>DG32 / MOTOR-CONTROL SILICON</Eyebrow><h1>Lockstep safety.<br/><em>Entry-level</em><br/>silicon.</h1><p>DG32-LITE puts a RISC-V MCU, the motor-control peripherals and a hardware lockstep safety monitor on one 130 nm chip.<br/>First silicon rides the September 2026 shuttle.</p><div className="hero-actions"><button className="primary" onClick={()=>navigate('architecture')}>Explore the architecture <ArrowUpRight size={19}/></button><button className="text-link" onClick={()=>go('library?pkg=lite')}>Watch the architecture film <ArrowRight size={18}/></button></div></div>
+  <div className="hero-copy"><Eyebrow>DG32 / MOTOR-CONTROL SILICON</Eyebrow><h1>Lockstep safety.<br/><em>Entry-level</em><br/>silicon.</h1><p>DG32-LITE puts a RISC-V MCU, the motor-control peripherals and a hardware lockstep safety monitor on one 130 nm chip.<br/>First silicon rides the September 2026 shuttle.</p><div className="hero-actions"><button className="primary" onClick={()=>navigate('architecture')}>Explore the architecture <ArrowUpRight size={19}/></button><button className="text-link" onClick={()=>go('library?pkg=lite')}>Watch the architecture film <ArrowRight size={18}/></button><button className="text-link" onClick={()=>{document.getElementById('fault-isolation')?.scrollIntoView({behavior:'smooth'})}}>Inspect 39-cycle fault isolation <ArrowRight size={18}/></button></div></div>
   <div className="hero-annotation"><span className="cross">+</span><div>DG32-LITE<small>QFN-64 · 9 × 9 MM · 130 NM CMOS</small></div></div><p className="image-disclaimer">ILLUSTRATIVE MODEL · NOT A MASK LAYOUT · DRAG TO ROTATE</p><div className="hero-bottom"><span>DEEPGRID SEMI PVT LTD / HYDERABAD, INDIA</span></div></section>
  <section className="metrics-strip">{headline.map(([v,l])=><div key={l}><strong>{v}</strong><span>{l}</span></div>)}<p>Pre-silicon figures.<br/>Design values, not measurements.</p></section>
 
@@ -57,7 +61,7 @@ export default function Home(){
 
  <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')}>Launch Ask DeepGrid Console <ArrowUpRight size={18}/></button></div></div></section>
 
- <section className="content-section"><div className="section-label"><Eyebrow>FAULT ISOLATION</Eyebrow><span>HOW DOES HARDWARE TRIP THE BRIDGE IN 39 CYCLES WITHOUT FIRMWARE?</span></div>
+ <section id="fault-isolation" className="content-section"><div className="section-label"><Eyebrow>FAULT ISOLATION</Eyebrow><span>HOW DOES HARDWARE TRIP THE BRIDGE IN 39 CYCLES WITHOUT FIRMWARE?</span></div>
   <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)}>Inside the safety core <ArrowUpRight size={18}/></button></>}/>
  </section>
 
@@ -132,7 +136,7 @@ export default function Home(){
    <ExplainedGrid items={positionNotes} cols={2}/>
   </Sec>
   <Sec kicker="THE MULTI-SPIN ROADMAP" title="Closing the gaps" em="in deliberate order." copy="Each step has a job: first silicon proves the architecture, the second spin closes the largest gaps, and connectivity follows.">
-   <ol className="dr-roadmap">{roadmapDetail.map(([when,t,what,proves])=><li key={t}><span className="mono">{when}</span><h3>{t}</h3><p>{what}</p><p className="dr-proves"><span className="mono">WHAT IT DELIVERS</span>{proves}</p></li>)}</ol>
+   <div className="dr-rail"><div className="dr-rail-stage"><div className="dr-rail-track"><ol className="dr-roadmap">{roadmapDetail.map(([when,t,what,proves])=><li key={t}><span className="mono">{when}</span><h3>{t}</h3><p>{what}</p><p className="dr-proves"><span className="mono">WHAT IT DELIVERS</span>{proves}</p></li>)}</ol></div><div className="dr-rail-progress" aria-hidden="true"><i/></div></div></div>
   </Sec>
   <div className="dr-notclaimed"><p className="dr-kicker">WHAT THIS SITE DOES NOT CLAIM</p><ul>{notClaimed.map(n=><li key={n}>{n}</li>)}</ul></div>
   <div className="dr-links dr-sec-gap">
@@ -153,7 +157,16 @@ export default function Home(){
 }
 
 function PackageDiagram(){
- const side=(k:string)=>{const x=packageSides.find(s=>s.side===k)!;return <div className={'dr-qfn-side dr-qfn-'+k}><span className="mono">{k.toUpperCase()} · PINS {x.pins}</span><strong>{x.groups}</strong><p>{x.signals}</p></div>;};
+ const [active,setActive]=useState<string|null>(null);
+ const side=(k:string)=>{
+  const x=packageSides.find(s=>s.side===k)!;
+  const isSelected=active===k;
+  return <div className={'dr-qfn-side dr-qfn-'+k+(isSelected?' is-active':'')} onPointerEnter={()=>setActive(k)} onPointerLeave={()=>setActive(null)}>
+   <span className="mono">{k.toUpperCase()} · PINS {x.pins}</span>
+   <strong>{x.groups}</strong>
+   <p>{x.signals}</p>
+  </div>;
+ };
  return <figure className="dr-package" aria-label="DG32-LITE QFN-64 top view, with the signal groups on each side of the package">
   {side('top')}{side('left')}<div className="dr-qfn-body" aria-hidden="true"><i className="dr-pin1"/><strong>DG32-LITE</strong><span>QFN-64 · 9 × 9 MM</span><span>TOP VIEW</span></div>{side('right')}{side('bottom')}
   <figcaption>Supplies and grounds sit between the groups on every side. Pin 1 (dot) is upper left, numbered counter-clockwise. Pin map awaiting the foundry’s bond-diagram confirmation.</figcaption>
@@ -166,6 +179,7 @@ function ControlLoop({go}:{go:(hash:string)=>void}){
  const maxF=180,target=50;
  return <section className="page-wrap"><SectionHead tag="04 / CONTROL LOOP" title="The CPU runs two regulators, not the loop" copy="Each field-oriented-control tick samples current, transforms it, regulates it and updates the bridge. DG32 moves every expensive step into hardware, so the loop cost is fixed and known."/>
   <ol className="dr-loop">{loopStages.map(([n,t,d,c])=><li key={n}><span className="dr-loop-n">{n}</span><div><h3>{t}</h3><p>{d}</p></div><strong>{c}</strong></li>)}</ol>
+  <ControlWaveform khz={r.khz}/>
   <p className="disclaimer">Cycle costs measured in simulation at the 50 MHz clock, where one cycle is 20 ns.</p>
 
   <Sec kicker="WHY THE LOOP RUNS IN HARDWARE" title="Why is the CPU fetch-bound," em="and why do peripherals execute the transforms?" copy="The core fetches every instruction over the bus. That one measured constant is what the whole peripheral set is designed around.">

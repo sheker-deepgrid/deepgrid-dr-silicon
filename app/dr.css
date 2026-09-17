@@ -324,7 +324,8 @@
 /* Pinout */
 .dr-package{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:". top ." "left body right" ". bottom ." "cap cap cap";gap:10px}
 .dr-qfn-top{grid-area:top}.dr-qfn-left{grid-area:left}.dr-qfn-right{grid-area:right}.dr-qfn-bottom{grid-area:bottom}
-.dr-qfn-side{border:1px solid var(--rule);background:#131615;padding:12px 14px;display:grid;gap:4px;align-content:start;border-radius:var(--sc-radius-sm,4px)}
+.dr-qfn-side{border:1px solid var(--rule);background:#131615;padding:12px 14px;display:grid;gap:4px;align-content:start;border-radius:var(--sc-radius-sm,4px);transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease;cursor:pointer}
+.dr-qfn-side:hover,.dr-qfn-side.is-active{border-color:var(--copper);background:#181d1a;box-shadow:0 0 16px rgba(212,163,110,.14)}
 .dr-qfn-side .mono{font:var(--text-meta) monospace;letter-spacing:.5px;color:#93a582}
 .dr-qfn-side strong{color:#eee6d4;font-weight:600;font-size:var(--sc-t-body)}
 .dr-qfn-side p{margin:0;color:var(--ink-2);font-size:var(--sc-t-meta);line-height:1.5}
@@ -403,9 +404,18 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 /* signature: the fault trace */
 .dr-fault-stage{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:6%;align-items:start}
 .dr-fault-side{display:grid;gap:22px}
-.dr-trace{border:1px solid var(--rule);background:#131615;padding:20px;display:grid;gap:14px}
+.dr-trace{border:1px solid var(--rule);background:#131615;padding:20px;display:grid;gap:14px;position:relative;overflow:hidden;border-radius:3px}
+.dr-trace::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(380px circle at var(--mx,-300px) var(--my,-300px),rgba(212,163,110,.14),transparent 70%);opacity:0;transition:opacity .25s ease}
+.dr-trace:hover::after{opacity:1}
+.dr-trace-meta{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--rule);font-size:.74rem}
+.dr-trace-badge{color:var(--copper);font-weight:600;letter-spacing:.8px}
+.dr-trace-hint{color:#8f9c8f;letter-spacing:.5px}
 .tr-cores{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.tr-node{position:relative;border:1px solid #333b35;background:#0f1211;padding:12px 14px;display:grid;gap:3px;transition:opacity .32s cubic-bezier(.23,1,.32,1),border-color .32s cubic-bezier(.23,1,.32,1),background-color .32s cubic-bezier(.23,1,.32,1)}
+.tr-node{position:relative;border:1px solid #333b35;background:#0f1211;padding:12px 14px;display:grid;gap:3px;transition:transform .16s cubic-bezier(.23,1,.32,1),opacity .28s cubic-bezier(.23,1,.32,1),border-color .24s cubic-bezier(.23,1,.32,1),background-color .24s cubic-bezier(.23,1,.32,1),box-shadow .24s cubic-bezier(.23,1,.32,1)}
+.tr-interactive{cursor:pointer;user-select:none}
+.tr-interactive:hover{border-color:var(--copper)!important;background:#171c19!important;transform:translateY(-2px);box-shadow:0 6px 18px rgba(212,163,110,.22)}
+.tr-interactive:active{transform:translateY(0)}
+.tr-node.is-active-node{border-color:var(--copper)!important;background:#1a201d!important;box-shadow:0 0 22px rgba(212,163,110,.35),inset 0 0 10px rgba(212,163,110,.12)!important}
 .tr-node:not(.on) strong{color:#a7b09f}
 .tr-node:not(.on) .mono{color:#7f8b81}
 .tr-bridge:not(.on) strong{color:#eee6d4}
@@ -968,7 +978,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
   color: var(--ink-2);
   font-size: .88rem;
   cursor: pointer;
-  transition: all .16s ease;
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
 }
 
 .dr-docs-tabs button:hover {
@@ -1198,7 +1208,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
   font-size: .82rem;
   cursor: pointer;
   text-decoration: none;
-  transition: all .16s ease;
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
 }
 
 .dr-doc-btn:hover {
@@ -1373,7 +1383,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
   display: grid;
   place-items: center;
   border-radius: 4px;
-  transition: all .14s ease;
+  transition:background-color .14s ease,border-color .14s ease,color .14s ease;
 }
 
 .dr-reader-close:hover {
@@ -1452,3 +1462,50 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 }
 
 
+
+/* --- scroll devices beyond the entrance reveal ------------------------------------------------
+   draw: a chart grows from its own baseline, so length reads as a measured quantity arriving
+   rather than a shape that was always there. The inline width stays the source of truth; only a
+   transform is animated. rail: the roadmap held and travelled sideways on wide viewports. */
+.will-draw .dr-bar,.will-draw.dr-stack .dr-seg{transform:scaleX(0);transform-origin:left center}
+.will-draw .dr-bar{transition:transform .82s cubic-bezier(.22,1,.36,1) var(--draw-d,0ms)}
+.will-draw.dr-stack .dr-seg{transition:transform .9s cubic-bezier(.22,1,.36,1)}
+.will-draw.is-drawn .dr-bar,.will-draw.is-drawn .dr-seg{transform:none}
+.dr-chart-plot .dr-bar-row:nth-child(1) .dr-bar{--draw-d:0ms}
+.dr-chart-plot .dr-bar-row:nth-child(2) .dr-bar{--draw-d:70ms}
+.dr-chart-plot .dr-bar-row:nth-child(3) .dr-bar{--draw-d:140ms}
+.dr-chart-plot .dr-bar-row:nth-child(4) .dr-bar{--draw-d:210ms}
+.dr-chart-plot .dr-bar-row:nth-child(5) .dr-bar{--draw-d:280ms}
+.dr-chart-plot .dr-bar-row:nth-child(6) .dr-bar{--draw-d:350ms}
+.dr-chart-plot .dr-bar-row:nth-child(n+7) .dr-bar{--draw-d:420ms}
+.will-draw.dr-stack .dr-seg-cpu{transform-origin:right center}
+
+.dr-rail{position:relative}
+.dr-rail.is-railed{height:260vh}
+.dr-rail.is-railed>.dr-rail-stage{position:sticky;top:calc(var(--nav-h,59px) + 8px)}
+.dr-rail.is-railed .dr-roadmap{grid-template-columns:repeat(4,minmax(320px,1fr));width:max-content;max-width:none;
+  transform:translate3d(var(--rail-x,0px),0,0);will-change:transform}
+.dr-rail.is-railed .dr-roadmap li{min-height:clamp(320px,42vh,440px)}
+.dr-rail-track{overflow:hidden}
+.dr-rail-progress{height:2px;background:var(--rule);margin-top:18px;display:none}
+.dr-rail.is-railed .dr-rail-progress{display:block}
+.dr-rail-progress>i{display:block;height:100%;background:var(--copper);
+  transform-origin:left center;transform:scaleX(calc(.06 + .94 * var(--rail-p,0)))}
+@media (prefers-reduced-motion:reduce){.dr-rail.is-railed{height:auto}.dr-rail.is-railed>.dr-rail-stage{position:static}
+  .dr-rail.is-railed .dr-roadmap{width:auto;transform:none;grid-template-columns:1fr 1fr}.dr-rail-progress{display:none!important}}
+@media print{.dr-rail{height:auto!important}.dr-rail>.dr-rail-stage{position:static!important}
+  .dr-rail .dr-roadmap{width:auto!important;transform:none!important}}
+
+/* --- Control Waveform Scrubber --- */
+.dr-waveform-card{background:#131615;border:1px solid var(--rule);border-radius:3px;padding:22px;margin:28px 0;display:grid;gap:16px}
+.dr-waveform-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px}
+.dr-waveform-tag{color:#93a582;font-size:.76rem;letter-spacing:1px}
+.dr-waveform-title{color:#eee6d4;font:400 1.25rem var(--serif);margin:4px 0 0}
+.dr-waveform-readout{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.dr-stage-pill{background:#202624;color:var(--copper);border:1px solid #d4a36e44;padding:4px 9px;border-radius:2px;font-size:.74rem;font-weight:600}
+.dr-cycle-val,.dr-angle-val{background:#181c1b;border:1px solid var(--rule);color:#eee6d4;padding:4px 9px;border-radius:2px;font-size:.74rem}
+.dr-canvas-wrap{position:relative;background:#0d0f0e;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.dr-waveform-canvas{cursor:ew-resize;touch-action:none;display:block}
+.dr-waveform-legend{display:flex;flex-wrap:wrap;gap:16px;padding:10px 14px;border-top:1px solid var(--rule);background:#101312;font-size:.78rem;color:#8f9c8f}
+.dr-waveform-legend span{display:inline-flex;align-items:center;gap:6px}
+.dr-waveform-legend i{display:inline-block;width:12px;height:4px;border-radius:1px}
