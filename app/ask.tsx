@@ -307,8 +307,8 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     <section className="page-wrap dr-ask-section">
       <SectionHead 
         tag="08 / ASK DEEPGRID" 
-        title="Silicon Intelligence & Multi-Agent Council" 
-        copy="Explore the complete DeepGrid Semi technology portfolio: 10-chip SKU compendium, automotive & defense qualification (AEC-Q100, DAP-2020), sovereign fab manufacturing, and dual-core lockstep benchmarks. All specifications are directly extracted and verified against authoritative engineering whitepapers."
+        title="Verified Silicon Intelligence" 
+        copy="Search DeepGrid Semi technology, manufacturing qualifications, sovereign supply chain security, and motor-control silicon architecture. Every answer is grounded in authoritative engineering whitepapers with downloadable primary references."
       />
 
       {/* Top View Selector Strip */}
@@ -317,23 +317,23 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           <button
             className={`dr-ask-toggle-btn ${activeView === 'council' ? 'active' : ''}`}
             onClick={() => setActiveView('council')}
-            title="Multi-Agent Specialist Council Deliberation"
+            title="Direct Grounded Answers with Official Citations"
           >
-            <Users size={16} /> <span>Agent Council</span>
+            <BookOpen size={16} /> <span>Grounded Answers</span>
           </button>
           <button
             className={`dr-ask-toggle-btn ${activeView === 'graph' ? 'active' : ''}`}
             onClick={() => setActiveView('graph')}
             title="Interactive Silicon Architecture Map"
           >
-            <Network size={16} /> <span>System Map</span>
+            <Network size={16} /> <span>Architecture Map</span>
           </button>
           <button
             className={`dr-ask-toggle-btn ${activeView === 'cards' ? 'active' : ''}`}
             onClick={() => setActiveView('cards')}
-            title="Executive Technical Dossiers"
+            title="Full Catalog Specification Dossiers"
           >
-            <LayoutGrid size={16} /> <span>Dossiers ({results.length})</span>
+            <LayoutGrid size={16} /> <span>Specification Dossiers ({results.length})</span>
           </button>
         </div>
 
@@ -351,7 +351,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             className="dr-ask-input"
             value={query}
             onChange={e => handleQuerySelect(e.target.value)}
-            placeholder="Ask the Council about lockstep latency, CDC bridges, 198-day loop, DAP-2020, 10-SKU compendium..."
+            placeholder="Ask about unit economics, supply chain security, 198-day loop, DAP-2020, ASIL-D safety..."
             aria-label="Search DeepGrid knowledge"
           />
           {query && (
