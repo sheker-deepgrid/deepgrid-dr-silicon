@@ -1591,6 +1591,14 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-exec-citation{margin-top:auto;padding-top:10px;border-top:1px solid var(--rule)}
 .dr-exec-citation span{font-size:.72rem;color:#7b8e78}
 
+.dr-pillar-details{margin:4px 0}
+.dr-pillar-details ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.dr-pillar-details li{display:flex;align-items:flex-start;gap:8px;font-size:.79rem;color:#b8c4b5;line-height:1.45}
+.dr-pillar-details li svg{color:var(--copper);flex-shrink:0;margin-top:2px}
+.dr-pillar-links{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.dr-pillar-link{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;color:var(--copper);text-align:left;padding:0;background:none;border:none;cursor:pointer}
+.dr-pillar-link:hover{text-decoration:underline;color:#eee6d4}
+
 /* --- Platform Directory Section Hub --- */
 .dr-hub-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
 .dr-hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:28px}

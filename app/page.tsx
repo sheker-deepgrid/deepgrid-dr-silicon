@@ -75,6 +75,18 @@ export default function Home(){
           </div>
           <h3>{p.title}</h3>
           <p>{p.summary}</p>
+          {p.details && p.details.length > 0 && (
+            <div className="dr-pillar-details">
+              <ul>
+                {p.details.map((d) => (
+                  <li key={d}>
+                    <Check size={13} aria-hidden="true" />
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="dr-exec-impact">
             <span className="mono">EXECUTIVE TAKEAWAY:</span>
             <strong>{p.businessImpact}</strong>
@@ -82,6 +94,25 @@ export default function Home(){
           <div className="dr-exec-citation">
             <span className="mono">{p.citation}</span>
           </div>
+          {p.links && p.links.length > 0 && (
+            <div className="dr-pillar-links">
+              {p.links.map((l) => (
+                <button
+                  key={l.label}
+                  className="text-link dr-pillar-link"
+                  onClick={() => {
+                    if (l.isScroll) {
+                      document.getElementById(l.target)?.scrollIntoView({ behavior: "smooth" });
+                    } else {
+                      navigate(l.target);
+                    }
+                  }}
+                >
+                  {l.label} <ArrowUpRight size={14} aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          )}
         </article>
       ))}
     </div>
@@ -109,10 +140,26 @@ export default function Home(){
           </div>
           <h3>{e.headline}</h3>
           <p>{e.detail}</p>
+          {e.highlights && e.highlights.length > 0 && (
+            <div className="dr-pillar-details">
+              <ul>
+                {e.highlights.map((h) => (
+                  <li key={h}>
+                    <Check size={13} aria-hidden="true" />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="dr-gist-bottom">
-            <button className="text-link" onClick={()=>navigate(e.targetView)}>
-              Explore details <ArrowUpRight size={15} />
-            </button>
+            <div className="dr-pillar-links">
+              {e.links.map(l => (
+                <button key={l.label} className="text-link dr-pillar-link" onClick={()=>navigate(l.target)}>
+                  {l.label} <ArrowUpRight size={14} aria-hidden="true" />
+                </button>
+              ))}
+            </div>
             <span className="mono dr-gist-ref">{e.reference}</span>
           </div>
         </article>
@@ -248,7 +295,7 @@ export default function Home(){
   <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)} aria-label="Inside the safety core">Inside the safety core <ArrowUpRight size={18} aria-hidden="true"/></button> <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Timing <ArrowUpRight size={16}/></button> <button className="text-link" onClick={()=>go('ask')}>Query Safety in Ask DeepGrid <ArrowUpRight size={16}/></button></>}/>
  </section>
 
- <section className="content-section"><div className="section-label"><Eyebrow>VERIFICATION LADDER</Eyebrow><span>WHAT EVIDENCE BACKS EVERY PRE-SILICON SPECIFICATION?</span></div>
+ <section id="verification-ladder" className="content-section"><div className="section-label"><Eyebrow>VERIFICATION LADDER</Eyebrow><span>WHAT EVIDENCE BACKS EVERY PRE-SILICON SPECIFICATION?</span></div>
   <div className="dr-two"><div><h2 className="dr-h2">Every figure says<br/><em>how it was obtained.</em></h2><p className="dr-lead">DG32 is pre-silicon. Each number on this site comes from one of five kinds of evidence, and first-silicon bring-up turns these design values into measurements.</p></div><div className="dr-ladder">{evidenceLadder.map(e=><div key={e.kind}><span className="mono">{e.kind.toUpperCase()}</span><p>{e.means}</p><small>{e.examples}</small></div>)}</div></div>
   <div className="dr-notclaimed"><p className="dr-kicker">WHAT THIS SITE DOES NOT CLAIM</p><ul>{notClaimed.map(n=><li key={n}>{n}</li>)}</ul></div>
   <div className="dr-links dr-sec-gap">

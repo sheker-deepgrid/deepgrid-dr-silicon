@@ -304,13 +304,21 @@ export const roadmapDetail: [when: string, title: string, what: string, proves: 
 
 // ---------- Strategic Executive Deliverables & Procurement Scorecard ----------
 
+export interface PillarLink {
+  label: string;
+  target: string;
+  isScroll?: boolean;
+}
+
 export interface ExecutivePillar {
   kpi: string;
   metric: string;
   title: string;
   summary: string;
+  details: string[];
   businessImpact: string;
   citation: string;
+  links: PillarLink[];
 }
 
 export const executivePillars: ExecutivePillar[] = [
@@ -319,32 +327,72 @@ export const executivePillars: ExecutivePillar[] = [
     metric: '60% Lower BOM',
     title: 'Sub-$3.10 Unit Target vs. Imported Legacy Parts',
     summary: 'Directly substitutes imported $6.80–$11.40 Western microcontrollers (STM32G0, TI Hercules, Infineon AURIX) while delivering higher hardware integration.',
-    businessImpact: 'Saves $3.70–$8.30 per drive inverter board, lowering motor control BOM across high-volume automotive and drone platforms.',
-    citation: 'Doc #5: Master Whitepaper v3, §5.2: Unit Cost & BOM Economics'
+    details: [
+      'Displaces multi-chip solutions: combines RV32IM CPU, lockstep safety core, CORDIC math, and DShot-bidir on one 130 nm die.',
+      'Eliminates external supervisor ICs and expensive high-pin-count BGA packaging, requiring only a simple 4-layer PCB.',
+      'Unit volume pricing targeted at $2.60–$3.10 in 100k+ production volumes, cutting drive inverter electronics costs by more than half.'
+    ],
+    businessImpact: 'Saves $3.70–$8.30 per drive inverter board, lowering motor control BOM across high-volume automotive and drone platforms ($740k–$1.66M direct savings per 200,000 units).',
+    citation: 'Doc #5: Master Whitepaper v3, §5.2: Unit Cost & BOM Economics',
+    links: [
+      { label: 'Compare in Procurement Scorecard', target: 'roadmap' },
+      { label: 'Query Unit Economics in Ask DeepGrid', target: 'ask' },
+      { label: 'Explore Product Family', target: 'family' }
+    ]
   },
   {
     kpi: 'SUPPLY CONTINUITY',
     metric: 'Dual-Foundry Sovereign',
     title: 'Immune to Export Controls & Fab Spikes',
     summary: 'Manufactured on mature 130 nm / 180 nm CMOS & BCD processes (SkyWater and SCL Mohali). Completely bypasses leading-edge Taiwanese fabs and foreign export licenses.',
-    businessImpact: 'Fulfills Indian Defence Acquisition Procedure (DAP-2020 Make-II) domestic content mandates and secures multi-year production stability.',
-    citation: 'Doc #5: Master Whitepaper v3, §4.3: Sovereign Silicon Moats'
+    details: [
+      'Dual-fab qualification eliminates single-foundry lock-in and geopolitical choke points on Taiwan (TSMC/UMC).',
+      'Exclusively targets mature-node planar processes (130 nm / 180 nm), immune to EUV lithography export sanctions and leading-edge capacity crunches.',
+      'Sovereign Indian wafer qualification at SCL Mohali provides an unassailable domestic supply chain for critical national infrastructure.'
+    ],
+    businessImpact: 'Fulfills Indian Defence Acquisition Procedure (DAP-2020 Make-II, PIL-5, SRIJAN) domestic content mandates and secures multi-year production stability.',
+    citation: 'Doc #5: Master Whitepaper v3, §4.3: Sovereign Silicon Moats',
+    links: [
+      { label: 'Review Sovereign Moats in Ask DeepGrid', target: 'ask' },
+      { label: 'Inspect 130nm Tape-In Packaging', target: 'architecture' },
+      { label: 'View Position & Multi-Spin Roadmap', target: 'roadmap' }
+    ]
   },
   {
     kpi: 'TIME TO MARKET',
     metric: '198-Day Loop',
     title: 'Rapid Tapeout-to-Silicon Shuttle Velocity',
     summary: 'Standardized multi-project wafer (MPW) runs and automated open-source verification pipelines replace rigid $20M+ custom silicon NRE lock-in.',
+    details: [
+      'Compresses traditional 18–36 month automotive custom ASIC lead times into a continuous 198-day tapeout-to-shuttle cycle.',
+      'Dismantles prohibitive $15M–$25M design NRE barriers down to sub-$500k by leveraging pre-hardened motor IP and open EDA tooling.',
+      'Enables rapid engineering spins for customized motor parameter tuning without waiting for multi-year semiconductor roadmaps.'
+    ],
     businessImpact: 'Enables agile vehicle platform iterations and custom spin delivery in under 7 months rather than 2–3 years.',
-    citation: 'Doc #2: DG32-LITE Architecture & MPW Shuttle Record'
+    citation: 'Doc #2: DG32-LITE Architecture & MPW Shuttle Record',
+    links: [
+      { label: 'Inspect 198-Day Roadmap & Gaps', target: 'roadmap' },
+      { label: 'Review Verification Ladder', target: 'verification-ladder', isScroll: true },
+      { label: 'Download Technical Annex PDF', target: 'library' }
+    ]
   },
   {
     kpi: 'WARRANTY PROTECTION',
     metric: '< 1 µs Fail-Safe',
     title: 'Zero Firmware Recall Liability',
     summary: 'Autonomous hardware fault isolation disengages the power bridge in 39 clock cycles (780 ns) without waiting for software interrupt handlers.',
+    details: [
+      'Dual RV32IM cores operate in strict 2-cycle lockstep, auditing every committed ALU operation and memory write in silicon.',
+      'Hardware divergence comparator asserts the FAULT signal and immediately tristates the 6 PWM channels in 39 clock cycles (780 ns).',
+      'Completely eliminates software interrupt latency and stack overflow vulnerabilities that destroy power MOSFET/GaN inverter bridges.'
+    ],
     businessImpact: 'Eliminates motor-stall and power bridge shoot-through hazards, directly reducing OEM warranty reserves and recall exposure.',
-    citation: 'Doc #1 & #2: Dual-Core Lockstep Invariant & ASIL-D Proofs'
+    citation: 'Doc #1 & #2: Dual-Core Lockstep Invariant & ASIL-D Proofs',
+    links: [
+      { label: 'Inspect 39-Cycle Fault Trace', target: 'fault-isolation', isScroll: true },
+      { label: 'Inside Lockstep Safety Core', target: 'architecture' },
+      { label: 'Test 100 kHz Control Loop', target: 'control' }
+    ]
   }
 ];
 
@@ -528,6 +576,8 @@ export interface ProductEssence {
   metric: string;
   reference: string;
   targetView: string;
+  highlights: string[];
+  links: { label: string; target: string }[];
 }
 
 export const productEssence: ProductEssence[] = [
@@ -537,7 +587,15 @@ export const productEssence: ProductEssence[] = [
     detail: 'A trailing checker core audits every committed CPU store with 2-cycle latency. Mismatches disengage the PWM bridge in 39 cycles (780 ns) without waiting for software interrupt handlers.',
     metric: '< 1 µs Fault Trip',
     reference: 'Doc #1 & #6: ASIL-D Dual-Core Lockstep Specification',
-    targetView: 'architecture'
+    targetView: 'architecture',
+    highlights: [
+      'Pure hardware comparator asserts FAULT pin autonomously',
+      'Protects MOSFET/GaN inverter bridges against destructive shoot-through'
+    ],
+    links: [
+      { label: 'Inside Lockstep Architecture', target: 'architecture' },
+      { label: 'Inspect 39-Cycle Timing', target: 'control' }
+    ]
   },
   {
     label: 'DETERMINISTIC 100 kHz LOOP',
@@ -545,7 +603,15 @@ export const productEssence: ProductEssence[] = [
     detail: 'ADC sampling, Clarke/Park vector transforms, and PWM generation execute in dedicated hardware blocks (~300 cycles total), leaving 82% of core CPU cycles free for user diagnostics.',
     metric: '82% Free Headroom',
     reference: 'Doc #3: 100 kHz Deterministic Control Loop Timing',
-    targetView: 'control'
+    targetView: 'control',
+    highlights: [
+      'Zero loop jitter at 10 kHz to 100 kHz electrical frequencies',
+      'Unburdened CPU headroom accommodates on-chip edge diagnostics'
+    ],
+    links: [
+      { label: 'Scrub 100 kHz Waveform', target: 'control' },
+      { label: 'Compare with STM32G0', target: 'roadmap' }
+    ]
   },
   {
     label: 'SINGLE-PCB DUAL-SoC PLATFORM',
@@ -553,7 +619,15 @@ export const productEssence: ProductEssence[] = [
     detail: 'DG32-LITE and DG32-2DOM share the identical 9 × 9 mm QFN-64 footprint and 44 signal pins. Upgrade from standard motor control to on-chip condition monitoring on the exact same PCB.',
     metric: '100% Pin Compatible',
     reference: 'Doc #4 & #6: QFN-64 Electrical & Packaging Datasheet',
-    targetView: 'family'
+    targetView: 'family',
+    highlights: [
+      'Same 44 signals, same power sequencing (1.8V core / 3.3V I/O)',
+      'Drops INT8 bearing-fault monitoring into standard PCB footprint'
+    ],
+    links: [
+      { label: 'Explore Product Family', target: 'family' },
+      { label: 'Review QFN-64 Pinout', target: 'pinout' }
+    ]
   },
   {
     label: 'SOVEREIGN MATURE SUPPLY',
@@ -561,6 +635,14 @@ export const productEssence: ProductEssence[] = [
     detail: 'Fabricated on mature 130 nm/180 nm CMOS with dual-foundry qualification (SkyWater + SCL Mohali). Completely insulated from export bans, meeting DAP-2020 Make-II defense mandates.',
     metric: '198-Day Shuttle',
     reference: 'Doc #2 & #5: Sovereign Silicon Roadmap & Import Substitution',
-    targetView: 'roadmap'
+    targetView: 'roadmap',
+    highlights: [
+      'Multi-source domestic supply eliminates single-foundry geopolitical risk',
+      'Fast 198-day MPW tapeout loop reduces NRE and iteration risk'
+    ],
+    links: [
+      { label: 'View Procurement Scorecard', target: 'roadmap' },
+      { label: 'Query Moats in Ask DeepGrid', target: 'ask' }
+    ]
   }
 ];
