@@ -57,7 +57,26 @@ export default function Home(){
   </div>
  </section>
 
- <section className="content-section dr-apps-section"><div className="section-label"><Eyebrow>TARGET APPLICATIONS</Eyebrow><span>WHERE DOES DG32 SILICON DEPLOY?</span></div><div className="dr-apps">{applications.map(([t,d],i)=><div key={t}><h3>{t}</h3><p>{d}</p></div>)}</div></section>
+ <section className="content-section dr-apps-section"><div className="section-label"><Eyebrow>TARGET APPLICATIONS</Eyebrow><span>WHERE DOES DG32 SILICON DEPLOY?</span></div>
+  <div className="dr-apps">
+   {applications.map((app)=>(
+    <div key={app.title} className="dr-app-card">
+     <div className="dr-app-media">
+      <img src={app.image} alt={app.alt} width={640} height={360} loading="lazy"/>
+      <span className="dr-app-badge">{app.tag}</span>
+     </div>
+     <div className="dr-app-body">
+      <span className="mono">{app.sub}</span>
+      <h3>{app.title}</h3>
+      <p>{app.desc}</p>
+      <div className="dr-app-meta">
+       <span>{app.metric}</span>
+      </div>
+     </div>
+    </div>
+   ))}
+  </div>
+ </section>
 
  <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')} aria-label="Launch Ask DeepGrid Console">Launch Ask DeepGrid Console <ArrowUpRight size={18} aria-hidden="true"/></button></div></div></section>
 
@@ -82,6 +101,36 @@ export default function Home(){
   <p className="disclaimer">{PRE_SILICON} The ~0.43 W power figure is a vectorless tool estimate at 25 °C and 1.8 V.</p>
   <Sec kicker="CHIP COMPARISON" title="What stays identical," em="and what does DG32-2DOM add?" copy="Everything outside the engine is the same design from the same source, which is why a DG32-LITE board takes DG32-2DOM unchanged and the control-loop budget carries over exactly.">
    <DataTable caption="DG32-LITE and DG32-2DOM compared" head={['Area','DG32-LITE','DG32-2DOM']} rows={familyCompare} wide/>
+  </Sec>
+  <Sec kicker="SILICON FABRICATION & ARCHITECTURE" title="Monolithic Die Micrograph" em="and Cross-Domain Platform Surfaces" copy="DeepGrid's proven silicon methodology pairs mature-node physics (TSMC 28nm monolithic / SkyWater 130nm) with dedicated hardware acceleration, delivering cycle-accurate deterministic motor control, safety lockstep, and condition monitoring.">
+   <div className="dr-pkg-cards" style={{marginTop: '28px'}}>
+    <article className="dr-pkg-card">
+     <div className="dr-pkg-poster" style={{background: '#000'}}>
+      <img src="./media/deepgrid_soc2_die.jpg" alt="DeepGrid Monolithic Silicon Die Micrograph" width={1280} height={720} loading="lazy" style={{objectFit: 'cover'}}/>
+     </div>
+     <div className="dr-pkg-body">
+      <span className="mono">PHYSICAL SILICON ARTIFACT · TSMC 28NM MONOLITHIC</span>
+      <h3>DeepGrid SoC2 Silicon Die Micrograph</h3>
+      <p>Direct die micrograph showing monolithic floorplan, 64 compute cubes (32,768 MACs), 102.4 GB/s dual-channel LPDDR5 interface, dual lockstep safety monitoring cores, and peripheral pad ring. Eliminates chiplet interconnect overhead while meeting ASIL-D certification.</p>
+      <div className="dr-pkg-actions">
+       <span className="mono" style={{color: 'var(--copper)'}}>57 MM² MONOLITHIC DIE · 39.3 TOPS</span>
+      </div>
+     </div>
+    </article>
+    <article className="dr-pkg-card">
+     <div className="dr-pkg-poster" style={{background: '#000'}}>
+      <img src="./media/lines_image.png" alt="DeepGrid Platform Architecture Stack" width={1280} height={720} loading="lazy" style={{objectFit: 'cover'}}/>
+     </div>
+     <div className="dr-pkg-body">
+      <span className="mono">CROSS-DOMAIN PLATFORM REUSE · 15 REVENUE LINES</span>
+      <h3>Four Platform Surfaces, Common Silicon Foundation</h3>
+      <p>Road Autonomy (AD0–AD4), Silicon & Compute, Fleet Mobility, and Sensors & Robotics sharing the common frozen silicon cores under specialized firmware. Prices held flat across six years with scaling economics driven by volume manufacturing.</p>
+      <div className="dr-pkg-actions">
+       <span className="mono" style={{color: 'var(--copper)'}}>FOUR SURFACES · ONE BILL OF MATERIALS</span>
+      </div>
+     </div>
+    </article>
+   </div>
   </Sec>
   <Sec kicker="WHICH CHIP FOR YOUR DRIVE?" title="Same board, same firmware base," em="one added capability.">
    <ExplainedGrid cols={2} items={[

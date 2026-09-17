@@ -154,6 +154,19 @@ function TapeIn({go,update}:{go:(hash:string)=>void;update:Update}){
    <ExplainedGrid items={tapeinSections}/>
   </Sec>
 
+  <Sec kicker="PHYSICAL ARTIFACT" title="Monolithic Silicon Die Micrograph" em="and Substrate Floorplan" copy="Physical micrograph of the monolithic silicon die showing compute tiles, high-speed memory interfaces, power distribution mesh, and peripheral I/O pad ring before encapsulation.">
+   <div className="dr-diagram-body" style={{background: '#131615', border: '1px solid var(--rule)', borderRadius: 'var(--sc-radius-md, 6px)', overflow: 'hidden', padding: 0}}>
+    <img src="./media/deepgrid_soc2_die.jpg" alt="DeepGrid Silicon Die Physical Micrograph" width={1600} height={900} loading="lazy" style={{width: '100%', height: 'auto', display: 'block', maxHeight: '540px', objectFit: 'cover'}}/>
+    <div style={{padding: '16px 22px', borderTop: '1px solid var(--rule)', background: '#101212', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px'}}>
+     <div>
+      <span className="mono" style={{color: 'var(--copper)', display: 'block', fontSize: '0.78rem', letterSpacing: '1px'}}>FABRICATED SILICON FLOORPLAN</span>
+      <strong style={{color: '#eee6d4', fontSize: '1rem'}}>Monolithic ASIC Substrate & Pad Ring</strong>
+     </div>
+     <span className="mono" style={{color: '#93a582', fontSize: '0.78rem'}}>PHYSICAL PHOTOMICROGRAPH · 28NM/130NM</span>
+    </div>
+   </div>
+  </Sec>
+
   <Sec kicker="PAD RING ALLOCATION" title="How are the 44 active pads allocated" em="across power, motor control, and test?" copy="The wrapper’s pad plan, grouped by function and drawn to scale.">
    <div className="dr-padplan"><div className="dr-padbar" role="img" aria-label={'44 pads: '+padPlan.map(([p,n])=>`${p} ${n}`).join(', ')}>{padPlan.map(([p,n],i)=><span key={p} className={colors[i%4]} style={{flexGrow:n}} title={`${p}: ${n}`}/>)}</div>
     <ul className="dr-padlegend">{padPlan.map(([p,n],i)=><li key={p}><i className={colors[i%4]}/>{p}<b>{n}</b></li>)}</ul></div>
