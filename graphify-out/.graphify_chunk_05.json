@@ -1,0 +1,211 @@
+{
+  "nodes": [
+    {
+      "id": "deepgrid_10_sku_sovereign_portfolio",
+      "label": "DeepGrid 10-SKU Sovereign Silicon Portfolio",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Master Whitepaper v3 · Section 9, p. 30–48",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Targeted silicon replacements addressing India's $9B electronics import deficit across motors, smart meters, power, and radar."
+    },
+    {
+      "id": "deepgrid_dap_2020_make_ii_statutory_moat",
+      "label": "DAP-2020 Buy (Indian-IDDM) & Make-II Statutory Moat",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Master Whitepaper v3 · Section 11, p. 45–52",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Mandates 50% domestic content, granting statutory procurement priority to sovereign RTL before foreign price bidding."
+    },
+    {
+      "id": "deepgrid_pil5_positive_indigenisation_lists",
+      "label": "PIL-5 Positive Indigenisation Lists (346 Items)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Master Whitepaper v3 · Section 11.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Prohibits import of designated military assemblies on milestone dates; DeepGrid sells silicon directly inside tier-1 LRUs."
+    },
+    {
+      "id": "deepgrid_three_factory_sovereignty_roadmap",
+      "label": "Three-Factory Sovereignty Roadmap (SkyWater, IHP, SCL)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Master Whitepaper v3 · Section 5, p. 18–20",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Decouples from single-source risk via SkyWater 130 nm CMOS, IHP 130 nm SiGe (Radar), and SCL Mohali 180 nm BCD."
+    },
+    {
+      "id": "deepgrid_sku7_sige_350ghz_radar_front_end",
+      "label": "SKU-7 77 GHz 4D MIMO Radar in IHP 130 nm SiGe BiCMOS",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Technical Annex v3 · Section 2, p. 5",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "IHP SG13G2 process (fmax = 350–500 GHz) delivers uncooled 77 GHz automotive radar, bypassing ITAR export controls."
+    },
+    {
+      "id": "deepgrid_organic_substrate_sip_vs_interposer",
+      "label": "Organic Substrate Multi-Die SiP vs Silicon Interposer",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Technical Annex v3 · Section 3, p. 7",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Packages 120V high-voltage drivers beside 1.8V processing dies on a 15x15 mm BT-resin substrate, eliminating multi-million-dollar interposer costs."
+    },
+    {
+      "id": "deepgrid_funds_10cr_capital_waterfall",
+      "label": "₹10 Cr Capital Waterfall & 24-Month Seed Runway",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Master Whitepaper v3 · Section 13, p. 58–64",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "₹3.8 Cr foundry runs, ₹2.6 Cr test/ATE, ₹2.4 Cr payroll, ₹1.2 Cr reserve; de-risked by ₹2.88 Cr in pre-ASIC customer revenue."
+    },
+    {
+      "id": "deepgrid_chinese_price_crash_stress_test",
+      "label": "Chinese Price Crash Stress Test & Stop Rules S1–S4",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Master Whitepaper v3 · Section 12 & 14, p. 53–57",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Charlie Munger inversion: 40% commercial price dumping preserves ₹750 Cr FY31 revenue via statutory defence insulation."
+    },
+    {
+      "id": "deepgrid_sdv_reference_zonal_architecture",
+      "label": "Software-Defined Vehicle (SDV) Reference Zonal Platform",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": "Technical Annex v3 · Section 5, p. 9–11",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Four corner zonal controllers eliminate 18 kg of copper wiring harness via 100 Mbps Ethernet and localized motor control."
+    }
+  ],
+  "edges": [
+    {
+      "source": "deepgrid_10_sku_sovereign_portfolio",
+      "target": "deepgrid_dap_2020_make_ii_statutory_moat",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "deepgrid_dap_2020_make_ii_statutory_moat",
+      "target": "deepgrid_pil5_positive_indigenisation_lists",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "deepgrid_three_factory_sovereignty_roadmap",
+      "target": "deepgrid_10_sku_sovereign_portfolio",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "deepgrid_sku7_sige_350ghz_radar_front_end",
+      "target": "deepgrid_three_factory_sovereignty_roadmap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "deepgrid_organic_substrate_sip_vs_interposer",
+      "target": "deepgrid_10_sku_sovereign_portfolio",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "deepgrid_funds_10cr_capital_waterfall",
+      "target": "deepgrid_10_sku_sovereign_portfolio",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "deepgrid_chinese_price_crash_stress_test",
+      "target": "deepgrid_funds_10cr_capital_waterfall",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "deepgrid_sdv_reference_zonal_architecture",
+      "target": "deepgrid_10_sku_sovereign_portfolio",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf",
+      "source_location": null,
+      "weight": 0.95
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_sovereignty_moat_waterfall",
+      "label": "Sovereignty Moat & Capital Waterfall",
+      "nodes": [
+        "deepgrid_10_sku_sovereign_portfolio",
+        "deepgrid_dap_2020_make_ii_statutory_moat",
+        "deepgrid_three_factory_sovereignty_roadmap",
+        "deepgrid_funds_10cr_capital_waterfall"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95
+    }
+  ],
+  "input_tokens": 12500,
+  "output_tokens": 4200
+}

@@ -178,9 +178,19 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     return raw.filter(item => doesItemMatchCategory(activeCategory, item.category));
   }, [query, activeCategory]);
 
-  // Document filter for quick queries
+  // Document filter for quick queries: 2 from each of the 6 PDF documents by default
   const filteredPrompts = useMemo(() => {
-    if (selectedDocId === 'all') return quickPrompts;
+    if (selectedDocId === 'all') {
+      const docIds: ('doc1' | 'doc2' | 'doc3' | 'doc4' | 'doc5' | 'doc6')[] = [
+        'doc1', 'doc2', 'doc3', 'doc4', 'doc5', 'doc6'
+      ];
+      const selected: typeof quickPrompts = [];
+      docIds.forEach(dId => {
+        const matches = quickPrompts.filter(p => p.docId === dId);
+        selected.push(...matches.slice(0, 2));
+      });
+      return selected;
+    }
     return quickPrompts.filter(p => p.docId === selectedDocId);
   }, [selectedDocId]);
 
@@ -364,9 +374,9 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           )}
         </div>
 
-        {/* Quick High-Yield Technical Queries */}
+        {/* Quick High-Yield Technical Queries (2 from each PDF document) */}
         <div className="dr-ask-prompts" style={{marginTop: '10px'}} aria-label="Quick queries">
-          {quickPrompts.slice(0, 6).map(p => (
+          {filteredPrompts.map(p => (
             <button
               key={p.id}
               className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}

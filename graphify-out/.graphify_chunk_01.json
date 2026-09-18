@@ -1,0 +1,233 @@
+{
+  "nodes": [
+    {
+      "id": "dg32_ai_compute_envelope_scalar_50mhz",
+      "label": "DG32-LITE AI Compute Envelope (50 MHz RV32IM)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 03",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "12.5 MMAC/s scalar budget and 16.5 KB SRAM footprint on a 50 MHz core runs 24 of 30 industrial ML tasks in <1.0 ms without a hardware NPU."
+    },
+    {
+      "id": "dg32_goertzel_recurrence_filter_8bin",
+      "label": "8-Bin Goertzel Recurrence Filter",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 06 & 09 (p. 11)",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Evaluates induction motor slip sidebands (0.5 to 3 Hz separation) in 6,144 cycles (0.12 ms) within 16.5 KB SRAM, replacing 8 MB RAM required for a 2^20-point FFT."
+    },
+    {
+      "id": "dg32_broken_rotor_bar_mcsa",
+      "label": "Broken Rotor Bar Detection (MCSA)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 08 (Task 9)",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Detects stator current sidebands fb = f1(1 ± 2s) sitting -40 to -60 dBc below the 50 Hz fundamental before mechanical failure destroys the stator."
+    },
+    {
+      "id": "dg32_kurtosis_non_monotonicity_trap",
+      "label": "Kurtosis Non-Monotonicity Trap & Dual Surveillance",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 06",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Kurtosis spikes on incipient spalls then collapses to Gaussian 3.0 on widespread flaking; dual-metric rule trends both kurtosis and monotonic RMS velocity."
+    },
+    {
+      "id": "dg32_cwru_bearing_leakage_audit",
+      "label": "CWRU Bearing Dataset Leakage Audit",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Appendix (p. 12)",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "40 of 41 academic papers used leaky train/test splits inflating accuracy to 99%; true bearing-wise splits drop real accuracy to 65%–80%."
+    },
+    {
+      "id": "dg32_tree_ensembles_model_hierarchy",
+      "label": "Tree Ensembles & 19-Model Execution Hierarchy",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 04–05",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Zero-multiply Random Forests (100 trees at depth 8) run in 0.06 ms (3,200 cycles) and 20 KB RAM, achieving 95.6% accuracy 50–500x cheaper than DNNs."
+    },
+    {
+      "id": "dg32_cordic_hardware_demodulation",
+      "label": "Hardware CORDIC Envelope Demodulation",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 06",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Reuses motor control CORDIC logic for Hilbert transform and envelope demodulation in 5,000 cycles (0.10 ms), outranking raw statistical moments by 4–5x."
+    },
+    {
+      "id": "dg32_afe_sensing_iso_dynamic_range",
+      "label": "AFE Sensing Constraints & ISO 13373-2 Dynamic Range",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 09",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "The analog front end is the binding constraint: D = 6(N-1) dB yields only 42 dB on 8-bit converters, requiring 12–16 bit ADCs or analog notch filters."
+    },
+    {
+      "id": "dg32_30_industrial_use_cases_catalog",
+      "label": "Thirty Industrial Diagnostics & Observers Suite",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slides 07–10",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "30 native tasks spanning rotating machinery, electrical power, control motion, and sequence forecasting."
+    },
+    {
+      "id": "dg32_asil_d_ml_advisory_decoupling",
+      "label": "ASIL-D Advisory Decoupling for Machine Learning",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": "Thirty Use Cases, No Accelerator · Slide 01 & Architecture Spec",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "All ML models run in an advisory telemetry role; hardware lockstep comparator retains autonomous 2-cycle (<40 ns) bridge shutdown authority."
+    }
+  ],
+  "edges": [
+    {
+      "source": "dg32_goertzel_recurrence_filter_8bin",
+      "target": "dg32_broken_rotor_bar_mcsa",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_goertzel_recurrence_filter_8bin",
+      "target": "dg32_ai_compute_envelope_scalar_50mhz",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_cordic_hardware_demodulation",
+      "target": "dg32_goertzel_recurrence_filter_8bin",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_kurtosis_non_monotonicity_trap",
+      "target": "dg32_cordic_hardware_demodulation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_tree_ensembles_model_hierarchy",
+      "target": "dg32_ai_compute_envelope_scalar_50mhz",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_cwru_bearing_leakage_audit",
+      "target": "dg32_tree_ensembles_model_hierarchy",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_afe_sensing_iso_dynamic_range",
+      "target": "dg32_broken_rotor_bar_mcsa",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_30_industrial_use_cases_catalog",
+      "target": "dg32_ai_compute_envelope_scalar_50mhz",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_asil_d_ml_advisory_decoupling",
+      "target": "dg32_30_industrial_use_cases_catalog",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-ai-30-use-cases.pdf",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_edge_ai_diagnostic_stack",
+      "label": "Edge AI Diagnostic Signal Stack",
+      "nodes": [
+        "dg32_ai_compute_envelope_scalar_50mhz",
+        "dg32_goertzel_recurrence_filter_8bin",
+        "dg32_cordic_hardware_demodulation",
+        "dg32_tree_ensembles_model_hierarchy"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95
+    }
+  ],
+  "input_tokens": 12500,
+  "output_tokens": 4200
+}

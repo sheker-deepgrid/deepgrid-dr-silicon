@@ -1,0 +1,189 @@
+{
+  "nodes": [
+    {
+      "id": "dg32_2dom_dual_domain_soc_ci2612",
+      "label": "DG32-2DOM Dual-Domain SoC (chipIgnite CI2612)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · p. 1–3",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "3400 x 4500 um die on SkyWater sky130A integrating 50 MHz control core and 114 MHz attention co-processor."
+    },
+    {
+      "id": "dg32_cdc_asynchronous_fifo_bridges",
+      "label": "Clock Domain Crossing (CDC) Asynchronous FIFO",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 2.2, p. 8–10",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Gray-code dual-clock FIFOs with 2-FF synchronizers isolate 50 MHz control core from 114 MHz neural co-processor without jitter."
+    },
+    {
+      "id": "dg32_int8_attention_engine_math",
+      "label": "INT8 Attention Engine Math (40-bit Accumulator)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 3, p. 11–15",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Dedicated 40-bit numerator accumulator and 15-bit LUT exponentiation prevent overflow during softmax calculation."
+    },
+    {
+      "id": "dg32_18_sky130_sram_macros_86pct",
+      "label": "18 On-Die SkyWater SRAM Macros (86% Die Area)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 4.1, p. 16",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "OpenRAM-generated 2 KB and 4 KB macros consume 86% of total die footprint to achieve 32 KB internal buffer for vibration frames."
+    },
+    {
+      "id": "dg32_sram_floorplan_lever_28kb_vs_32kb",
+      "label": "28 KB vs 32 KB SRAM Floorplan Lever",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 4.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Trimming from 32 KB to 28 KB frees 18% routing channels, avoiding DRC metal pitch violations on standard sky130 metal stack."
+    },
+    {
+      "id": "dg32_avip_bearing_fault_csa",
+      "label": "AVIP Stator Current Bearing Diagnostics",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 5, p. 18–20",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Automated Vibration Inference Protocol evaluates bearing damage direct from phase current without an external accelerometer."
+    },
+    {
+      "id": "dg32_39cycle_hardware_lockstep_trip",
+      "label": "39-Cycle Hardware Lockstep Safe-State Latch",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 1.3",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Comparator divergence latches FAULT_N safe state within 2 clock cycles (<40 ns), preventing shoot-through and inverter explosion."
+    },
+    {
+      "id": "dg32_foc_100khz_cycle_budget",
+      "label": "FOC Control Loop Cycle Budget & 82% Headroom",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": "DG32-2DOM System Architecture · Section 2.4",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Hardwired Park/Clarke and CORDIC execute in 300 cycles (6.0 µs), leaving 82% to 88% CPU cycles unburdened at 10–20 kHz PWM."
+    }
+  ],
+  "edges": [
+    {
+      "source": "dg32_2dom_dual_domain_soc_ci2612",
+      "target": "dg32_cdc_asynchronous_fifo_bridges",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_2dom_dual_domain_soc_ci2612",
+      "target": "dg32_int8_attention_engine_math",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_int8_attention_engine_math",
+      "target": "dg32_18_sky130_sram_macros_86pct",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_sram_floorplan_lever_28kb_vs_32kb",
+      "target": "dg32_18_sky130_sram_macros_86pct",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_avip_bearing_fault_csa",
+      "target": "dg32_int8_attention_engine_math",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_39cycle_hardware_lockstep_trip",
+      "target": "dg32_2dom_dual_domain_soc_ci2612",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_foc_100khz_cycle_budget",
+      "target": "dg32_39cycle_hardware_lockstep_trip",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf",
+      "source_location": null,
+      "weight": 0.95
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_dual_domain_subsystem",
+      "label": "Dual-Domain Compute & Memory Hierarchy",
+      "nodes": [
+        "dg32_2dom_dual_domain_soc_ci2612",
+        "dg32_cdc_asynchronous_fifo_bridges",
+        "dg32_int8_attention_engine_math",
+        "dg32_18_sky130_sram_macros_86pct"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95
+    }
+  ],
+  "input_tokens": 12500,
+  "output_tokens": 4200
+}

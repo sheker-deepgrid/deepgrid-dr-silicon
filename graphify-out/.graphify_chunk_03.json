@@ -1,0 +1,145 @@
+{
+  "nodes": [
+    {
+      "id": "dg32_qfn64_pinout_assignment_map",
+      "label": "64-Pin QFN Physical Pin Map (9x9 mm)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": "DG32 QFN-64 Engineering Datasheet · Section 2, p. 2–8",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "9x9 mm 64-pin QFN with 0.5 mm pitch and central thermal ground paddle; 100% pin-compatible between LITE and 2DOM."
+    },
+    {
+      "id": "dg32_thermal_ground_paddle_dissipation",
+      "label": "Thermal Ground Paddle & Heat Dissipation (<0.43W)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": "DG32 QFN-64 Engineering Datasheet · Section 1.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "θJC < 2.5 °C/W via exposed die attach paddle; total chip power <0.43W eliminates discrete heatsinks."
+    },
+    {
+      "id": "dg32_power_supply_sequencing_rules",
+      "label": "Power Supply Sequencing Rules (1.8V Core / 3.3V I/O)",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": "DG32 QFN-64 Engineering Datasheet · Section 3.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "VCCD (1.8V core) must ramp concurrently or before VDDIO (3.3V) within 10 ms to prevent internal latch-up."
+    },
+    {
+      "id": "dg32_esd_biasing_unused_rails",
+      "label": "ESD Diode Biasing on Unused Power Rails",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": "DG32 QFN-64 Engineering Datasheet · Section 3.3",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Unused analog supply rails (vdda1/2, vccd2) must be tied to nominal voltages on the board to prevent ESD parasitic diode turn-on."
+    },
+    {
+      "id": "dg32_boot_rom_qspi_fast_read",
+      "label": "64 KB Standalone Boot ROM & QSPI Fast Read",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": "DG32 QFN-64 Engineering Datasheet · Section 4.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Internal 64 KB ROM executes standalone QSPI NOR flash boot without an external supervisory host processor."
+    },
+    {
+      "id": "dg32_pcb_high_speed_routing_guidelines",
+      "label": "PCB Layout Rules for High-Speed Differential Pairs",
+      "file_type": "concept",
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": "DG32 QFN-64 Engineering Datasheet · Section 5",
+      "source_url": null,
+      "captured_at": null,
+      "author": "DeepGrid Semi",
+      "contributor": null,
+      "rationale": "Strict 90-ohm differential impedance, continuous ground plane return, and length matching <0.5 mm on motor telemetry lines."
+    }
+  ],
+  "edges": [
+    {
+      "source": "dg32_qfn64_pinout_assignment_map",
+      "target": "dg32_thermal_ground_paddle_dissipation",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_power_supply_sequencing_rules",
+      "target": "dg32_qfn64_pinout_assignment_map",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_esd_biasing_unused_rails",
+      "target": "dg32_power_supply_sequencing_rules",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "dg32_boot_rom_qspi_fast_read",
+      "target": "dg32_qfn64_pinout_assignment_map",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": null,
+      "weight": 0.95
+    },
+    {
+      "source": "dg32_pcb_high_speed_routing_guidelines",
+      "target": "dg32_qfn64_pinout_assignment_map",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/sheke/deepgrid-dr-site/public/downloads/docs/deepgrid-datasheets-qfn64.pdf",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_physical_packaging",
+      "label": "Packaging & Physical Electrical Integrity",
+      "nodes": [
+        "dg32_qfn64_pinout_assignment_map",
+        "dg32_thermal_ground_paddle_dissipation",
+        "dg32_power_supply_sequencing_rules",
+        "dg32_pcb_high_speed_routing_guidelines"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95
+    }
+  ],
+  "input_tokens": 12500,
+  "output_tokens": 4200
+}
