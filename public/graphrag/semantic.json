@@ -1,0 +1,29 @@
+{
+ "model": "Xenova/all-MiniLM-L6-v2",
+ "dtype": "q8",
+ "dims": 384,
+ "scale": 127,
+ "counts": {
+  "nodes": 1075,
+  "chunks": 177,
+  "themes": 13
+ },
+ "themeTitles": [
+  "Goertzel Recurrence vs. 8 MB FFT for Broken Rotor Bar Detection",
+  "The Kurtosis Non-Monotonicity Trap in Bearing Health Alarms",
+  "DG32-LITE AI Compute Envelope (No Accelerator)",
+  "30 Industrial Diagnostics & Observers on a 50 MHz Scalar Core",
+  "Academic Benchmark Audit: CWRU Bearing Dataset Leakage",
+  "DAP-2020 Buy (Indian-IDDM) & Make-II Statutory Defence Moats",
+  "Hardware DShot Receive (dgrid_dshot_rx) & Zero-Jitter Motor Telemetry",
+  "50 MHz Operating Frequency: Lockstep Margin & Physical Timing Closure",
+  "DG32 vs. STM32G0: Hardware Lockstep, BOM Cost & Latency Benchmark",
+  "₹10 Cr Capital Waterfall & 24-Month Seed Runway",
+  "Chinese Price Crash Stress Test & Operational Stop Rules S1–S4",
+  "DG32 64-Pin QFN Physical Pin Map & Packaging Specification",
+  "Sovereign Supply Chain Immunity: The Three-Factory & 100% Domestic Architecture"
+ ],
+ "indexSha256": "f6089806a995e03f10a0e903e9de2b464ce7283fbe36802135605ab33b4b9a11",
+ "rowKeySha256": "bb797ab342a6f34b7f889f97ca632e583275cef533c1c679bc18cfe027b8e395",
+ "modelSha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1"
+}

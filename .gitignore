@@ -43,3 +43,6 @@ next-env.d.ts
 **/.dev.vars
 .wrangler/
 **/.wrangler/
+
+# ONNX runtime for in-browser embeddings, copied from node_modules at build (scripts/copy-runtime.mjs)
+/public/ort/

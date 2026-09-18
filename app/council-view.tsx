@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {
   FileText,
   Download,
@@ -9,7 +9,8 @@ import {
   BookOpen,
   Network
 } from 'lucide-react';
-import {executeGraphRAG} from './data/graphrag-engine';
+import {executeGraphRAG,type SemanticScores} from './data/graphrag-engine';
+import {getSemantic} from './data/semantic';
 import LiveCouncil from './live-council';
 
 interface GroundedAnswerViewProps {
@@ -18,12 +19,35 @@ interface GroundedAnswerViewProps {
   go: (hash: string) => void;
 }
 
+const DEFAULT_QUESTION = 'What makes DeepGrid silicon immune to supply chain disruption?';
+
+// Semantic scores for the question on screen, once the in-browser model has them. Loading starts when
+// Ask opens; each question is embedded 250 ms after typing pauses, so fast typing costs nothing. Until
+// then (or if the model cannot load) this returns null and the engine answers by TF-IDF.
+function useSemanticScores(question: string): SemanticScores | null {
+  const [state, setState] = useState<{q: string; s: SemanticScores} | null>(null);
+  useEffect(() => { void getSemantic(); }, []);
+  useEffect(() => {
+    if (question.trim().length < 3) return;
+    let live = true;
+    const t = setTimeout(async () => {
+      const sem = await getSemantic();
+      if (!sem || !live) return;
+      try { const s = await sem.scores(question); if (live) setState({q: question, s}); } catch { /* stay on TF-IDF */ }
+    }, 250);
+    return () => { live = false; clearTimeout(t); };
+  }, [question]);
+  return state && state.q === question ? state.s : null;
+}
+
 export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedAnswerViewProps) {
   const [showTechnical, setShowTechnical] = useState(false);
-  const result = executeGraphRAG(query || 'What makes DeepGrid silicon immune to supply chain disruption?');
+  const question = query || DEFAULT_QUESTION;
+  const sem = useSemanticScores(question);
+  const result = executeGraphRAG(question, sem);
 
   return (
-    <div className="dr-grounded-answer-wrap">
+    <div className="dr-grounded-answer-wrap" data-semantic={sem ? 'on' : 'off'}>
       {/* 1. Contextual Architectural Answer Card */}
       <article className="dr-answer-card">
         {/* Dynamic Contextual Header (replaces generic 'Verified Answer' label) */}

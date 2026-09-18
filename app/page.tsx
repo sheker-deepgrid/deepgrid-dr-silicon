@@ -1,12 +1,14 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {lazy,Suspense,useEffect,useState} from 'react';
 import {ArrowUpRight,ArrowRight,ArrowLeft,Menu,ShieldCheck,Gauge,BrainCircuit,Check,Play,Download} from 'lucide-react';
 import {Sheet,SheetContent,SheetTitle,SheetDescription} from '@/components/ui/sheet';
 import Silicon from './silicon';
 import Library from './library';
 import Architecture from './architecture';
 import FaultTrace from './fault-trace';
-import AskDeepGrid from './ask';
+// Ask DeepGrid carries a 1.5 MB graph index and the semantic-search loader; split it out so the other
+// views do not download it (first-load JS had grown from 392 to 713 KB gzipped).
+const AskDeepGrid = lazy(() => import('./ask'));
 import ControlWaveform from './control-waveform';
 import AppCard from './app-card';
 import {useReveal,useScrollVars} from './motion';
@@ -509,7 +511,7 @@ export default function Home(){
   </div>
  </section>}
 
- {view==='ask'&&<AskDeepGrid go={go}/>}
+ {view==='ask'&&<Suspense fallback={<section className="page-wrap"><p className="disclaimer">Loading Ask DeepGrid…</p></section>}><AskDeepGrid go={go}/></Suspense>}
 
  <nav className="section-pagination" aria-label="Section navigation">{viewIndex>0?<a href={'#'+views[viewIndex-1]} onClick={e=>{e.preventDefault();navigate(views[viewIndex-1])}}><ArrowLeft size={19}/><span><small>Previous section</small>{titles[views[viewIndex-1]]}</span></a>:<span/>}{viewIndex<views.length-1&&<a href={'#'+views[viewIndex+1]} onClick={e=>{e.preventDefault();navigate(views[viewIndex+1])}}><span><small>Next section</small>{titles[views[viewIndex+1]]}</span><ArrowRight size={19}/></a>}</nav>
  </main>

@@ -178,7 +178,7 @@ function cleanExtractedText(raw: string): string {
 }
 
 // Canonical Executive Knowledge Definitions for Core Engineering Themes
-interface ExecutiveTheme {
+export interface ExecutiveTheme {
   keywords: string[];
   title: string;
   tag: string;
@@ -195,7 +195,7 @@ interface ExecutiveTheme {
   refLinks: { label: string; hash: string; description: string }[];
 }
 
-const executiveThemes: ExecutiveTheme[] = [
+export const executiveThemes: ExecutiveTheme[] = [
   // 1. Goertzel vs FFT
   {
     keywords: ['goertzel', 'fft', 'broken rotor', 'rotor bar', 'sideband', 'quantization floor'],
@@ -597,9 +597,35 @@ const executiveThemes: ExecutiveTheme[] = [
   }
 ];
 
-export function executeGraphRAG(rawQuery: string): GraphRAGResult {
+/**
+ * Semantic scores for one question, from the in-browser embedding model (see app/data/semantic.ts).
+ * Each array is aligned with graphIndex.nodes, graphIndex.chunks and executiveThemes. Without them the
+ * engine ranks by TF-IDF exactly as before, so the page answers while the model is still loading.
+ */
+export interface SemanticScores { nodes: Float32Array; chunks: Float32Array; themes: Float32Array }
+
+// A reworded question reuses a curated theme only when that theme is both close and clearly closer than
+// the runner-up. Similarity alone cannot tell them apart: "What does DG32-2DOM add over DG32-LITE?" (no
+// theme) scored 0.58 against the pinout theme, above most genuine matches. The gap can: genuine matches
+// stood 0.03-0.30 clear, un-themed questions at most 0.066. On 13 reworded + 11 un-themed questions,
+// 0.30 / 0.08 gave 11/13 curated answers and 0/11 wrong ones. A small set: retune with more questions.
+export const SEMANTIC_THEME_MIN = 0.30;
+export const SEMANTIC_THEME_GAP = 0.08;
+
+/**
+ * The row order the semantic index must match: node ids, chunk ids, theme titles. The build script and
+ * the browser both hash this string; a mismatch means the index is stale and the page stays on TF-IDF.
+ */
+export function semanticRowKey(): string {
+  return [graphIndex.nodes.map(n => n.id).join('\n'), graphIndex.chunks.map(c => c.id).join('\n'),
+    executiveThemes.map(t => t.title).join('\n')].join('\n--\n');
+}
+
+export function executeGraphRAG(rawQuery: string, sem?: SemanticScores | null): GraphRAGResult {
   const q = rawQuery.trim().toLowerCase();
   const qVec = vectorizeQuery(q);
+  const useSem = !!sem && sem.nodes.length === graphIndex.nodes.length && sem.chunks.length === graphIndex.chunks.length
+    && sem.themes.length === executiveThemes.length;
 
   // 1. Check for Exact Executive Theme Match First
   let matchedTheme: ExecutiveTheme | null = null;
@@ -618,10 +644,20 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
     }
   }
 
+  // 1b. No keyword hit: a reworded question can still reach its curated theme by meaning.
+  if (useSem && maxThemeScore < 15) {
+    const order = Array.from(sem!.themes, (v, i) => [v, i] as const).sort((a, b) => b[0] - a[0]);
+    const [best, second] = [order[0], order[1]];
+    if (best && best[0] >= SEMANTIC_THEME_MIN && best[0] - (second ? second[0] : 0) >= SEMANTIC_THEME_GAP) {
+      matchedTheme = executiveThemes[best[1]];
+      maxThemeScore = 15;
+    }
+  }
+
   // 2. Semantic Entry Point Resolution over all 318 Graph Nodes
   const scoredNodes: { node: UnifiedNode; score: number }[] = [];
-  graphIndex.nodes.forEach(node => {
-    const score = dotProduct(qVec, node.vector);
+  graphIndex.nodes.forEach((node, i) => {
+    const score = useSem ? Math.max(0, sem!.nodes[i]) : dotProduct(qVec, node.vector);
     if (score > 0) {
       // Prioritize semantic specification & architecture nodes over low-level AST code tokens
       const isCodeAst = node.category === 'code' || node.name.endsWith('()') || node.id.startsWith('source_');
@@ -704,8 +740,8 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
 
   // 4. Grounded Document Chunk Retrieval
   const scoredChunks: { chunk: UnifiedChunk; score: number }[] = [];
-  graphIndex.chunks.forEach(chunk => {
-    const score = dotProduct(qVec, chunk.vector);
+  graphIndex.chunks.forEach((chunk, i) => {
+    const score = useSem ? Math.max(0, sem!.chunks[i]) : dotProduct(qVec, chunk.vector);
     if (score > 0) {
       scoredChunks.push({ chunk, score });
     }
