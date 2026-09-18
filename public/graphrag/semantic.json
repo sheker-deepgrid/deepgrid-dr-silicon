@@ -3,6 +3,7 @@
  "dtype": "q8",
  "dims": 384,
  "scale": 127,
+ "queryPrefix": "Represent this sentence for searching relevant passages: ",
  "counts": {
   "nodes": 1075,
   "chunks": 177,

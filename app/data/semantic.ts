@@ -9,7 +9,8 @@
 import {semanticRowKey, type SemanticScores} from './graphrag-engine';
 
 type Meta = {model: string; dtype: string; dims: number; scale: number;
-  counts: {nodes: number; chunks: number; themes: number}; rowKeySha256: string; modelSha256: string};
+  counts: {nodes: number; chunks: number; themes: number}; rowKeySha256: string; modelSha256: string;
+  queryPrefix?: string};
 type Extractor = (texts: string[], opts: {pooling: 'mean'; normalize: boolean}) => Promise<{data: Float32Array}>;
 export type Semantic = {scores: (question: string) => Promise<SemanticScores>};
 
@@ -85,7 +86,8 @@ async function load(): Promise<Semantic | null> {
     };
     return {
       scores: async (question: string) => {
-        const q = (await extract([question], {pooling: 'mean', normalize: true})).data;
+        // the model's own retrieval instruction for questions, recorded with the index (BGE: see the build script)
+        const q = (await extract([(meta.queryPrefix || '') + question], {pooling: 'mean', normalize: true})).data;
         return {nodes: block(0, nodes, q), chunks: block(nodes, chunks, q), themes: block(nodes + chunks, themes, q)};
       },
     };

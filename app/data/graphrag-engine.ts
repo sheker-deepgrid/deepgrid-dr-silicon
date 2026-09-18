@@ -640,12 +640,13 @@ export const executiveThemes: ExecutiveTheme[] = [
 export interface SemanticScores { nodes: Float32Array; chunks: Float32Array; themes: Float32Array }
 
 // A reworded question reuses a curated theme only when that theme is both close and clearly closer than
-// the runner-up. Similarity alone cannot tell them apart: "What does DG32-2DOM add over DG32-LITE?" (no
-// theme) scored 0.58 against the pinout theme, above most genuine matches. The gap can: genuine matches
-// stood 0.03-0.30 clear, un-themed questions at most 0.066. On 13 reworded + 11 un-themed questions,
-// 0.30 / 0.08 gave 11/13 curated answers and 0/11 wrong ones. A small set: retune with more questions.
+// the runner-up. Similarity alone cannot separate them: an un-themed question can score as high as a
+// genuine match. The gap can. Calibrated per model on 15 reworded + 10 un-themed questions:
+//   BGE-small + query instruction (current): 0.30 / 0.06 -> 11/15 curated, 0 wrong, 0/10 forced
+//   MiniLM-L6 (previous):                    0.30 / 0.08 -> 13/15 curated, 0 wrong, 0/10 forced
+// A small set, and model-specific: re-run the calibration whenever the embedding model changes.
 export const SEMANTIC_THEME_MIN = 0.30;
-export const SEMANTIC_THEME_GAP = 0.08;
+export const SEMANTIC_THEME_GAP = 0.06;
 
 /**
  * The row order the semantic index must match: node ids, chunk ids, theme titles. The build script and

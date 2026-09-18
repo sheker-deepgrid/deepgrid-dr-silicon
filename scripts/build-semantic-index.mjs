@@ -11,8 +11,12 @@
 // questions share one vector space. If the unified index is regenerated without re-running this script,
 // its hash no longer matches and the page falls back to TF-IDF rather than scoring misaligned rows.
 //
-// Why BGE-small: SOTA on MTEB retrieval benchmark (outperforming OpenAI text-embedding-ada-002),
-// specialized for technical documentation and query-chunk retrieval, 33 MB q8 ONNX, ~5 ms in-browser CPU inference.
+// Why BGE-small (measured on this corpus, 18 Sep 2026; 8 reworded questions over the 177 PDF chunks and a
+// 25-question theme calibration set): right material in the top 3 for 17/24 (MiniLM-L6: 15/24, TF-IDF:
+// 5/24), right chunk first for 5/7 reworded questions (MiniLM: 6/7, TF-IDF: 0/7), and 11/15 reworded
+// questions reach their curated theme with none wrong (MiniLM: 13/15). A modest trade for 34 MB against
+// MiniLM's 23 MB. Mean pooling beat CLS on every measure here, and the query instruction below helped.
+// Changing MODEL means re-measuring and recalibrating SEMANTIC_THEME_MIN / _GAP in graphrag-engine.ts.
 //
 // esbuild is used only to read the themes out of TypeScript; it is present through vite and wrangler.
 import fs from 'node:fs';
@@ -24,6 +28,9 @@ import {pipeline, env} from '@huggingface/transformers';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MODEL = 'Xenova/bge-small-en-v1.5';
+// BGE v1.5's retrieval instruction, prepended to questions only (documents are embedded bare).
+// It goes into semantic.json so the browser always pairs the right instruction with the right model.
+const QUERY_PREFIX = 'Represent this sentence for searching relevant passages: ';
 const DTYPE = 'q8';                                   // onnx/model_quantized.onnx
 const MODEL_FILES = ['config.json', 'tokenizer.json', 'tokenizer_config.json', 'onnx/model_quantized.onnx'];
 const SCALE = 127;                                    // unit vectors stored as round(v * 127) in int8
@@ -83,7 +90,7 @@ if (worst > 0.02) throw new Error(`int8 quantisation error ${worst.toFixed(4)} e
 fs.mkdirSync(OUT_DIR, {recursive: true});
 fs.writeFileSync(path.join(OUT_DIR, 'semantic.bin'), Buffer.from(bin.buffer));
 const meta = {
-  model: MODEL, dtype: DTYPE, dims, scale: SCALE,
+  model: MODEL, dtype: DTYPE, dims, scale: SCALE, queryPrefix: QUERY_PREFIX,
   counts: {nodes: index.nodes.length, chunks: index.chunks.length, themes: executiveThemes.length},
   themeTitles: executiveThemes.map(t => t.title),
   indexSha256: crypto.createHash('sha256').update(raw).digest('hex'),
