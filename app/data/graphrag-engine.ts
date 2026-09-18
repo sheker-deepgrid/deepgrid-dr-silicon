@@ -594,6 +594,41 @@ export const executiveThemes: ExecutiveTheme[] = [
       { label: 'Inspect DAP-2020 Defence Moats', hash: 'overview', description: 'Read statutory indigenisation requirements under Make-II rules.' },
       { label: 'Review 198-Day Execution Loop', hash: 'loop', description: 'Analyze the fast tape-out timeline enabled by open-source EDA.' }
     ]
+    },
+  {
+    // Every figure below is on a cited page or in the site's own copy: checker core and store-by-store
+    // compare (DG32-2DOM System Architecture p. 4), 39 cycles with the cause latched (p. 13), sticky
+    // fault register (QFN-64 datasheet p. 1), FAULT_N active-low on pin 59 (p. 12), the 2-cycle checker
+    // lag and "simulation, not silicon" (site Overview). 780 ns is 39 cycles x 20 ns at 50 MHz. Internal
+    // module names and board-design guidance are left out on purpose, as everywhere on the site.
+    keywords: ['lockstep', 'checker core', 'fault latch', 'fault_n', 'faulty computation', 'fault isolation', 'fault detection', 'fault injection', 'second core', 'safe state'],
+    title: 'Hardware Lockstep: How DG32 Catches a Faulty Computation',
+    tag: 'SAFETY CORE · HARDWARE LOCKSTEP',
+    lead: 'DG32 runs two identical RISC-V cores in lockstep and compares their committed stores in hardware; on the first mismatch it latches the cause and drives its FAULT_N output, within 39 cycles of an injected fault in simulation, without waiting for firmware.',
+    explanation: [
+      'Two cores, one checking the other: a second core, the checker, runs the same instructions two cycles behind the main core on mirrored inputs and bus responses. Its output is discarded; its only job is to produce the value the main core should have committed.',
+      'Every committed store is compared: the comparator checks the two cores\u2019 store signatures as each store is handed to the bus, so the first mismatch is caught on that store, not at the next periodic software self-test.',
+      'The first cause is held: a mismatch raises a fault with a cause code into a sticky fault register, because later faults are usually consequences of the first. Firmware can read the cause after the fact.',
+      'The trip does not depend on firmware: FAULT_N is the chip\u2019s active-low hardware fault output. In simulation it goes low within 39 cycles of an injected fault, 780 ns at the 50 MHz clock.'
+    ],
+    facts: [
+      'Detection point: every committed store, compared in hardware.',
+      'Fault to latch: 39 cycles from an injected fault, cause latched. A pre-silicon simulation figure, not yet measured on silicon.',
+      'Checker lag: the checker core trails the main core by 2 cycles on mirrored inputs.',
+      'Evidence so far: fault injection passes end-to-end in simulation.',
+      'Output: FAULT_N (pin 59), an active-low hardware fault output.'
+    ],
+    docNum: '04',
+    docTitle: 'DG32-2DOM System Architecture',
+    section: 'Section 4.1: Lockstep CPU core pair and comparator',
+    page: 'p. 4, 13',
+    pdfPath: './downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf',
+    pdfSize: '77 KB',
+    specPath: './downloads/docs/deepgrid-2dom-architecture.md',
+    refLinks: [
+      { label: 'Step through the 39-cycle fault trace', hash: 'overview', description: 'Follow one wrong value from the main core to a bridge that is switched off.' },
+      { label: 'Inside the safety core', hash: 'architecture', description: 'The lockstep pair, comparator and fault register in the block diagram.' }
+    ]
   }
 ];
 
