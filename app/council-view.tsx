@@ -7,10 +7,9 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  Compass,
-  CheckCircle2
+  Network
 } from 'lucide-react';
-import {getGroundedAnswer} from './data/multi-agent-engine';
+import {executeGraphRAG} from './data/graphrag-engine';
 import LiveCouncil from './live-council';
 
 interface GroundedAnswerViewProps {
@@ -21,7 +20,7 @@ interface GroundedAnswerViewProps {
 
 export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedAnswerViewProps) {
   const [showTechnical, setShowTechnical] = useState(false);
-  const result = getGroundedAnswer(query || 'What makes DeepGrid silicon immune to supply chain disruption?');
+  const result = executeGraphRAG(query || 'What makes DeepGrid silicon immune to supply chain disruption?');
 
   return (
     <div className="dr-grounded-answer-wrap">
@@ -37,6 +36,28 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
             Grounded in {result.citation.documentTitle} ({result.citation.page})
           </span>
         </div>
+
+        {/* Real GraphRAG Traversal Path Display */}
+        {result.graphPath.steps.length > 0 && (
+          <div className="dr-graphrag-path-card">
+            <div className="dr-graphrag-path-head">
+              <span className="mono dr-graphrag-path-label">
+                <Network size={13} style={{marginRight: '6px'}} />
+                GRAPHRAG TRAVERSAL TRAIL ({result.seedEntities.length} SEEDS · {result.traversedEdges.length} EDGES)
+              </span>
+              <span className="dr-graphrag-community">{result.communityName}</span>
+            </div>
+            <div className="dr-graphrag-breadcrumbs">
+              {result.graphPath.steps.map((step, idx) => (
+                <div key={idx} className="dr-graphrag-step">
+                  <span className="dr-step-node">{step.source}</span>
+                  <span className="dr-step-rel">──({step.relation})──&gt;</span>
+                  <span className="dr-step-node">{step.target}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Query-Contextual Title */}
         <h2 className="dr-contextual-title">{result.contextualTitle}</h2>

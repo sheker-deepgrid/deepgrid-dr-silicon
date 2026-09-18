@@ -1553,6 +1553,16 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-ref-link-top svg{color:var(--copper)}
 .dr-ref-link-card p{margin:0;font-size:.78rem;color:#8f9c8f;line-height:1.45}
 
+/* --- GraphRAG Active Traversal Trail --- */
+.dr-graphrag-path-card{background:#0d100f;border:1px solid #2d3631;border-left:3px solid var(--copper);border-radius:var(--sc-radius-sm,4px);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.dr-graphrag-path-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.dr-graphrag-path-label{font-size:.7rem;color:var(--copper);display:inline-flex;align-items:center;letter-spacing:.8px;font-weight:600}
+.dr-graphrag-community{font-size:.68rem;font-family:monospace;color:#93a582;background:#161c19;border:1px solid var(--rule);padding:2px 7px;border-radius:3px}
+.dr-graphrag-breadcrumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dr-graphrag-step{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-family:monospace;background:#141816;border:1px solid #ffffff12;padding:3px 8px;border-radius:3px}
+.dr-step-node{color:#eee6d4;font-weight:500}
+.dr-step-rel{color:var(--copper);font-size:.72rem}
+
 .dr-answer-facts{display:flex;flex-direction:column;gap:10px;background:#0d100f;border:1px solid var(--rule);border-radius:var(--sc-radius-sm,4px);padding:16px 20px}
 .dr-facts-heading{font-size:.74rem;color:var(--copper);letter-spacing:.8px}
 .dr-facts-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
