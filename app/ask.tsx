@@ -4,7 +4,8 @@ import {useState, useMemo, useRef} from 'react';
 import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
-  FileText, Compass, HelpCircle, Download, Copy, Users
+  FileText, Compass, HelpCircle, Download, Copy, Users,
+  ExternalLink, Maximize2
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import CouncilView from './council-view';
@@ -399,321 +400,62 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         />
       )}
 
-      {/* View 1: Interactive Knowledge Graph View */}
+      {/* View 1: Interactive Knowledge Graph View (Powered by Graphify) */}
       {activeView === 'graph' && (
-        <>
-          {/* Strategic Technology Domain Filter */}
-          <div className="dr-deck-strip" style={{marginBottom: '16px'}} role="tablist" aria-label="Filter by technology domain">
-            {categories.map(c => (
-              <button
-                key={c.id}
-                role="tab"
-                aria-selected={activeCategory === c.id}
-                className={`dr-deck-pill ${activeCategory === c.id ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveCategory(c.id);
-                  if (c.id === 'ai') setSelectedNodeId('dg32-30-usecases');
-                  else if (c.id === 'sku') setSelectedNodeId('sku-1');
-                  else if (c.id === 'strategy') setSelectedNodeId('fab-scl');
-                  else if (c.id === 'loop') setSelectedNodeId('arch-198loop');
-                  else if (c.id === 'defense') setSelectedNodeId('moat-dap2020');
-                  else if (c.id === 'architecture') setSelectedNodeId('arch-lockstep');
-                  else if (c.id === 'finance') setSelectedNodeId('fin-munger');
-                }}
+        <div className="dr-graphify-embed-container">
+          {/* Top Control Bar with Graph Metrics & Actions */}
+          <div className="dr-graphify-embed-header">
+            <div className="dr-graphify-header-left">
+              <div className="dr-graphify-title">
+                <Network size={18} style={{color: 'var(--copper)'}} />
+                <span>DEEPGRID KNOWLEDGE GRAPH TOPOLOGY</span>
+                <span className="dr-graphify-badge">1,037 NODES · 1,803 EDGES · 72 COMMUNITIES</span>
+              </div>
+              <p className="dr-graphify-subtitle">
+                Interactive force-directed graph generated directly by Graphify across all 8 PDF whitepapers, 42 Markdown specs, and 143 code modules.
+              </p>
+            </div>
+
+            <div className="dr-graphify-header-right">
+              <a
+                href="./downloads/graph.html"
+                target="_blank"
+                rel="noreferrer"
+                className="dr-graphify-btn outline"
+                title="Open interactive 3D graph in full window"
               >
-                {c.label}
-              </button>
-            ))}
+                <Maximize2 size={13} /> Fullscreen
+              </a>
+              <a
+                href="./downloads/graph.json"
+                download="deepgrid-graph.json"
+                className="dr-graphify-btn outline"
+                title="Download 1,037-node Graphify JSON"
+              >
+                <Download size={13} /> Graph JSON
+              </a>
+              <a
+                href="./downloads/GRAPH_REPORT.md"
+                target="_blank"
+                rel="noreferrer"
+                className="dr-graphify-btn primary"
+                title="View Graphify Audit Report"
+              >
+                <FileText size={13} /> Graph Report
+              </a>
+            </div>
           </div>
 
-          <div className="dr-graph-container">
-          <div className="dr-graph-canvas-wrap">
-            <div className="dr-graph-legend">
-              <span className="legend-item"><i style={{background: '#00e5ff'}}/> Edge AI (30 Tasks)</span>
-              <span className="legend-item"><i style={{background: '#d4a36e'}}/> SKUs & Dies</span>
-              <span className="legend-item"><i style={{background: '#4fc3f7'}}/> Foundries</span>
-              <span className="legend-item"><i style={{background: '#81c784'}}/> Defense Moats</span>
-              <span className="legend-item"><i style={{background: '#ba68c8'}}/> Protocols</span>
-              <span className="legend-item"><i style={{background: '#ffd54f'}}/> Anchors</span>
-              <span className="legend-item"><i style={{background: '#ff8a65'}}/> Governance</span>
-              <button className="dr-graph-reset" onClick={resetGraphPositions} title="Reset Graph Layout">
-                <RotateCcw size={14} /> Reset View
-              </button>
-            </div>
-
-            <svg
-              ref={svgRef}
-              className="dr-graph-svg"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="xMidYMid meet"
-              role="application"
-              aria-label="DeepGrid Knowledge Graph Network"
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-            >
-              <defs>
-                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="1.5" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
-
-              {/* Connecting Edges */}
-              <g className="dr-graph-edges">
-                {graphEdges.map((e, idx) => {
-                  const pFrom = nodePositions[e.from] || { x: 50, y: 50 };
-                  const pTo = nodePositions[e.to] || { x: 50, y: 50 };
-                  const isHighlighted = e.from === selectedNodeId || e.to === selectedNodeId;
-                  const isNeighborConnection = activeConnectedNodeIds.has(e.from) && activeConnectedNodeIds.has(e.to);
-
-                  const fromNode = graphNodes.find(n => n.id === e.from);
-                  const toNode = graphNodes.find(n => n.id === e.to);
-                  const fromCatMatch = doesItemMatchCategory(activeCategory, deepGridCatalog.find(i => i.id === (nodeToCatalogMap[e.from] || e.from))?.category, fromNode?.category);
-                  const toCatMatch = doesItemMatchCategory(activeCategory, deepGridCatalog.find(i => i.id === (nodeToCatalogMap[e.to] || e.to))?.category, toNode?.category);
-
-                  let edgeOpacity = isHighlighted ? 1 : (isNeighborConnection ? 0.42 : 0.08);
-                  if (activeCategory !== 'all' && !isHighlighted) {
-                    if (!fromCatMatch || !toCatMatch) {
-                      edgeOpacity = 0.03;
-                    } else {
-                      edgeOpacity = 0.35;
-                    }
-                  }
-
-                  return (
-                    <g key={idx} className={`dr-edge-group ${isHighlighted ? 'highlighted' : ''}`} style={{ opacity: edgeOpacity, transition: 'opacity 0.25s ease' }}>
-                      <line
-                        x1={pFrom.x}
-                        y1={pFrom.y}
-                        x2={pTo.x}
-                        y2={pTo.y}
-                        className="dr-graph-edge-line"
-                        stroke={isHighlighted ? "#d4a36e" : "#51625a"}
-                        strokeWidth={isHighlighted ? "0.6" : "0.22"}
-                      />
-                      {isHighlighted && (
-                        <g>
-                          <rect
-                            x={(pFrom.x + pTo.x) / 2 - 9}
-                            y={(pFrom.y + pTo.y) / 2 - 2.6}
-                            width="18"
-                            height="3.2"
-                            rx="0.6"
-                            fill="#0c0f0e"
-                            stroke="#d4a36e66"
-                            strokeWidth="0.15"
-                          />
-                          <text
-                            x={(pFrom.x + pTo.x) / 2}
-                            y={(pFrom.y + pTo.y) / 2 - 0.5}
-                            className="dr-graph-edge-text"
-                            textAnchor="middle"
-                            fill="#eee6d4"
-                            fontSize="1.5"
-                            fontFamily="monospace"
-                            fontWeight="600"
-                          >
-                            {e.label}
-                          </text>
-                        </g>
-                      )}
-                    </g>
-                  );
-                })}
-              </g>
-
-              {/* Nodes with True Subgraph Dimming */}
-              <g className="dr-graph-nodes">
-                {graphNodes.map(node => {
-                  const pos = nodePositions[node.id] || { x: node.x, y: node.y };
-                  const isSelected = selectedNodeId === node.id;
-                  const isConnected = activeConnectedNodeIds.has(node.id);
-                  const color = getNodeColor(node.category);
-                  
-                  const catalogId = nodeToCatalogMap[node.id] || node.id;
-                  const catalogItem = deepGridCatalog.find(item => item.id === catalogId);
-                  const isCategoryMatch = doesItemMatchCategory(activeCategory, catalogItem?.category, node.category);
-
-                  // True Subgraph Dimming:
-                  // Selected: 1.0, 1st-degree connected: 0.90, category-match: 0.75, non-category: 0.08
-                  let nodeOpacity = 0.28;
-                  if (isSelected) {
-                    nodeOpacity = 1.0;
-                  } else if (isConnected) {
-                    nodeOpacity = 0.90;
-                  } else if (activeCategory !== 'all') {
-                    nodeOpacity = isCategoryMatch ? 0.75 : 0.08;
-                  }
-
-                  return (
-                    <g
-                      key={node.id}
-                      className={`dr-graph-node-group ${isSelected ? 'selected' : ''} ${isConnected ? 'connected' : ''}`}
-                      transform={`translate(${pos.x}, ${pos.y})`}
-                      style={{ opacity: nodeOpacity, transition: 'opacity 0.25s ease' }}
-                    >
-                      {/* Outer pulse halo for selected */}
-                      {isSelected && (
-                        <circle
-                          r="4.0"
-                          className="dr-node-halo"
-                          stroke={color}
-                        />
-                      )}
-                      {/* Outer ring for 1st-degree connected neighbors */}
-                      {isConnected && !isSelected && (
-                        <circle
-                          r="2.8"
-                          fill="none"
-                          stroke={color}
-                          strokeWidth="0.3"
-                          strokeDasharray="0.8 0.4"
-                          opacity="0.8"
-                        />
-                      )}
-                      {/* Center Node Dot */}
-                      <circle
-                        r={isSelected ? "2.6" : (isConnected ? "2.1" : "1.7")}
-                        fill={color}
-                        className="dr-node-dot"
-                        onMouseDown={(e) => handleMouseDown(node.id, e)}
-                        onClick={() => handleNodeSelect(node.id)}
-                      />
-                      {/* Node Label */}
-                      <text
-                        y="4.2"
-                        className="dr-node-label"
-                        textAnchor="middle"
-                        fill={isSelected ? '#ffffff' : (isConnected ? color : (isCategoryMatch && activeCategory !== 'all' ? '#ede5d5' : '#7a8880'))}
-                        fontWeight={isSelected || isConnected || (isCategoryMatch && activeCategory !== 'all') ? "600" : "400"}
-                        fontSize={isSelected ? "2.6" : (isConnected ? "2.2" : "1.8")}
-                        onClick={() => handleNodeSelect(node.id)}
-                      >
-                        {node.shortName}
-                      </text>
-                    </g>
-                  );
-                })}
-              </g>
-            </svg>
+          {/* Embedded vis.js Interactive Graph Stage */}
+          <div className="dr-graphify-frame-wrap">
+            <iframe
+              src="./downloads/graph.html"
+              title="DeepGrid Graphify Knowledge Network"
+              className="dr-graphify-iframe"
+              loading="lazy"
+            />
           </div>
-
-          {/* Interactive Spec Inspector Drawer */}
-          <aside className="dr-graph-spec-drawer">
-            <div className="dr-drawer-header">
-              <span className="mono dr-drawer-badge" style={{color: getNodeColor(graphNodes.find(n => n.id === selectedNodeId)?.category || 'sku')}}>
-                {(graphNodes.find(n => n.id === selectedNodeId)?.category || 'SKU').toUpperCase()} NODE
-              </span>
-              <span className="dr-drawer-citation mono">{activeDetailItem?.citation || 'DeepGrid Architecture Matrix'}</span>
-            </div>
-
-            <h3 className="dr-drawer-title">{activeDetailItem ? activeDetailItem.name : selectedNodeId}</h3>
-            <p className="dr-drawer-tagline">{activeDetailItem?.tagline || graphNodes.find(n => n.id === selectedNodeId)?.description}</p>
-
-            {/* Hardware Parameters */}
-            {activeDetailItem && (activeDetailItem.nodeFoundry || activeDetailItem.voltageRail || activeDetailItem.standards) && (
-              <div className="dr-drawer-specs">
-                {activeDetailItem.nodeFoundry && (
-                  <div className="dr-drawer-spec-row">
-                    <span className="mono">FAB & NODE:</span>
-                    <strong>{activeDetailItem.nodeFoundry}</strong>
-                  </div>
-                )}
-                {activeDetailItem.voltageRail && (
-                  <div className="dr-drawer-spec-row">
-                    <span className="mono">VOLTAGE / RAIL:</span>
-                    <strong>{activeDetailItem.voltageRail}</strong>
-                  </div>
-                )}
-                {activeDetailItem.standards && (
-                  <div className="dr-drawer-spec-row">
-                    <span className="mono">STANDARDS:</span>
-                    <strong>{activeDetailItem.standards}</strong>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Grounded Summary */}
-            {activeDetailItem && (
-              <div className="dr-drawer-summary">
-                <p>{activeDetailItem.summary}</p>
-              </div>
-            )}
-
-            {/* Key Facts list */}
-            {activeDetailItem && (
-              <div className="dr-drawer-facts">
-                <span className="mono dr-drawer-facts-title">KEY SPECIFICATIONS & HIGHLIGHTS</span>
-                <ul>
-                  {activeDetailItem.keyFacts.map((fact, idx) => (
-                    <li key={idx}>
-                      <Check size={14} className="dr-check-icon" />
-                      <span>{fact}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Authoritative Source Document Reference with Direct Links */}
-            {activeDetailItem && (() => {
-              const doc = resolveItemDocument(activeDetailItem);
-              return (
-                <div className="dr-drawer-doc-card">
-                  <div className="dr-drawer-doc-header">
-                    <span className="mono dr-drawer-doc-badge">{doc.badge}</span>
-                    <span className="mono dr-drawer-doc-num">DOC #{doc.docNum}</span>
-                  </div>
-                  <h4 className="dr-drawer-doc-name">{doc.title}</h4>
-                  <p className="dr-drawer-doc-citation mono">{activeDetailItem.citation}</p>
-                  <div className="dr-drawer-doc-actions">
-                    <a 
-                      href={doc.pdfFile} 
-                      download={doc.pdfFileName}
-                      className="dr-drawer-link-btn primary"
-                      title={`Download official ${doc.pdfFileName} (${doc.fileSizePdf})`}
-                    >
-                      <Download size={13} />
-                      <span>Download PDF ({doc.fileSizePdf})</span>
-                    </a>
-                    <a 
-                      href={doc.specFile} 
-                      download={doc.specFileName}
-                      className="dr-drawer-link-btn outline"
-                      title={`Download ${doc.specFileName} (${doc.fileSizeMd})`}
-                    >
-                      <FileText size={13} />
-                      <span>MD Spec</span>
-                    </a>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Action buttons */}
-            <div className="dr-drawer-actions">
-              {activeDetailItem?.actions && activeDetailItem.actions.map(act => (
-                <button
-                  key={act.target}
-                  className="primary"
-                  onClick={() => go(act.target)}
-                >
-                  {act.label} <ArrowUpRight size={16} />
-                </button>
-              ))}
-              {activeDetailItem && (
-                <button
-                  className="text-link"
-                  onClick={() => setSelectedItem(activeDetailItem)}
-                >
-                  Full Technical Specification <ArrowRight size={15} />
-                </button>
-              )}
-            </div>
-          </aside>
         </div>
-        </>
       )}
 
       {/* View 2: Traditional Intel Dossier Cards Grid */}
