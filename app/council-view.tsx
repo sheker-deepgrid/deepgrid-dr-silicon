@@ -6,9 +6,9 @@ import {
   ArrowUpRight,
   ChevronDown,
   ChevronUp,
-  CheckCircle2,
-  ExternalLink,
-  BookOpen
+  BookOpen,
+  Compass,
+  CheckCircle2
 } from 'lucide-react';
 import {getGroundedAnswer} from './data/multi-agent-engine';
 import LiveCouncil from './live-council';
@@ -25,21 +25,33 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
 
   return (
     <div className="dr-grounded-answer-wrap">
-      {/* 1. Direct Business Answer Card */}
-      <div className="dr-answer-card">
+      {/* 1. Contextual Architectural Answer Card */}
+      <article className="dr-answer-card">
+        {/* Dynamic Contextual Header (replaces generic 'Verified Answer' label) */}
         <div className="dr-answer-header">
           <div className="dr-answer-badge">
-            <CheckCircle2 size={15} style={{color: '#10b981'}} />
-            <span>VERIFIED ANSWER</span>
+            <span className="dr-bullet-pulse" />
+            <span className="mono dr-domain-tag">{result.domainTag}</span>
           </div>
           <span className="dr-answer-source-ref">
             Grounded in {result.citation.documentTitle} ({result.citation.page})
           </span>
         </div>
 
-        <p className="dr-answer-body">{result.answer}</p>
+        {/* Query-Contextual Title */}
+        <h2 className="dr-contextual-title">{result.contextualTitle}</h2>
 
-        {/* Key Business Facts */}
+        {/* Executive Bottom-Line Answer */}
+        <p className="dr-answer-lead">{result.answer}</p>
+
+        {/* In-Depth Explanation & Architectural Breakdown */}
+        <div className="dr-answer-explanation">
+          {result.explanation.map((paragraph, idx) => (
+            <p key={idx}>{paragraph}</p>
+          ))}
+        </div>
+
+        {/* Key Strategic & Operational Metrics */}
         <div className="dr-answer-facts">
           <span className="mono dr-facts-heading">KEY STRATEGIC & OPERATIONAL METRICS:</span>
           <ul className="dr-facts-list">
@@ -52,45 +64,69 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
           </ul>
         </div>
 
-        {/* Grounded Citation & Primary Document Access */}
-        <div className="dr-citation-card">
-          <div className="dr-citation-content">
-            <div className="dr-citation-icon-wrap">
-              <FileText size={20} style={{color: 'var(--copper)'}} />
-            </div>
-            <div className="dr-citation-meta">
-              <span className="mono dr-citation-tag">OFFICIAL PRIMARY SOURCE</span>
-              <strong className="dr-citation-title">
-                {result.citation.documentTitle} · {result.citation.section}
-              </strong>
-              <span className="dr-citation-loc">{result.citation.page}</span>
-            </div>
+        {/* Further References & Deep Dives */}
+        <div className="dr-answer-references">
+          <div className="dr-ref-header">
+            <span className="mono dr-ref-title">FURTHER REFERENCES & DEEP-DIVE SECTIONS:</span>
           </div>
 
-          <div className="dr-citation-actions">
-            <a 
-              href={result.citation.pdfPath}
-              download
-              className="dr-citation-btn primary"
-              title={`Download official whitepaper PDF (${result.citation.pdfSize})`}
-            >
-              <Download size={14} />
-              <span>Download PDF ({result.citation.pdfSize})</span>
-            </a>
-            <a 
-              href={result.citation.specPath}
-              download
-              className="dr-citation-btn outline"
-              title="Download full Markdown specification"
-            >
-              <BookOpen size={14} />
-              <span>Full Spec</span>
-            </a>
+          <div className="dr-ref-links-grid">
+            {result.referenceLinks.map((link, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className="dr-ref-link-card"
+                onClick={() => go(link.hash)}
+              >
+                <div className="dr-ref-link-top">
+                  <strong>{link.label}</strong>
+                  <ArrowUpRight size={15} />
+                </div>
+                <p>{link.description}</p>
+              </button>
+            ))}
+          </div>
+
+          {/* Primary Whitepaper PDF & Specification Access */}
+          <div className="dr-citation-card">
+            <div className="dr-citation-content">
+              <div className="dr-citation-icon-wrap">
+                <FileText size={20} style={{color: 'var(--copper)'}} />
+              </div>
+              <div className="dr-citation-meta">
+                <span className="mono dr-citation-tag">OFFICIAL PRIMARY SOURCE</span>
+                <strong className="dr-citation-title">
+                  {result.citation.documentTitle} · {result.citation.section}
+                </strong>
+                <span className="dr-citation-loc">{result.citation.page}</span>
+              </div>
+            </div>
+
+            <div className="dr-citation-actions">
+              <a 
+                href={result.citation.pdfPath}
+                download
+                className="dr-citation-btn primary"
+                title={`Download official whitepaper PDF (${result.citation.pdfSize})`}
+              >
+                <Download size={14} />
+                <span>Download PDF ({result.citation.pdfSize})</span>
+              </a>
+              <a 
+                href={result.citation.specPath}
+                download
+                className="dr-citation-btn outline"
+                title="Download full Markdown specification"
+              >
+                <BookOpen size={14} />
+                <span>Full Spec</span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
+      </article>
 
-      {/* Live multi-agent council: model answer over the same graph, opt-in, below the verified answer */}
+      {/* Live multi-agent council: in-browser model answer over the same graph, opt-in */}
       <LiveCouncil query={query} />
 
       {/* 2. Progressive Disclosure: Deeper Technical Specifications */}
