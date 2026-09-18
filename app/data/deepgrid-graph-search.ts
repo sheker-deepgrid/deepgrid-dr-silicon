@@ -3,6 +3,7 @@
 
 import graphDataRaw from './deepgrid-graphify.json';
 import { deepGridCatalog, catalogToNodeMap, nodeToCatalogMap, searchDeepGridKnowledge, DeepGridItem } from './deepgrid-knowledge';
+import { faultPath, evidenceLadder } from '../detail-content';
 
 export interface GraphifyNode {
   id: string;
@@ -240,17 +241,32 @@ export const SPECIALISTS: Record<SpecialistId, {name: string; remit: string; see
 };
 export const SPECIALIST_IDS = Object.keys(SPECIALISTS) as SpecialistId[];
 
+/** docId for grounding that comes from the site's own Overview rather than a published PDF. */
+export const SITE_OVERVIEW = 'site-overview';
+
 export interface SpecialistContext {
   graph: GraphSearchResult;
-  facts: {item: string; citation: string; facts: string[]}[];
+  facts: {item: string; citation: string; docId?: string; facts: string[]}[];
 }
 
 /** A specialist's own grounding: a graph walk plus the verified catalog facts, both seeded with its remit. */
 export function specialistContext(id: SpecialistId, question: string): SpecialistContext {
   const seeded = `${question} ${SPECIALISTS[id].seeds}`;
   const graph = queryGraphify(seeded, 2, 16);
-  const facts = searchDeepGridKnowledge(seeded).slice(0, 3)
-    .map(i => ({item: i.name, citation: i.citation, facts: i.keyFacts.slice(0, 6)}));
+  const facts: SpecialistContext['facts'] = searchDeepGridKnowledge(seeded).slice(0, 3)
+    .map(i => ({item: i.name, citation: i.citation, docId: i.docId, facts: i.keyFacts.slice(0, 6)}));
+  // The fault path and the evidence ladder exist only as site content, not in the catalog or graph.
+  // Without them the safety answer told readers the documents "do not cover" a fault latch and a
+  // verification ladder that the Overview shows, so the safety specialist is grounded in them too.
+  if (id === 'safety') facts.unshift({
+    item: 'Fault isolation and verification evidence',
+    citation: 'DG32 Overview — Fault isolation and verification ladder',
+    docId: SITE_OVERVIEW,
+    facts: [
+      ...faultPath.map(([t, d]) => `${t}: ${d}`),
+      ...evidenceLadder.map(e => `${e.kind} evidence (${e.means.toLowerCase()}): ${e.examples}`),
+    ],
+  });
   return {graph, facts};
 }
 
@@ -291,22 +307,27 @@ export function buildSpecialistPrompt(id: SpecialistId, question: string, subQue
 
 export function buildSynthesisPrompt(question: string, answers: {name: string; text: string}[]): string {
   return [
-    'You chair a silicon diligence council. Merge the specialists’ answers below into one answer to the question.',
-    'Use only claims the specialists made; do not add facts. Where they disagree or one lacks the data, say so in one line.',
-    RULES,
-    'Write 100 to 200 words: a one-sentence answer first, then at most five bullets.',
+    'Write the final answer for a business reader (an executive, buyer or investor) evaluating DeepGrid silicon, using only the analyst notes below.',
+    'Never mention analysts, specialists, agents, a council, notes, "the context" or how the answer was produced; the reader sees only the answer.',
+    'Use only claims the notes make; do not add facts. If the notes lack something the question asks, say plainly that DeepGrid\u2019s published documents do not cover it. If two notes conflict, state both figures once.',
+    'Never invent a number, part, date or standard. DG32 figures are pre-silicon design values, not measurements; say so once, not per bullet.',
+    'Never state a conclusion the notes do not directly support: "safe", "compliant", "cheaper", "qualified" and the like need evidence in the notes for that exact point. If the question asks for one and the notes lack it, say DeepGrid\u2019s published documents do not establish it.',
+    'Plain text: a one-sentence answer first, then at most five "- " bullets, **bold** for at most three key terms. No headings. 100 to 200 words.',
     '',
     `Question: ${question}`,
     '',
-    ...answers.map(a => `${a.name}:\n${a.text}\n`),
+    ...answers.map((a, i) => `Analyst note ${i + 1}:\n${a.text}\n`),
   ].join('\n');
 }
 
-/** Events the Worker streams while the council works; the page renders them as a trajectory. */
+/** A document a specialist drew on: the page turns these into the answer's reference links. */
+export type CouncilSource = {item: string; citation: string; docId?: string};
+
+/** Events the Worker streams while the council works. The page shows only the final answer and its sources. */
 export type CouncilUsage = {model: string; ms: number; tokensIn: number; tokensOut: number};
 export type CouncilEvent =
   | {type: 'triage'; routes: {id: SpecialistId; subQuestion: string}[]; reason: string; fallback?: boolean; usage?: CouncilUsage}
-  | {type: 'specialist-start'; id: SpecialistId; grounding: string[]; sources: string[]}
+  | {type: 'specialist-start'; id: SpecialistId; grounding: string[]; sources: CouncilSource[]}
   | {type: 'specialist'; id: SpecialistId; text: string; usage: CouncilUsage}
   | {type: 'specialist-error'; id: SpecialistId}
   | {type: 'final'; text: string; usage: CouncilUsage}

@@ -1,29 +1,67 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Users} from 'lucide-react';
-import {queryGraphify,streamCouncil,SPECIALISTS,type CouncilEvent,type CouncilUsage,type SpecialistId} from './data/deepgrid-graph-search';
+import {ArrowUpRight,FileText} from 'lucide-react';
+import {queryGraphify,streamCouncil,SITE_OVERVIEW,type CouncilEvent,type CouncilSource} from './data/deepgrid-graph-search';
+import {groundedDocuments} from './documents-data';
 
-// The live multi-agent council under the verified answer (the ADK triage pattern): a root agent routes
-// the question to domain specialists, each answers from its own grounding, and the council merges
-// them. The trajectory is the point: the reader sees the routing and why, what each specialist was
-// grounded in, and the model, time and tokens every call cost. The verified answer above stays the
-// primary, deterministic one; this is generated and says so. It runs on a click, because the query
-// updates on every keystroke and a council is five model calls.
+// The in-depth answer under the verified answer. Behind it, a multi-agent council (a triage agent
+// routes the question to safety, silicon and supply-chain specialists, each grounded in its own slice
+// of the knowledge graph, and a synthesis merges them) runs in the GraphRAG Worker. The reader sees
+// none of that machinery: only the answer and the documents it drew on, linked. Routing, models and
+// token counts are for whoever operates the Worker (wrangler tail), not for a buyer reading the page.
 //
-// The block exists only when the build is given NEXT_PUBLIC_COUNCIL_URL. That is a URL, not a
-// secret: the model key lives in the Worker.
+// It runs on a click, because the query updates on every keystroke and each answer is several model
+// calls. The block exists only when the build is given NEXT_PUBLIC_COUNCIL_URL (an address, not a
+// secret: the model key lives in the Worker).
 const COUNCIL = process.env.NEXT_PUBLIC_COUNCIL_URL || '';
 
 type Phase = 'idle' | 'running' | 'done' | 'fallback';
+type Ref = {key: string; title: string; section: string; href: string; internal?: boolean};
+
+// Every catalog citation opens with the name of the document it came from; only 1 of 39 entries
+// carries a docId, so the name is what maps a source to a published PDF. Order matters: the first
+// match wins, so the more specific names come first.
+const CITED_DOC: [RegExp, string][] = [
+ [/thirty use cases/i, 'doc1'],
+ [/sku compendium|technical annex/i, 'doc2'],
+ [/block spec|dshot/i, 'doc3'],
+ [/datasheet/i, 'doc6'],
+ [/dg32-2dom (system architecture|technical specification)/i, 'doc4'],
+ [/mature silicon/i, 'doc5'],
+];
+const docFor=(s: CouncilSource):{id:string;title:string;href:string;internal?:boolean}|undefined=>{
+ if(s.docId===SITE_OVERVIEW) return {id:SITE_OVERVIEW,title:'DG32 Overview: fault isolation and verification evidence',href:'#overview',internal:true};
+ const id=s.docId||CITED_DOC.find(([re])=>re.test(s.citation.split('—')[0]))?.[1];
+ const d=id?groundedDocuments.find(x=>x.id===id):undefined;
+ return d?{id:d.id,title:d.title,href:d.pdfFile}:undefined;
+};
+
+// One reference per published document, with the sections cited from it. A source that maps to no
+// published document is dropped: a reader cannot follow it, and its internal name must not show.
+function toRefs(sources: CouncilSource[]): Ref[] {
+ const byKey=new Map<string,Ref>();
+ for(const s of sources){
+  // tolerate an older Worker that sent bare names: those cannot be linked, so they are skipped
+  if(!s||typeof s!=='object'||typeof s.citation!=='string') continue;
+  const doc=docFor(s);
+  if(!doc) continue;
+  const section=s.citation.includes('—')?s.citation.split('—').slice(1).join('—').trim():'';
+  const prev=byKey.get(doc.id);
+  if(prev){if(section&&!prev.section.includes(section))prev.section+=prev.section?'; '+section:section;continue;}
+  byKey.set(doc.id,{key:doc.id,title:doc.title,section:doc.internal?'':section,href:doc.href,internal:doc.internal});
+ }
+ return [...byKey.values()];
+}
 
 export default function LiveCouncil({query}:{query:string}){
  const grounded=useMemo(()=>query.trim().length>=3?queryGraphify(query):null,[query]);
  const [phase,setPhase]=useState<Phase>('idle');
- const [events,setEvents]=useState<CouncilEvent[]>([]);
+ const [answer,setAnswer]=useState('');
+ const [sources,setSources]=useState<CouncilSource[]>([]);
  const abort=useRef<AbortController|null>(null);
 
- // a new question discards the previous council
- useEffect(()=>{abort.current?.abort();setPhase('idle');setEvents([]);},[query]);
+ // a new question discards the previous answer
+ useEffect(()=>{abort.current?.abort();setPhase('idle');setAnswer('');setSources([]);},[query]);
  useEffect(()=>()=>abort.current?.abort(),[]);
 
  if(!COUNCIL||!grounded||!grounded.subgraphNodes.length) return null;
@@ -31,59 +69,39 @@ export default function LiveCouncil({query}:{query:string}){
  const run=async()=>{
   abort.current?.abort();
   const ctl=new AbortController();abort.current=ctl;
-  setPhase('running');setEvents([]);
-  let finished=false;
-  const ok=await streamCouncil(COUNCIL,query,e=>{if(ctl.signal.aborted)return;if(e.type==='final')finished=true;setEvents(prev=>[...prev,e]);},ctl.signal);
+  setPhase('running');setAnswer('');setSources([]);
+  let text='';const src:CouncilSource[]=[];
+  const ok=await streamCouncil(COUNCIL,query,(e:CouncilEvent)=>{
+   if(e.type==='specialist-start') src.push(...e.sources);
+   if(e.type==='final') text=e.text;
+  },ctl.signal);
   if(ctl.signal.aborted) return;
-  setPhase(ok&&finished?'done':'fallback');
+  if(ok&&text){setAnswer(text);setSources(src);setPhase('done');}
+  else setPhase('fallback');
  };
 
- const triage=events.find((e):e is Extract<CouncilEvent,{type:'triage'}>=>e.type==='triage');
- const final=events.find((e):e is Extract<CouncilEvent,{type:'final'}>=>e.type==='final');
- const done=events.find((e):e is Extract<CouncilEvent,{type:'done'}>=>e.type==='done');
- const spec=(id:SpecialistId)=>({
-  start:events.find((e):e is Extract<CouncilEvent,{type:'specialist-start'}>=>e.type==='specialist-start'&&e.id===id),
-  answer:events.find((e):e is Extract<CouncilEvent,{type:'specialist'}>=>e.type==='specialist'&&e.id===id),
-  failed:events.some(e=>e.type==='specialist-error'&&e.id===id),
- });
- const usages=[triage?.usage,...events.map(e=>e.type==='specialist'?e.usage:undefined),final?.usage].filter((u):u is CouncilUsage=>!!u);
- const tokens=usages.reduce((n,u)=>n+u.tokensIn+u.tokensOut,0);
- const models=[...new Set(usages.map(u=>u.model))];
-
+ const refs=toRefs(sources);
  return <section className="dr-live-rag dr-council" aria-labelledby="dr-council-h">
   <div className="dr-live-rag-head">
-   <span className="mono dr-live-rag-tag">MULTI-AGENT COUNCIL · LIVE</span>
-   <h3 id="dr-council-h">Put the question to the specialist council</h3>
-   <p>A root agent routes the question to the specialists it needs. Each answers only from its own slice of the knowledge graph and the verified catalog, and the council merges them. Unlike the verified answer above, this is generated, so check it against the cited sources.</p>
+   <h3 id="dr-council-h">Need the fuller picture?</h3>
+   <p>Get an in-depth answer that draws on every relevant DeepGrid document: safety, silicon and supply chain.</p>
   </div>
-  {phase==='idle'&&<button type="button" className="text-link dr-live-rag-run" onClick={run}><Users size={16} aria-hidden="true"/>Convene the council</button>}
-
-  {phase!=='idle'&&<ol className="dr-council-trail" aria-busy={phase==='running'}>
-   <li className={'dr-council-step'+(triage?' is-done':' is-now')}>
-    <div className="dr-council-step-head"><span className="mono">ROOT TRIAGE</span>{triage?.usage?<Usage u={triage.usage}/>:triage?.fallback?<span className="dr-council-usage">keyword routing</span>:null}</div>
-    {triage?<p>Routed to {triage.routes.map(r=>SPECIALISTS[r.id].name).join(' and ')}. {triage.reason}</p>:<p className="dr-live-rag-wait">Reading the question and choosing specialists…</p>}
-   </li>
-   {triage?.routes.map(r=>{const s=spec(r.id);return <li key={r.id} className={'dr-council-step'+(s.answer||s.failed?' is-done':' is-now')}>
-    <div className="dr-council-step-head"><span className="mono">{SPECIALISTS[r.id].name.toUpperCase()}</span>{s.answer&&<Usage u={s.answer.usage}/>}</div>
-    {r.subQuestion&&<p className="dr-council-sub">{r.subQuestion}</p>}
-    {s.start&&<div className="dr-live-rag-trail"><span className="mono">GROUNDED IN</span><ul>{s.start.sources.map(x=><li key={'s'+x} className="dr-council-src">{x}</li>)}{s.start.grounding.map(x=><li key={'g'+x}>{x}</li>)}</ul></div>}
-    {s.answer?<Rendered text={s.answer.text}/>:s.failed?<p className="dr-live-rag-note">This specialist could not answer (model unavailable).</p>:<p className="dr-live-rag-wait">Working from its grounding…</p>}
-   </li>;})}
-   {triage&&<li className={'dr-council-step dr-council-final'+(final?' is-done':' is-now')}>
-    <div className="dr-council-step-head"><span className="mono">COUNCIL SYNTHESIS</span>{final&&<Usage u={final.usage}/>}</div>
-    <div aria-live="polite">{final?<Rendered text={final.text}/>:phase==='running'?<p className="dr-live-rag-wait">Waiting for the specialists…</p>:null}</div>
-   </li>}
-  </ol>}
-
-  {phase==='fallback'&&<div aria-live="polite"><Rendered text={grounded.instantSynthesis}/><p className="dr-live-rag-note">The council is unavailable right now (quota or network), so this is the graph’s deterministic synthesis instead.</p></div>}
-  {(phase==='done'||phase==='fallback')&&<div className="dr-council-foot">
-   {done&&<span className="mono">{usages.length} MODEL CALLS · {(done.ms/1000).toFixed(1)} S · {tokens.toLocaleString('en-US')} TOKENS · {models.join(', ')}</span>}
-   <button type="button" className="text-link dr-live-rag-run" onClick={run}>Convene again</button>
-  </div>}
+  {phase==='idle'&&<button type="button" className="text-link dr-live-rag-run" onClick={run}>Get the in-depth answer <ArrowUpRight size={16} aria-hidden="true"/></button>}
+  <div aria-live="polite" aria-busy={phase==='running'}>
+   {phase==='running'&&<p className="dr-live-rag-wait">Reviewing DeepGrid’s documents…</p>}
+   {answer&&<Rendered text={answer}/>}
+   {phase==='done'&&refs.length>0&&<div className="dr-council-refs">
+    <span className="mono">SOURCES</span>
+    <ul>{refs.map(r=><li key={r.key}>
+     <a href={r.href} {...(r.internal?{}:{target:'_blank',rel:'noopener'})}><FileText size={15} aria-hidden="true"/><span>{r.title}</span><ArrowUpRight size={14} aria-hidden="true"/></a>
+     {r.section&&<small>{r.section}</small>}
+    </li>)}</ul>
+   </div>}
+   {phase==='done'&&<p className="dr-live-rag-note">AI-generated from DeepGrid’s published documents. Check key figures against the sources.</p>}
+   {phase==='fallback'&&<p className="dr-live-rag-note">The in-depth answer isn’t available right now. The verified answer above stands; please try again later.</p>}
+  </div>
  </section>;
 }
-
-function Usage({u}:{u:CouncilUsage}){return <span className="dr-council-usage">{u.model} · {(u.ms/1000).toFixed(1)}&nbsp;s · {(u.tokensIn+u.tokensOut).toLocaleString('en-US')}&nbsp;tokens</span>;}
 
 // Model text rendered as React text nodes, never as HTML: "- " lines become a list, **x** bold.
 function Rendered({text}:{text:string}){

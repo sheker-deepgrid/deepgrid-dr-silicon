@@ -82,12 +82,11 @@ async function generate(env: Env, prompt: string, maxOut: number, schema?: objec
   return null;
 }
 
-// When triage fails or returns something unusable, route by each specialist's own terms instead.
-function keywordRoutes(q: string): {id: SpecialistId; subQuestion: string}[] {
-  const ql = q.toLowerCase();
-  const scored = SPECIALIST_IDS.map(id => ({id, n: SPECIALISTS[id].seeds.split(' ').filter(w => ql.includes(w)).length}))
-    .filter(x => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 2);
-  return (scored.length ? scored.map(x => x.id) : (['hardware', 'safety'] as SpecialistId[])).map(id => ({id, subQuestion: q}));
+// When triage fails, consult every specialist. Guessing scope from keywords is what failed: "safe"
+// matched no safety term, only the defence specialist ran, and the answer called DG32 "safe" with no
+// safety grounding at all. Three calls cost more than one; an unsupported claim costs more than that.
+function allRoutes(q: string): {id: SpecialistId; subQuestion: string}[] {
+  return SPECIALIST_IDS.map(id => ({id, subQuestion: q}));
 }
 
 function parseRoutes(text: string): {routes: {id: SpecialistId; subQuestion: string}[]; reason: string} | null {
@@ -106,14 +105,14 @@ async function council(env: Env, query: string, send: (e: CouncilEvent) => Promi
   const t0 = Date.now();
   const triage = await generate(env, buildTriagePrompt(query), 400, TRIAGE_SCHEMA);
   const parsed = triage && parseRoutes(triage.text);
-  const routes = parsed ? parsed.routes : keywordRoutes(query);
+  const routes = parsed ? parsed.routes : allRoutes(query);
   await send(parsed
     ? {type: 'triage', routes, reason: parsed.reason, usage: triage!.usage}
-    : {type: 'triage', routes, reason: 'Routed by keyword: the triage agent was unavailable.', fallback: true});
+    : {type: 'triage', routes, reason: 'All specialists consulted: the triage agent was unavailable.', fallback: true});
 
   const answers = (await Promise.all(routes.map(async ({id, subQuestion}) => {
     const ctx = specialistContext(id, subQuestion || query);
-    await send({type: 'specialist-start', id, grounding: ctx.graph.subgraphNodes.slice(0, 8).map(n => n.label), sources: ctx.facts.map(f => f.item)});
+    await send({type: 'specialist-start', id, grounding: ctx.graph.subgraphNodes.slice(0, 8).map(n => n.label), sources: ctx.facts.map(f => ({item: f.item, citation: f.citation, docId: f.docId}))});
     const r = await generate(env, buildSpecialistPrompt(id, query, subQuestion || query, ctx), 500);
     if (!r) { await send({type: 'specialist-error', id}); return null; }
     await send({type: 'specialist', id, text: r.text, usage: r.usage});
