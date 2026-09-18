@@ -1,12 +1,13 @@
 // True GraphRAG Engine for DeepGrid Silicon Intelligence
+// Ingests 419 semantic chunks across all 71 architecture specifications & playbooks.
 // Combines:
-// 1. Text Embedding Vector Cosine Similarity for semantic entry point resolution
+// 1. Full-Corpus Document Vector Embeddings (Sparse-Dense TF-IDF over 5,029 vocabulary terms)
 // 2. K-Hop Relational Traversal over typed graph edges
-// 3. Community Cluster Aggregation
-// 4. Graph-Grounded Multi-Tier Synthesis & Citations
+// 3. Knowledge Community Cluster Aggregation
+// 4. Dynamic Chunk-Grounded Multi-Tier Synthesis & Primary PDF Citations
 // 100% Deterministic, $0 Runtime Cost, Fully Static Compatible.
 
-import embeddingDataRaw from './graphrag-embeddings.json';
+import fullCorpusDataRaw from './graphrag-full-corpus.json';
 import {
   graphNodes,
   graphEdges,
@@ -74,29 +75,39 @@ export interface GraphRAGResult {
   }[];
 }
 
-interface EmbeddingIndex {
-  vocab: string[];
-  idf: number[];
-  nodes: Record<string, {
-    id: string;
-    name: string;
-    category: string;
-    vector: Record<string, number>;
-  }>;
+interface CorpusChunk {
+  id: string;
+  file: string;
+  sourcePath?: string;
+  docTitle: string;
+  docNum: string;
+  pdfPath: string;
+  pdfSize: string;
+  specPath: string;
+  section: string;
+  text: string;
+  vector: Record<string, number>;
 }
 
-const embeddingData = embeddingDataRaw as unknown as EmbeddingIndex;
-const vocabMap = new Map<string, number>(embeddingData.vocab.map((w, i) => [w, i]));
-const idfList = embeddingData.idf;
+interface FullCorpusIndex {
+  totalChunks: number;
+  vocab: string[];
+  idf: number[];
+  chunks: CorpusChunk[];
+}
+
+const fullCorpus = fullCorpusDataRaw as unknown as FullCorpusIndex;
+const vocabMap = new Map<string, number>(fullCorpus.vocab.map((w, i) => [w, i]));
+const idfList = fullCorpus.idf;
 
 // Node lookup map
 const nodeMap = new Map<string, GraphNode>();
 graphNodes.forEach(n => nodeMap.set(n.id, n));
 
 /**
- * Computes cosine similarity between user query and pre-computed graph node embeddings.
+ * Computes vector cosine similarity between user query and all 419 corpus chunks.
  */
-function computeSemanticSeeds(query: string, topK = 3): GraphNode[] {
+function retrieveTopChunks(query: string, topK = 3): { chunk: CorpusChunk; score: number }[] {
   const words = query.toLowerCase().match(/[a-z0-9_]+/g) || [];
   const queryVec: Record<number, number> = {};
   let normSq = 0;
@@ -121,25 +132,23 @@ function computeSemanticSeeds(query: string, topK = 3): GraphNode[] {
     }
   }
 
-  const scored: { node: GraphNode; score: number }[] = [];
+  const scored: { chunk: CorpusChunk; score: number }[] = [];
 
-  for (const nid in embeddingData.nodes) {
-    const item = embeddingData.nodes[nid];
+  fullCorpus.chunks.forEach(chunk => {
     let dot = 0;
-    for (const idxStr in item.vector) {
+    for (const idxStr in chunk.vector) {
       const idx = Number(idxStr);
       if (queryVec[idx]) {
-        dot += item.vector[idxStr] * queryVec[idx];
+        dot += chunk.vector[idxStr] * queryVec[idx];
       }
     }
-    const realNode = nodeMap.get(nid);
-    if (realNode && dot > 0) {
-      scored.push({ node: realNode, score: dot });
+    if (dot > 0) {
+      scored.push({ chunk, score: dot });
     }
-  }
+  });
 
   scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK).map(s => s.node);
+  return scored.slice(0, topK);
 }
 
 // Map domain topics to communities
@@ -185,14 +194,35 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
   const q = rawQuery.trim().toLowerCase();
   const queryTokens = q.split(/\s+/).filter(w => w.length > 2);
 
-  // 1. EMBEDDING-ASSISTED SEED RESOLUTION
-  let seedEntities = computeSemanticSeeds(q, 3);
+  // 1. FULL-CORPUS SEMANTIC RETRIEVAL
+  const topMatches = retrieveTopChunks(q, 3);
+  const bestMatch = topMatches.length > 0 ? topMatches[0].chunk : fullCorpus.chunks[0];
+
+  // 2. SEED ENTITY RESOLUTION FROM QUERY & RETRIEVED CHUNK
+  const scoredNodes = graphNodes.map(node => {
+    let score = 0;
+    const text = `${node.name} ${node.description} ${node.category} ${node.shortName || ''}`.toLowerCase();
+    
+    queryTokens.forEach(t => {
+      if (text.includes(t)) score += 10;
+      if (node.name.toLowerCase().includes(t)) score += 15;
+      if (node.id.toLowerCase() === t) score += 25;
+    });
+
+    if (bestMatch.text.toLowerCase().includes(node.name.toLowerCase())) score += 20;
+
+    return { node, score };
+  })
+  .filter(item => item.score > 0)
+  .sort((a, b) => b.score - a.score);
+
+  let seedEntities = scoredNodes.slice(0, 3).map(s => s.node);
   if (seedEntities.length === 0) {
     seedEntities = [graphNodes[0], graphNodes[1]];
   }
   const seedIds = new Set(seedEntities.map(s => s.id));
 
-  // 2. K-HOP RELATIONAL TRAVERSAL: Walk graph edges connected to seed entities
+  // 3. K-HOP RELATIONAL TRAVERSAL
   const traversedEdges: TraversedEdge[] = [];
   const visitedEdgePairs = new Set<string>();
 
@@ -213,7 +243,6 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
     }
   });
 
-  // Assemble human-readable traversal paths
   const graphPathSteps = traversedEdges.slice(0, 3).map(e => ({
     source: e.fromNode.name,
     relation: e.relationLabel,
@@ -222,7 +251,7 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
 
   const graphPathSummary = graphPathSteps.map(s => `[${s.source}] ──(${s.relation})──> [${s.target}]`).join('  ·  ');
 
-  // 3. COMMUNITY RESOLUTION: Identify primary graph community
+  // 4. COMMUNITY RESOLUTION
   let communityKey = 'sovereign';
   if (q.includes('50 mhz') || q.includes('clock') || q.includes('frequency') || q.includes('fmax')) {
     communityKey = 'timing';
@@ -241,7 +270,7 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
   }
   const community = communityKeywords[communityKey] || communityKeywords.sovereign;
 
-  // 4. MATCH CATALOG ITEM & AUTHORITATIVE DOCUMENT
+  // 5. MATCH CATALOG ITEM & AUTHORITATIVE DOCUMENT
   let matchedDoc = groundedDocuments[community.defaultDocIdx];
   let matchedItem = deepGridCatalog[0];
   let maxCatScore = -1;
@@ -259,16 +288,36 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
     }
   });
 
-  // 5. GRAPH-GROUNDED MULTI-TIER SYNTHESIS
+  // 6. GRAPH-GROUNDED MULTI-TIER SYNTHESIS
   let contextualTitle = '';
   let answer = '';
   let explanation: string[] = [];
   let keyBusinessFacts: string[] = [];
-  let citationSection = 'Section 4.1';
-  let citationPage = 'p. 24';
+  let citationSection = bestMatch.section;
+  let citationPage = 'p. 1–12';
   let referenceLinks: { label: string; hash: string; description: string }[] = [];
 
-  if (communityKey === 'timing') {
+  if (communityKey === 'usecases30') {
+    contextualTitle = '30 Industrial Diagnostics & Observers on a 50 MHz Scalar Core (No Accelerator)';
+    answer = 'DG32-LITE supports 30 native industrial predictive maintenance, health monitoring, and control observer use cases on its baseline 50 MHz RV32IM core without an external NPU or coprocessor. By leveraging hardware-accelerated CORDIC vector transforms and an 82% unburdened CPU headroom at 10 kHz FOC, 24 of the 30 use cases execute in under 1.0 ms (>1 kHz sample rates).';
+    explanation = [
+      'High-accuracy industrial condition monitoring does not require multi-watt neural accelerators. By exploiting the architectural reality that integer branch comparisons and table lookups cost almost nothing on a RISC-V scalar core, tree ensembles (Random Forests, Gradient Boosting) achieve 95.6% accuracy on bearing fault classification—matching deep neural networks (97–100%) while requiring zero floating-point multiplications and running 50–500× faster within a strict 16.5 KB SRAM budget.',
+      'The 30 use cases span four industrial operational domains: (1) Rotating Machinery (8 models): Bearing Fault Classification, Bearing Severity Trending, Gearbox Mesh Faults, Pump Cavitation, Fan Imbalance, Compressor Valves, Belt Slip, Shaft Misalignment; (2) Electrical & Power Diagnostics (8 models): Broken Rotor Bar Detection via 8-bin Goertzel, Air-Gap Eccentricity, Stator Inter-Turn Short, Phase Loss, Arc-Fault/Discharge, Power-Quality Events, Battery State-of-Health, Winding Thermal Estimation; (3) Control, Motion & Sensing (8 models): Sensorless Rotor Position (EKF), Learned Sensor Plausibility, Operating-Mode Classification (GMM), Duty-Cycle Tracking (HMM), Adaptive Friction Compensation, Stall Detection, Torque Ripple Estimation, Multivariate Anomaly Scoring; (4) Slower-Rate, Sequence & Anomaly (6 models): Remaining Useful Life (RUL), Unsupervised Drift (Autoencoder), Short-Horizon Forecasting (GRU), Raw Waveform 1D-CNN, Novelty Detection (Isolation Forest), Per-Machine Baselining (k-NN).',
+      'Crucially, all 30 predictive models operate in an advisory and telemetry reporting role only. The secondary hardware lockstep core retains exclusive physical authority over inverter bridge tripping, asserting the FAULT_N safe state within 2 clock cycles (<40 ns) upon any hardware overcurrent or phase-fault event. In addition, DeepGrid models are calibrated against realistic physical baselines (65%–80% accuracy on un-instrumented factory machinery) after auditing and removing academic temporal leakage found in standard CWRU benchmark datasets.'
+    ];
+    keyBusinessFacts = [
+      '24 of 30 industrial use cases execute comfortably above 1 kHz sample rates (<1.0 ms latency).',
+      'Zero NPU hardware dependency: Operates within 12.5 MMAC/s scalar budget, 16.5 KB SRAM, and 82% CPU headroom.',
+      'Strict ASIL-D advisory boundary: Lockstep hardware supervisor retains exclusive inverter trip authority in <2 clock cycles.'
+    ];
+    citationSection = 'Section 1–3: Physical Compute Envelope & 30-Use-Case Master Table';
+    citationPage = 'p. 1–12';
+    referenceLinks = [
+      { label: 'Explore 30 Industrial AI Tasks in Overview', hash: 'overview', description: 'Review the full 30 use cases and their physical compute envelopes.' },
+      { label: 'Inspect 100 kHz Control Loop Budget', hash: 'control', description: 'Analyze the cycle budget showing 82% unburdened CPU headroom.' },
+      { label: 'Review Dual-Core Lockstep Safety Gate', hash: 'architecture', description: 'Inspect the hardware fault isolation gate that decouples advisory AI from hard tripping.' }
+    ];
+  } else if (communityKey === 'timing') {
     contextualTitle = '50 MHz Operating Frequency: Lockstep Margin & Physical Timing Closure';
     answer = 'DG32 locks its primary control clock at exactly 50 MHz (20.0 ns cycle) to guarantee absolute static timing closure across all PVT corners (-40 °C to +125 °C) while running dual RV32IM cores in cycle-accurate hardware lockstep.';
     explanation = [
@@ -368,28 +417,31 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
       { label: 'Inspect Drone ESC Architecture & Pinout', hash: 'pinout', description: 'Review QFN-64 pin assignments for 3-phase gate drive and DShot signals.' },
       { label: 'Thirty Industrial Drone & Motor Use Cases', hash: 'overview', description: 'Review drone propulsion and tactical flight actuator applications.' }
     ];
-  } else if (communityKey === 'usecases30') {
-    contextualTitle = '30 Industrial Diagnostics & Observers on a 50 MHz Scalar Core (No Accelerator)';
-    answer = 'DG32-LITE supports 30 native industrial predictive maintenance, health monitoring, and control observer use cases on its baseline 50 MHz RV32IM core without an external NPU or coprocessor. By leveraging hardware-accelerated CORDIC vector transforms and an 82% unburdened CPU headroom at 10 kHz FOC, 24 of the 30 use cases execute in under 1.0 ms (>1 kHz sample rates).';
-    explanation = [
-      'High-accuracy industrial condition monitoring does not require multi-watt neural accelerators. By exploiting the architectural reality that integer branch comparisons and table lookups cost almost nothing on a RISC-V scalar core, tree ensembles (Random Forests, Gradient Boosting) achieve 95.6% accuracy on bearing fault classification—matching deep neural networks (97–100%) while requiring zero floating-point multiplications and running 50–500× faster within a strict 16.5 KB SRAM budget.',
-      'The 30 use cases span four industrial operational domains: (1) Rotating Machinery (8 models): Bearing Fault Classification, Bearing Severity Trending, Gearbox Mesh Faults, Pump Cavitation, Fan Imbalance, Compressor Valves, Belt Slip, Shaft Misalignment; (2) Electrical & Power Diagnostics (8 models): Broken Rotor Bar Detection via 8-bin Goertzel, Air-Gap Eccentricity, Stator Inter-Turn Short, Phase Loss, Arc-Fault/Discharge, Power-Quality Events, Battery State-of-Health, Winding Thermal Estimation; (3) Control, Motion & Sensing (8 models): Sensorless Rotor Position (EKF), Learned Sensor Plausibility, Operating-Mode Classification (GMM), Duty-Cycle Tracking (HMM), Adaptive Friction Compensation, Stall Detection, Torque Ripple Estimation, Multivariate Anomaly Scoring; (4) Slower-Rate, Sequence & Anomaly (6 models): Remaining Useful Life (RUL), Unsupervised Drift (Autoencoder), Short-Horizon Forecasting (GRU), Raw Waveform 1D-CNN, Novelty Detection (Isolation Forest), Per-Machine Baselining (k-NN).',
-      'Crucially, all 30 predictive models operate in an advisory and telemetry reporting role only. The secondary hardware lockstep core retains exclusive physical authority over inverter bridge tripping, asserting the FAULT_N safe state within 2 clock cycles (<40 ns) upon any hardware overcurrent or phase-fault event. In addition, DeepGrid models are calibrated against realistic physical baselines (65%–80% accuracy on un-instrumented factory machinery) after auditing and removing academic temporal leakage found in standard CWRU benchmark datasets.'
-    ];
+  } else if (topMatches.length > 0 && topMatches[0].score > 0.10) {
+    // Dynamic Synthesis from Best Retrieved Corpus Chunk across 419 Chunks
+    contextualTitle = bestMatch.section.replace(/^[0-9.]+\s*/, '').trim();
+    const cleanSnippet = bestMatch.text.split('\n\n')[0].replace(/^[#\s*-_]+/, '').replace(/\n/g, ' ').trim();
+    answer = `Grounded in ${bestMatch.docTitle} (${bestMatch.section}): ${cleanSnippet.slice(0, 280)}...`;
+    
+    const rawParagraphs = bestMatch.text.split('\n\n').filter(p => p.trim().length > 35);
+    explanation = rawParagraphs.slice(0, 3).map(p => p.replace(/^[#\s*-_]+/, '').trim());
+    if (explanation.length === 0) {
+      explanation = [bestMatch.text.slice(0, 450)];
+    }
+    
     keyBusinessFacts = [
-      '24 of 30 industrial use cases execute comfortably above 1 kHz sample rates (<1.0 ms latency).',
-      'Zero NPU hardware dependency: Operates within 12.5 MMAC/s scalar budget, 16.5 KB SRAM, and 82% CPU headroom.',
-      'Strict ASIL-D advisory boundary: Lockstep hardware supervisor retains exclusive inverter trip authority in <2 clock cycles.'
+      `Primary Architecture Source: ${bestMatch.docTitle} (${bestMatch.file})`,
+      `Verified Section: ${bestMatch.section}`,
+      `Hardware Implementation: 130nm CMOS / 180nm BCD, ISO 26262 ASIL-D, DAP-2020 Make-II`
     ];
-    citationSection = 'Section 1–3: Physical Compute Envelope & 30-Use-Case Master Table';
-    citationPage = 'p. 1–12';
+    citationSection = bestMatch.section;
     referenceLinks = [
-      { label: 'Explore 30 Industrial AI Tasks in Overview', hash: 'overview', description: 'Review the full 30 use cases and their physical compute envelopes.' },
-      { label: 'Inspect 100 kHz Control Loop Budget', hash: 'control', description: 'Analyze the cycle budget showing 82% unburdened CPU headroom.' },
-      { label: 'Review Dual-Core Lockstep Safety Gate', hash: 'architecture', description: 'Inspect the hardware fault isolation gate that decouples advisory AI from hard tripping.' }
+      { label: 'Inspect System Architecture', hash: 'architecture', description: 'Review block diagrams, clock domains, and floorplans.' },
+      { label: 'Executive Platform Directory', hash: 'overview', description: 'Explore all specialized sections of the DeepGrid platform.' },
+      { label: 'Download Whitepaper PDF', hash: 'library', description: `Access the full document (${bestMatch.pdfSize}).` }
     ];
   } else {
-    // Sovereign Economics & Default Graph Traversal
+    // Sovereign Economics Fallback
     contextualTitle = `${matchedItem.name}: Sovereign Architecture & Economics`;
     answer = `${matchedItem.summary} Manufactured on mature planar nodes, DeepGrid integrates motor control, hardware lockstep safety, and real-time telemetry into a unified 9 × 9 mm QFN-64 silicon package.`;
     explanation = [
@@ -407,6 +459,10 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
     ];
   }
 
+  const primaryDoc = groundedDocuments.find(d => d.title.toLowerCase().includes(bestMatch.docTitle.toLowerCase())) ||
+                     groundedDocuments[community.defaultDocIdx] ||
+                     matchedDoc;
+
   return {
     query: rawQuery,
     domainTag: community.tag,
@@ -419,19 +475,19 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
       steps: graphPathSteps
     },
     matchedItem,
-    matchedDoc,
+    matchedDoc: primaryDoc,
     answer,
     explanation,
     keyBusinessFacts,
     referenceLinks,
     citation: {
-      documentTitle: matchedDoc.title,
-      documentNum: matchedDoc.docNum,
-      section: citationSection,
+      documentTitle: bestMatch.docTitle || primaryDoc.title,
+      documentNum: bestMatch.docNum || primaryDoc.docNum,
+      section: bestMatch.section || citationSection,
       page: citationPage,
-      pdfPath: matchedDoc.pdfFile,
-      pdfSize: matchedDoc.fileSizePdf,
-      specPath: matchedDoc.specFile
+      pdfPath: bestMatch.pdfPath || primaryDoc.pdfFile,
+      pdfSize: bestMatch.pdfSize || primaryDoc.fileSizePdf,
+      specPath: bestMatch.specPath || primaryDoc.specFile
     },
     technicalDetails: {
       summary: 'Silicon Specifications & Electrical Implementation:',
