@@ -19,7 +19,9 @@ jobs:
       PAGES_BASE: /deepgrid-dr-silicon/
       PAGES_DOMAIN: ''
       # No API keys here. This is a static site: any NEXT_PUBLIC_ value is inlined into the public JS
-      # bundle and readable by every visitor. A model call needs a server-side proxy, not a build env.
+      # bundle and readable by every visitor. The model key lives in the GraphRAG Worker
+      # (worker/graphrag); the page gets only the Worker's address, which is not a secret.
+      NEXT_PUBLIC_GRAPHRAG_URL: https://deepgrid-graphrag.shekerkamma.workers.dev/synthesize
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
