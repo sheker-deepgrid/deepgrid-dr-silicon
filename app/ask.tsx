@@ -94,7 +94,6 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [readingDocContent, setReadingDocContent] = useState<{title: string; text: string} | null>(null);
   const [loadingDocContent, setLoadingDocContent] = useState<boolean>(false);
   const [copiedModalSpec, setCopiedModalSpec] = useState<boolean>(false);
-  const [dossierSearch, setDossierSearch] = useState<string>('');
   const [dossierLayout, setDossierLayout] = useState<'cards' | 'table'>('cards');
   const [expandedCardIds, setExpandedCardIds] = useState<Set<string>>(new Set());
 
@@ -173,35 +172,14 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     return counts;
   }, []);
 
-  // Filter catalog items with localized dossier search, document pillar and category scoping
+  // Filter catalog items strictly by document pillar
   const results = useMemo(() => {
-    let list = deepGridCatalog;
-
-    // 1. Filter by localized dossier search if provided
-    if (dossierSearch.trim()) {
-      const q = dossierSearch.toLowerCase().trim();
-      list = list.filter(item => 
-        item.name.toLowerCase().includes(q) ||
-        item.tagline.toLowerCase().includes(q) ||
-        item.summary.toLowerCase().includes(q) ||
-        (item.nodeFoundry && item.nodeFoundry.toLowerCase().includes(q)) ||
-        (item.standards && item.standards.toLowerCase().includes(q)) ||
-        (item.voltageRail && item.voltageRail.toLowerCase().includes(q)) ||
-        item.category.toLowerCase().includes(q) ||
-        item.citation.toLowerCase().includes(q)
-      );
-    }
-
-    // 2. Filter by selected document pillar
-    if (selectedDocId !== 'all') {
-      list = list.filter(item => {
-        const doc = resolveItemDocument(item);
-        return doc.id === selectedDocId;
-      });
-    }
-
-    return list;
-  }, [dossierSearch, selectedDocId]);
+    if (selectedDocId === 'all') return deepGridCatalog;
+    return deepGridCatalog.filter(item => {
+      const doc = resolveItemDocument(item);
+      return doc.id === selectedDocId;
+    });
+  }, [selectedDocId]);
 
   // Document filter for quick queries: 2 from each of the 6 PDF documents by default
   const filteredPrompts = useMemo(() => {
@@ -537,31 +515,15 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             </div>
           </div>
 
-          {/* Dossier Control & Search Toolbar */}
+          {/* Dossier Control Toolbar (Clean View & Display Controls) */}
           <div className="dr-dossier-toolbar">
-            <div className="dr-dossier-search-box">
-              <Search className="dr-dossier-search-icon" size={16} />
-              <input
-                type="search"
-                name="dossier-search"
-                autoComplete="off"
-                spellCheck={false}
-                className="dr-dossier-search-input"
-                placeholder="Filter specifications by SKU, process node, standards, or keywords…"
-                value={dossierSearch}
-                onChange={e => setDossierSearch(e.target.value)}
-                aria-label="Filter specifications"
-              />
-              {dossierSearch && (
-                <button
-                  type="button"
-                  className="dr-dossier-search-clear"
-                  onClick={() => setDossierSearch('')}
-                  aria-label="Clear dossier filter"
-                >
-                  <X size={14} />
-                </button>
-              )}
+            <div className="dr-dossier-toolbar-left">
+              <span className="dr-dossier-status-title">
+                <strong>{results.length} Specification Dossiers</strong>
+                <span className="dr-dossier-status-sub">
+                  {selectedDocId === 'all' ? 'All 6 source documents' : activeDoc.title}
+                </span>
+              </span>
             </div>
 
             {/* Layout Toggle (Cards vs Spec Matrix Table) & Expand All */}
@@ -646,20 +608,6 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                   View All (39)
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Dossier Search Indicator */}
-          {dossierSearch.trim() && (
-            <div className="dr-dossier-query-bar">
-              <span>Showing {results.length} matching specifications for &ldquo;{dossierSearch}&rdquo;</span>
-              <button
-                type="button"
-                className="dr-dossier-clear-btn"
-                onClick={() => setDossierSearch('')}
-              >
-                Clear Search
-              </button>
             </div>
           )}
 
@@ -835,23 +783,11 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
           {/* Empty State */}
           {results.length === 0 && (
             <div className="dr-ask-empty">
-              <p className="dr-lead">No specifications found matching &ldquo;{dossierSearch}&rdquo; {selectedDocId !== 'all' ? `in ${activeDoc.title}` : ''}.</p>
-              <p className="muted">
-                Try searching by SKU name (e.g. <code>SKU-1</code>, <code>SKU-4</code>, <code>SKU-7</code>), 
-                node (<code>130 nm</code>, <code>180 nm</code>, <code>SCL Mohali</code>, <code>SkyWater</code>), 
-                or reset your active filters.
-              </p>
+              <p className="dr-lead">No specifications found in this document category.</p>
               <div style={{display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '12px'}}>
-                {dossierSearch && (
-                  <button className="primary" onClick={() => setDossierSearch('')}>
-                    Reset Search Filter
-                  </button>
-                )}
-                {selectedDocId !== 'all' && (
-                  <button className="outline" onClick={() => setSelectedDocId('all')}>
-                    View All 39 Dossiers
-                  </button>
-                )}
+                <button className="outline" onClick={() => setSelectedDocId('all')}>
+                  View All 39 Dossiers
+                </button>
               </div>
             </div>
           )}

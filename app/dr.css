@@ -2111,50 +2111,30 @@ input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-sea
   border-radius: 6px;
 }
 
-.dr-dossier-search-box {
-  position: relative;
-  flex: 1;
-  min-width: 280px;
+.dr-dossier-toolbar-left {
   display: flex;
   align-items: center;
 }
 
-.dr-dossier-search-icon {
-  position: absolute;
-  left: 10px;
-  color: #7b8e83;
-  pointer-events: none;
-}
-
-.dr-dossier-search-input {
-  width: 100%;
-  padding: 7px 32px 7px 34px;
-  background: #090c0b;
-  border: 1px solid #23302b;
-  border-radius: 4px;
-  color: #e5ede7;
-  font-size: 0.78rem;
+.dr-dossier-status-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: monospace;
-  outline: none;
-  transition: border-color 0.15s ease;
+  font-size: 0.78rem;
+  color: #e5ede7;
 }
 
-.dr-dossier-search-input:focus {
-  border-color: var(--copper);
+.dr-dossier-status-title strong {
+  color: var(--copper);
+  font-weight: 600;
 }
 
-.dr-dossier-search-clear {
-  position: absolute;
-  right: 8px;
-  background: transparent;
-  border: none;
-  color: #7b8e83;
-  cursor: pointer;
-  padding: 2px;
-}
-
-.dr-dossier-search-clear:hover {
-  color: #ffffff;
+.dr-dossier-status-sub {
+  color: #7d8f84;
+  font-size: 0.72rem;
+  padding-left: 6px;
+  border-left: 1px solid #23302b;
 }
 
 .dr-dossier-toolbar-right {
