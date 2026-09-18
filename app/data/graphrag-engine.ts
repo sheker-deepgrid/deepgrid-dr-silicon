@@ -431,7 +431,7 @@ const executiveThemes: ExecutiveTheme[] = [
     docTitle: 'DG32-2DOM System Architecture',
     section: 'Section 2.1: Clock Distribution & Timing Closure Budget',
     page: 'p. 8–14',
-    pdfPath: './downloads/docs/deepgrid-2dom-system-architecture.pdf',
+    pdfPath: './downloads/docs/deepgrid-dg32-2dom-system-architecture.pdf',
     pdfSize: '77 KB',
     specPath: './downloads/docs/deepgrid-2dom-architecture.md',
     refLinks: [
