@@ -213,99 +213,85 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
 }
 
 /**
- * Background Gemini 2.5 Flash Streamer.
- * Uses NEXT_PUBLIC_GEMINI_API_KEY from background environment.
- * Not wired into any view, and must not be as-is: a NEXT_PUBLIC_ key is inlined into the static
- * bundle, so every visitor could read it. Route model calls through a server-side proxy instead.
+ * The prompt the GraphRAG proxy sends to the model, built from the same deterministic subgraph the
+ * page shows as its grounding trail. It lives here, beside queryGraphify, so the proxy and the page
+ * cannot drift apart: one function decides what the model is allowed to see. The proxy runs this
+ * itself from the query alone, so the key it holds can only ever answer questions about this graph.
  */
-export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+export function buildRagPrompt(query: string, r: GraphSearchResult): string {
+  const nodes = r.subgraphNodes.slice(0, 20).map(n =>
+    `- "${n.label}" (source: ${n.source_file || 'spec'}${n.source_location ? ', ' + n.source_location : ''}; community: ${n.community_name || 'DeepGrid'})`
+  ).join('\n');
+  const edges = r.subgraphLinks.slice(0, 15).map(e => {
+    const src = typeof e.source === 'string' ? e.source : (e.source as { id: string }).id;
+    const tgt = typeof e.target === 'string' ? e.target : (e.target as { id: string }).id;
+    return `- (${nodeMap.get(src)?.label || src}) --[${e.relation}]--> (${nodeMap.get(tgt)?.label || tgt})`;
+  }).join('\n');
+  return [
+    'You are the DeepGrid Semi silicon architect answering a diligence question.',
+    'Answer ONLY from the knowledge-graph context below. If the context does not contain the answer, say so plainly and name what is missing. Never invent a number, part, date or standard.',
+    'All DG32 figures are pre-silicon design values, not measurements; say so when you quote one.',
+    'Write 120 to 220 words: a one-sentence answer first, then at most five short bullets. Use plain text with "- " bullets and **bold** for at most three key terms. No headings, no tables.',
+    '',
+    `Question: ${query}`,
+    '',
+    'Verified facts from the matched catalog entry:',
+    r.instantSynthesis,
+    '',
+    'Graph entities reached from the question:',
+    nodes || '- (none)',
+    '',
+    'Graph relationships:',
+    edges || '- (none)',
+  ].join('\n');
+}
 
-export async function streamGeminiRAG(
+/**
+ * Stream a live GraphRAG synthesis from the proxy. The model key lives in the proxy, never in this
+ * static bundle: the page sends only the question. Resolves to the full text, or null when the proxy
+ * is unavailable, rate-limited or out of quota, so the caller can fall back to the deterministic
+ * synthesis instead of showing an error.
+ */
+export async function streamGraphRAG(
+  url: string,
   query: string,
-  searchResult: GraphSearchResult,
-  onChunk: (text: string) => void
-): Promise<string> {
-  // Read background API key from environment variable
-  const apiKey = (process.env.NEXT_PUBLIC_GEMINI_API_KEY || '').trim();
-  
-  if (!apiKey) {
-    // If no network key is embedded in build, deliver the instant deep synthesis
-    onChunk(searchResult.instantSynthesis);
-    return searchResult.instantSynthesis;
+  onChunk: (text: string) => void,
+  signal?: AbortSignal
+): Promise<string | null> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({query}),
+      signal,
+    });
+  } catch {
+    return null;
   }
-
-  const context = searchResult.subgraphNodes.map(n => 
-    `- Entity: "${n.label}" (File: ${n.source_file || 'spec'}, Line: ${n.source_location || '1'}, Community: ${n.community_name || 'DeepGrid'})`
-  ).join('\n');
-
-  const edgeContext = searchResult.subgraphLinks.slice(0, 15).map(e => 
-    `- (${e.source}) --[${e.relation}]--> (${e.target})`
-  ).join('\n');
-
-  const systemInstruction = 
-    `You are the DeepGrid Semi Lead Silicon Architect. ` +
-    `Answer the user query strictly using the verified Graphify knowledge graph context provided below. ` +
-    `Rules: Zero hallucination, cite exact silicon nodes (SkyWater 130nm / 180nm BCD), pinout references, and statutory moats (DAP-2020 Make-II) where relevant. Format clearly with bold headers and bullet points.`;
-
-  const prompt = `User Query: "${query}"\n\nVerified Subgraph Context:\n${context}\n\nKey Graph Relationships:\n${edgeContext}\n\nProvide an authoritative, executive engineering response:`;
-
-  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
-
-  for (const model of modelsToTry) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: `${systemInstruction}\n\n${prompt}` }] }]
-        })
-      });
-
-      if (!response.ok) {
-        continue;
+  if (!res.ok || !res.body) return null;
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '', text = '';
+  for (;;) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    // strip CRs so \r\n-framed events split too; a CR inside a JSON string is escaped, never literal
+    buffer += decoder.decode(value, {stream: true}).replace(/\r/g, '');
+    // SSE events end with a blank line; keep any partial event for the next read
+    const events = buffer.split('\n\n');
+    buffer = events.pop() || '';
+    for (const ev of events) {
+      for (const line of ev.split('\n')) {
+        if (!line.startsWith('data:')) continue;
+        const json = line.slice(5).trim();
+        if (!json || json === '[DONE]') continue;
+        try {
+          const part = JSON.parse(json)?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (part) { text += part; onChunk(text); }
+        } catch { /* a malformed event is skipped, not fatal */ }
       }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
-
-      if (!reader) throw new Error('ReadableStream not supported');
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const jsonStr = line.replace('data: ', '').trim();
-            if (!jsonStr || jsonStr === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const candidate = parsed.candidates?.[0];
-              const partText = candidate?.content?.parts?.[0]?.text || '';
-              if (partText) {
-                fullText += partText;
-                onChunk(fullText);
-              }
-            } catch {
-              // Ignore SSE framing chunks
-            }
-          }
-        }
-      }
-
-      if (fullText) return fullText;
-    } catch {
-      // Try fallback model
     }
   }
-
-  // Fallback to instant synthesis if streaming fails
-  onChunk(searchResult.instantSynthesis);
-  return searchResult.instantSynthesis;
+  return text || null;
 }

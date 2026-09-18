@@ -11,6 +11,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import {getGroundedAnswer} from './data/multi-agent-engine';
+import LiveGraphRAG from './live-graphrag';
 
 interface GroundedAnswerViewProps {
   query: string;
@@ -88,6 +89,9 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
           </div>
         </div>
       </div>
+
+      {/* Live GraphRAG: model synthesis over the same graph, opt-in, below the verified answer */}
+      <LiveGraphRAG query={query} />
 
       {/* 2. Progressive Disclosure: Deeper Technical Specifications */}
       {result.technicalDetails && (

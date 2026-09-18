@@ -1,0 +1,14 @@
+{
+  // GraphRAG proxy for Ask DeepGrid. Deploy: npx wrangler deploy -c worker/graphrag/wrangler.jsonc
+  // Key: npx wrangler secret put GEMINI_API_KEY -c worker/graphrag/wrangler.jsonc
+  "name": "deepgrid-graphrag",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-09-01",
+  "vars": {
+    // production browsers only; local dev adds localhost through .dev.vars
+    "ALLOWED_ORIGINS": "https://shekerkamma.github.io"
+  },
+  "ratelimits": [
+    {"name": "LIMITER", "namespace_id": "4201", "simple": {"limit": 8, "period": 60}}
+  ]
+}
