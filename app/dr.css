@@ -1925,3 +1925,153 @@ input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-sea
    label, at the heading's edge, a step quieter. Every word stays; phones already hide the question. */
 .section-label{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px}
 .section-label>span{font-size:var(--text-meta);letter-spacing:.06em;color:#7f8b81;text-align:left}
+
+/* ==========================================================================
+   Specification Dossiers — Document Pillar Context Banner & UX Polish
+   ========================================================================== */
+.dr-dossier-doc-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(180deg, #121815 0%, #0d1210 100%);
+  border: 1px solid #233029;
+  border-left: 3px solid var(--copper);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.dr-dossier-doc-banner-main {
+  flex: 1;
+  min-width: 280px;
+}
+
+.dr-dossier-banner-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.dr-dossier-pill-tag {
+  font-family: monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--copper);
+  background: #d4a36e18;
+  border: 1px solid #d4a36e40;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dr-dossier-count-tag {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: #34d399;
+  background: #34d39914;
+  border: 1px solid #34d39933;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.dr-dossier-doc-title {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  color: #f1f5f2;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.dr-dossier-doc-subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #94a397;
+  line-height: 1.45;
+}
+
+.dr-dossier-doc-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dr-dossier-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  font-size: 0.74rem;
+  font-family: monospace;
+  font-weight: 600;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.dr-dossier-action-btn.primary {
+  background: #1e2b24;
+  color: #cde6d5;
+  border-color: #34d39955;
+}
+
+.dr-dossier-action-btn.primary:hover {
+  background: #27382f;
+  border-color: #34d39999;
+  color: #ffffff;
+}
+
+.dr-dossier-action-btn.secondary {
+  background: #161c18;
+  color: #d4a36e;
+  border-color: #d4a36e44;
+}
+
+.dr-dossier-action-btn.secondary:hover {
+  background: #202823;
+  border-color: #d4a36e88;
+  color: #ffe0b2;
+}
+
+.dr-dossier-action-btn.outline {
+  background: transparent;
+  color: #8fa093;
+  border-color: #2b3830;
+}
+
+.dr-dossier-action-btn.outline:hover {
+  background: #161c18;
+  color: #dbe4dd;
+  border-color: #43554a;
+}
+
+.dr-dossier-query-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  background: #111714;
+  border: 1px dashed #2d3b32;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #9eb1a3;
+  margin-bottom: 16px;
+}
+
+.dr-dossier-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--copper);
+  font-family: monospace;
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
