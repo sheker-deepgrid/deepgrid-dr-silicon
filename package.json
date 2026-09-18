@@ -7,14 +7,15 @@
   },
   "scripts": {
     "dev": "vinext dev",
-    "build": "node scripts/copy-runtime.mjs && node scripts/build.mjs",
+    "build": "node scripts/check-semantic.mjs && node scripts/copy-runtime.mjs && node scripts/build.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
-    "build:pages": "node scripts/copy-runtime.mjs && node scripts/build.mjs && node scripts/package-pages.mjs",
+    "build:pages": "node scripts/check-semantic.mjs && node scripts/copy-runtime.mjs && node scripts/build.mjs && node scripts/package-pages.mjs",
     "build:semantic": "node scripts/build-semantic-index.mjs",
-    "publish:graph": "node scripts/publish-graph.mjs"
+    "publish:graph": "node scripts/publish-graph.mjs",
+    "check:semantic": "node scripts/check-semantic.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

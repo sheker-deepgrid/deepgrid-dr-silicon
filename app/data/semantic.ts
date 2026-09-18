@@ -9,8 +9,8 @@
 import {semanticRowKey, type SemanticScores} from './graphrag-engine';
 
 type Meta = {model: string; dtype: string; dims: number; scale: number;
-  counts: {nodes: number; chunks: number; themes: number}; rowKeySha256: string; modelSha256: string;
-  queryPrefix?: string};
+  counts: {nodes: number; chunks: number; themes: number; examples?: number}; rowKeySha256: string; modelSha256: string;
+  queryPrefix?: string; exampleTheme?: number[]; themeMin?: number; themeGap?: number};
 type Extractor = (texts: string[], opts: {pooling: 'mean'; normalize: boolean}) => Promise<{data: Float32Array}>;
 export type Semantic = {scores: (question: string) => Promise<SemanticScores>};
 
@@ -57,8 +57,9 @@ async function load(): Promise<Semantic | null> {
     // stale index: rows would line up with the wrong nodes, so stay on TF-IDF
     if (meta.rowKeySha256 !== await sha256(semanticRowKey())) return null;
     const rows = new Int8Array(bin);
-    const {nodes, chunks, themes} = meta.counts, dims = meta.dims;
-    if (rows.length !== (nodes + chunks + themes) * dims) return null;
+    const {nodes, chunks, themes} = meta.counts, examples = meta.counts.examples || 0, dims = meta.dims;
+    const exampleTheme = meta.exampleTheme || [];
+    if (rows.length !== (nodes + chunks + themes + examples) * dims || exampleTheme.length !== examples) return null;
 
     const {pipeline, env} = await import('@huggingface/transformers');
     env.allowRemoteModels = false;                    // the model comes from this site, never the HF hub
@@ -88,7 +89,13 @@ async function load(): Promise<Semantic | null> {
       scores: async (question: string) => {
         // the model's own retrieval instruction for questions, recorded with the index (BGE: see the build script)
         const q = (await extract([(meta.queryPrefix || '') + question], {pooling: 'mean', normalize: true})).data;
-        return {nodes: block(0, nodes, q), chunks: block(nodes, chunks, q), themes: block(nodes + chunks, themes, q)};
+        // a curated answer scores its best match: its own text or any of its example questions,
+        // exactly as the routing eval scored it when the index was built
+        const themeScores = block(nodes + chunks, themes, q);
+        const ex = block(nodes + chunks + themes, examples, q);
+        ex.forEach((v, k) => { const t = exampleTheme[k]; if (v > themeScores[t]) themeScores[t] = v; });
+        return {nodes: block(0, nodes, q), chunks: block(nodes, chunks, q), themes: themeScores,
+          themeMin: meta.themeMin, themeGap: meta.themeGap};
       },
     };
   } catch {

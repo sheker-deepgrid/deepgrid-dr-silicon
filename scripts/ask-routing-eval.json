@@ -1,0 +1,31 @@
+{
+  "_about": "Held-out routing eval for Ask DeepGrid. Each question names the curated answer (theme title) it must reach, or null for a question that must NOT be forced into a curated answer. Written on 18 Sep 2026 before the example questions in app/data/theme-examples.ts existed; never copy these into that file. npm run build:semantic picks the curated-answer threshold from this set (most correct with zero wrong and zero forced) and fails if that bar cannot be met.",
+  "minRecall": 0.7,
+  "cases": [
+    {"q": "How can the chip spot a cracked rotor bar without a big frequency transform?", "expect": "Goertzel Recurrence vs. 8 MB FFT for Broken Rotor Bar Detection"},
+    {"q": "Why is a single peakedness statistic a poor alarm for worn bearings?", "expect": "The Kurtosis Non-Monotonicity Trap in Bearing Health Alarms"},
+    {"q": "How much machine learning can the base chip run with no dedicated neural hardware?", "expect": "DG32-LITE AI Compute Envelope (No Accelerator)"},
+    {"q": "What diagnostic jobs can the entry chip handle in a factory?", "expect": "30 Industrial Diagnostics & Observers on a 50 MHz Scalar Core"},
+    {"q": "Are published bearing-fault accuracy numbers inflated by how the data was split?", "expect": "Academic Benchmark Audit: CWRU Bearing Dataset Leakage"},
+    {"q": "Does DG32 qualify under Indian defence procurement rules for domestic content?", "expect": "DAP-2020 Buy (Indian-IDDM) & Make-II Statutory Defence Moats"},
+    {"q": "How does the chip read speed commands and report RPM back to the flight controller?", "expect": "Hardware DShot Receive (dgrid_dshot_rx) & Zero-Jitter Motor Telemetry"},
+    {"q": "Why was the clock speed chosen where it is?", "expect": "50 MHz Operating Frequency: Lockstep Margin & Physical Timing Closure"},
+    {"q": "How does DG32 compare with the incumbent entry-level ST microcontroller?", "expect": "DG32 vs. STM32G0: Hardware Lockstep, BOM Cost & Latency Benchmark"},
+    {"q": "How will the seed money be spent and how long will it last?", "expect": "₹10 Cr Capital Waterfall & 24-Month Seed Runway"},
+    {"q": "What happens to the business if Chinese competitors slash prices?", "expect": "Chinese Price Crash Stress Test & Operational Stop Rules S1–S4"},
+    {"q": "Which pins are on which side of the package?", "expect": "DG32 64-Pin QFN Physical Pin Map & Packaging Specification"},
+    {"q": "Can supply be guaranteed if foreign fabs are cut off?", "expect": "Sovereign Supply Chain Immunity: The Three-Factory & 100% Domestic Architecture"},
+    {"q": "How does the lockstep checker catch a faulty computation?", "expect": "Hardware Lockstep: How DG32 Catches a Faulty Computation"},
+    {"q": "What stops the motor if the processor silently computes a wrong value?", "expect": "Hardware Lockstep: How DG32 Catches a Faulty Computation"},
+    {"q": "What does DG32-2DOM add over DG32-LITE?", "expect": null},
+    {"q": "How much SRAM does the chip have?", "expect": null},
+    {"q": "What is the D100 drone processor?", "expect": null},
+    {"q": "What radar chip is on the roadmap?", "expect": null},
+    {"q": "How does the attention engine stay isolated from motor control?", "expect": null},
+    {"q": "What voltage rails does the chip need?", "expect": null},
+    {"q": "How many CORDIC operations does one control loop use?", "expect": null},
+    {"q": "What is the verification evidence for pre-silicon figures?", "expect": null},
+    {"q": "What is the weather in Tokyo tomorrow?", "expect": null},
+    {"q": "Recommend a good pasta recipe", "expect": null}
+  ]
+}

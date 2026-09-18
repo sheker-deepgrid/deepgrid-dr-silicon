@@ -8,6 +8,7 @@
 // 100% Deterministic, $0 Runtime Cost, Fully Static Compatible.
 
 import unifiedIndexRaw from './graphrag-unified-index.json';
+import {THEME_EXAMPLES} from './theme-examples';
 import { deepGridCatalog, DeepGridItem, GraphNode } from './deepgrid-knowledge';
 import { groundedDocuments, GroundedDoc } from '../documents-data';
 
@@ -601,7 +602,7 @@ export const executiveThemes: ExecutiveTheme[] = [
     // fault register (QFN-64 datasheet p. 1), FAULT_N active-low on pin 59 (p. 12), the 2-cycle checker
     // lag and "simulation, not silicon" (site Overview). 780 ns is 39 cycles x 20 ns at 50 MHz. Internal
     // module names and board-design guidance are left out on purpose, as everywhere on the site.
-    keywords: ['lockstep', 'checker core', 'fault latch', 'fault_n', 'faulty computation', 'fault isolation', 'fault detection', 'fault injection', 'second core', 'safe state'],
+    keywords: ['lockstep', 'checker core', 'fault latch', 'fault_n', 'faulty computation', 'fault isolation', 'fault detection', 'fault injection', 'second core', 'safe state', 'wrong value', 'silent fault', 'silently computes'],
     title: 'Hardware Lockstep: How DG32 Catches a Faulty Computation',
     tag: 'SAFETY CORE · HARDWARE LOCKSTEP',
     lead: 'DG32 runs two identical RISC-V cores in lockstep and compares their committed stores in hardware; on the first mismatch it latches the cause and drives its FAULT_N output, within 39 cycles of an injected fault in simulation, without waiting for firmware.',
@@ -637,14 +638,19 @@ export const executiveThemes: ExecutiveTheme[] = [
  * Each array is aligned with graphIndex.nodes, graphIndex.chunks and executiveThemes. Without them the
  * engine ranks by TF-IDF exactly as before, so the page answers while the model is still loading.
  */
-export interface SemanticScores { nodes: Float32Array; chunks: Float32Array; themes: Float32Array }
+export interface SemanticScores {
+  nodes: Float32Array; chunks: Float32Array; themes: Float32Array;
+  // thresholds picked by the routing eval when the index was built (scripts/ask-routing-eval.json)
+  themeMin?: number; themeGap?: number;
+}
 
 // A reworded question reuses a curated theme only when that theme is both close and clearly closer than
 // the runner-up. Similarity alone cannot separate them: an un-themed question can score as high as a
 // genuine match. The gap can. Calibrated per model on 15 reworded + 10 un-themed questions:
 //   BGE-small + query instruction (current): 0.30 / 0.06 -> 11/15 curated, 0 wrong, 0/10 forced
 //   MiniLM-L6 (previous):                    0.30 / 0.08 -> 13/15 curated, 0 wrong, 0/10 forced
-// A small set, and model-specific: re-run the calibration whenever the embedding model changes.
+// These are fallbacks only: `npm run build:semantic` now picks both from the routing eval
+// (scripts/ask-routing-eval.json) against the example-question bank, and the index carries them.
 export const SEMANTIC_THEME_MIN = 0.30;
 export const SEMANTIC_THEME_GAP = 0.06;
 
@@ -654,7 +660,8 @@ export const SEMANTIC_THEME_GAP = 0.06;
  */
 export function semanticRowKey(): string {
   return [graphIndex.nodes.map(n => n.id).join('\n'), graphIndex.chunks.map(c => c.id).join('\n'),
-    executiveThemes.map(t => t.title).join('\n')].join('\n--\n');
+    executiveThemes.map(t => t.title).join('\n'),
+    executiveThemes.map(t => (THEME_EXAMPLES[t.title] || []).join('\n')).join('\n~\n')].join('\n--\n');
 }
 
 export function executeGraphRAG(rawQuery: string, sem?: SemanticScores | null): GraphRAGResult {
@@ -684,7 +691,8 @@ export function executeGraphRAG(rawQuery: string, sem?: SemanticScores | null): 
   if (useSem && maxThemeScore < 15) {
     const order = Array.from(sem!.themes, (v, i) => [v, i] as const).sort((a, b) => b[0] - a[0]);
     const [best, second] = [order[0], order[1]];
-    if (best && best[0] >= SEMANTIC_THEME_MIN && best[0] - (second ? second[0] : 0) >= SEMANTIC_THEME_GAP) {
+    const min = sem!.themeMin ?? SEMANTIC_THEME_MIN, gap = sem!.themeGap ?? SEMANTIC_THEME_GAP;
+    if (best && best[0] >= min && best[0] - (second ? second[0] : 0) >= gap) {
       matchedTheme = executiveThemes[best[1]];
       maxThemeScore = 15;
     }
