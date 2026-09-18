@@ -558,6 +558,42 @@ const executiveThemes: ExecutiveTheme[] = [
       { label: 'Inspect QFN-64 Pinout & Layout Rules', hash: 'pinout', description: 'Review full 64-pin table and high-speed PCB routing rules.' },
       { label: 'Download QFN-64 Datasheet PDF', hash: 'library', description: 'Access the complete 24-page electrical and physical datasheet.' }
     ]
+  },
+
+  // 13. Sovereign Supply Chain Immunity & Three-Factory Strategy
+  {
+    keywords: [
+      'supply chain', 'immune', 'disruption', 'supply chain disruption',
+      'sovereign silicon', 'three-factory', 'three factory', 'sovereignty',
+      'import substitution', 'foundry roadmap', 'skywater', 'ihp', 'scl mohali',
+      'domestic supply', 'geopolitical'
+    ],
+    title: 'Sovereign Supply Chain Immunity: The Three-Factory & 100% Domestic Architecture',
+    tag: 'SOVEREIGN SUPPLY CHAIN IMMUNITY · THREE-FACTORY ROADMAP',
+    lead: 'DeepGrid silicon achieves complete immunity from global semiconductor disruptions through a sovereign Three-Factory manufacturing strategy: dual-sourcing across SkyWater (130 nm CMOS) and SCL Mohali (180 nm BCD), utilizing open-source EDA tooling free of Western export controls, and packaging in standard wirebond QFNs available entirely within India.',
+    explanation: [
+      'The Three-Factory Redundancy Architecture: Unlike foreign microcontrollers tied to single geographic fabs (e.g. TSMC or UMC in Taiwan), DeepGrid designs its silicon masks to be process-portable across three independent foundries: (1) SkyWater Technology (USA) for commercial 130 nm CMOS tape-outs; (2) IHP Microelectronics (Germany) for 130 nm / 250 nm SiGe BiCMOS radar front-ends; and (3) SCL Mohali (India) for sovereign 180 nm BCD fabrication. If any single fab or trade route faces geopolitical embargo or disruption, production shifts across qualified masks without architectural redesign.',
+      'Open-Source EDA & Export Control Immunity: DeepGrid completely eliminates dependency on proprietary, ITAR-restricted EDA tools (Synopsys, Cadence) that require recurring foreign licenses. By pioneering full RTL-to-GDSII tape-outs using the open-source OpenLane/OpenROAD flow and open SkyWater PDKs, DeepGrid owns 100% of its intellectual property and mask tooling, ensuring that foreign sanctions or software revoking can never halt domestic silicon delivery.',
+      'Statutory Defence Moat & Standard Packaging: By standardizing on mature 9×9 mm 64-pin QFN packages with domestic wirebonding, DeepGrid avoids complex advanced packaging bottlenecks (such as CoWoS or TSVs). Under Ministry of Defence DAP-2020 Make-II regulations and the 5th Positive Indigenisation List (PIL-5), DeepGrid qualifies for Buy (Indian-IDDM) status with >50% domestic content, securing mandatory statutory purchasing priority over imported silicon.'
+    ],
+    facts: [
+      'Three-Factory Foundry Redundancy: Portable GDSII masks qualified across SkyWater 130 nm, IHP SiGe, and SCL Mohali 180 nm.',
+      'Open-Source EDA Independence: 100% open-source RTL-to-GDSII toolchain eliminates Western software licensing chokeholds.',
+      'Domestic Wirebond Packaging: Standard 64-pin QFN packaging eliminates reliance on foreign advanced packaging foundries.',
+      'Statutory Procurement Immunity: Qualifies for DAP-2020 Make-II and PIL-5 statutory protection against foreign price wars.'
+    ],
+    docNum: '05',
+    docTitle: 'Master Whitepaper v3 (Mature-Node Silicon)',
+    section: 'Section 4 & 9: Sovereign Supply Architecture & Three-Factory Strategy',
+    page: 'p. 18–24',
+    pdfPath: './downloads/docs/deepgrid-mature-node-silicon-master-whitepaper-v3.pdf',
+    pdfSize: '5.4 MB',
+    specPath: './downloads/docs/deepgrid-mature-silicon-architecture.md',
+    refLinks: [
+      { label: 'Examine Three-Factory Roadmap', hash: 'roadmap', description: 'Review the multi-fab transition across SkyWater, IHP, and SCL Mohali.' },
+      { label: 'Inspect DAP-2020 Defence Moats', hash: 'overview', description: 'Read statutory indigenisation requirements under Make-II rules.' },
+      { label: 'Review 198-Day Execution Loop', hash: 'loop', description: 'Analyze the fast tape-out timeline enabled by open-source EDA.' }
+    ]
   }
 ];
 
@@ -587,7 +623,10 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
   graphIndex.nodes.forEach(node => {
     const score = dotProduct(qVec, node.vector);
     if (score > 0) {
-      scoredNodes.push({ node, score });
+      // Prioritize semantic specification & architecture nodes over low-level AST code tokens
+      const isCodeAst = node.category === 'code' || node.name.endsWith('()') || node.id.startsWith('source_');
+      const adjustedScore = isCodeAst ? score * 0.25 : score * 1.5;
+      scoredNodes.push({ node, score: adjustedScore });
     }
   });
 

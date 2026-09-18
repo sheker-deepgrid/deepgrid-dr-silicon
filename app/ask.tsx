@@ -140,7 +140,14 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   });
 
   const [dragNode, setDragNode] = useState<string | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const graphIframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  // Send message to embedded graph when query changes
+  const sendGraphSearch = (term: string) => {
+    if (graphIframeRef.current && graphIframeRef.current.contentWindow) {
+      graphIframeRef.current.contentWindow.postMessage({ search: term }, '*');
+    }
+  };
 
   // Active selected item details with bidirectional mapping
   const activeDetailItem = useMemo(() => {
@@ -270,36 +277,6 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     { id: 'finance', label: 'Capital & Financial Audits' }
   ];
 
-  // Dragging logic for graph nodes
-  const handleMouseDown = (nodeId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDragNode(nodeId);
-    setSelectedNodeId(nodeId);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!dragNode || !svgRef.current) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const x = Math.max(5, Math.min(95, ((e.clientX - rect.left) / rect.width) * 100));
-    const y = Math.max(5, Math.min(95, ((e.clientY - rect.top) / rect.height) * 100));
-    setNodePositions(prev => ({
-      ...prev,
-      [dragNode]: { x, y }
-    }));
-  };
-
-  const handleMouseUp = () => {
-    setDragNode(null);
-  };
-
-  const resetGraphPositions = () => {
-    const initial: Record<string, {x: number; y: number}> = {};
-    graphNodes.forEach(n => {
-      initial[n.id] = { x: n.x, y: n.y };
-    });
-    setNodePositions(initial);
-  };
-
   // Node Category styling helper
   const getNodeColor = (cat: string) => {
     switch (cat) {
@@ -418,7 +395,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
 
             <div className="dr-graphify-header-right">
               <a
-                href="./downloads/graph.html"
+                href={`./downloads/graph.html${query ? `?search=${encodeURIComponent(query)}` : ''}`}
                 target="_blank"
                 rel="noreferrer"
                 className="dr-graphify-btn outline"
@@ -446,10 +423,66 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             </div>
           </div>
 
+          {/* Query-Contextual Focus Strip */}
+          <div className="dr-graphify-focus-strip">
+            <span className="dr-focus-label">CONTEXTUAL SUBGRAPH FOCUS:</span>
+            <div className="dr-focus-chips">
+              <button
+                type="button"
+                className="dr-focus-chip"
+                onClick={() => sendGraphSearch('Goertzel')}
+                title="Focus on Edge AI Goertzel recurrence filter"
+              >
+                Doc 1: Goertzel Recurrence
+              </button>
+              <button
+                type="button"
+                className="dr-focus-chip"
+                onClick={() => sendGraphSearch('DShot')}
+                title="Focus on Hardware DShot RX RTL"
+              >
+                Doc 3: DShot RTL & GCR
+              </button>
+              <button
+                type="button"
+                className="dr-focus-chip"
+                onClick={() => sendGraphSearch('2DOM')}
+                title="Focus on Dual-Domain DG32-2DOM CDC Bridges"
+              >
+                Doc 4: DG32-2DOM Dual Clock
+              </button>
+              <button
+                type="button"
+                className="dr-focus-chip"
+                onClick={() => sendGraphSearch('Three-Factory')}
+                title="Focus on Sovereign Three-Factory Roadmap"
+              >
+                Doc 5: Three-Factory Roadmap
+              </button>
+              <button
+                type="button"
+                className="dr-focus-chip"
+                onClick={() => sendGraphSearch('DAP-2020')}
+                title="Focus on DAP-2020 Make-II Moats"
+              >
+                Doc 5: DAP-2020 Make-II
+              </button>
+              <button
+                type="button"
+                className="dr-focus-chip"
+                onClick={() => sendGraphSearch('QFN-64')}
+                title="Focus on QFN-64 Packaging & Pinout"
+              >
+                Doc 6: QFN-64 Pinout
+              </button>
+            </div>
+          </div>
+
           {/* Embedded vis.js Interactive Graph Stage */}
           <div className="dr-graphify-frame-wrap">
             <iframe
-              src="./downloads/graph.html"
+              ref={graphIframeRef}
+              src={`./downloads/graph.html${query ? `?search=${encodeURIComponent(query)}` : ''}`}
               title="DeepGrid Graphify Knowledge Network"
               className="dr-graphify-iframe"
               loading="lazy"

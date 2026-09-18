@@ -215,6 +215,48 @@ document.addEventListener('click', e => {
     searchResults.style.display = 'none';
 });
 
+function applyQuerySearch(queryText) {
+  if (!queryText) return;
+  const q = queryText.toLowerCase().trim();
+  const matches = RAW_NODES.filter(n => 
+    n.label.toLowerCase().includes(q) || 
+    (n.community_name && n.community_name.toLowerCase().includes(q)) ||
+    (n.source_file && n.source_file.toLowerCase().includes(q))
+  );
+  if (matches.length > 0) {
+    const top = matches[0];
+    searchInput.value = top.label;
+    network.focus(top.id, { scale: 1.6, animation: { duration: 1000, easingFunction: "easeInOutQuad" } });
+    network.selectNodes([top.id]);
+    showInfo(top.id);
+  }
+}
+
+// Support query parameters & parent window postMessage
+const urlParams = new URLSearchParams(window.location.search);
+const initialSearch = urlParams.get("search");
+const initialFocus = urlParams.get("focus");
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    if (initialFocus) {
+      focusNode(initialFocus);
+    } else if (initialSearch) {
+      applyQuerySearch(initialSearch);
+    }
+  }, 700);
+});
+
+window.addEventListener("message", event => {
+  if (event.data && typeof event.data === "object") {
+    if (event.data.search) {
+      applyQuerySearch(event.data.search);
+    } else if (event.data.focus) {
+      focusNode(event.data.focus);
+    }
+  }
+});
+
 const hiddenCommunities = new Set();
 
 const selectAllCb = document.getElementById('select-all-cb');
