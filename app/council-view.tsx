@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import {executeGraphRAG} from './data/graphrag-engine';
 import LiveCouncil from './live-council';
-import VisualGraphTraversal from './visual-graph-traversal';
+import ADKMultiAgentTraversal from './adk-multiagent-traversal';
 
 interface GroundedAnswerViewProps {
   query: string;
@@ -38,8 +38,8 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
           </span>
         </div>
 
-        {/* Interactive Visual AGUI Graph Traversal Component */}
-        <VisualGraphTraversal result={result} />
+        {/* Google ADK Multi-Agent Execution Graph Component */}
+        <ADKMultiAgentTraversal result={result} />
 
         {/* Query-Contextual Title */}
         <h2 className="dr-contextual-title">{result.contextualTitle}</h2>
