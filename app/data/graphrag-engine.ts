@@ -281,14 +281,15 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
   // 6. MULTI-TIER GROUNDED SYNTHESIS FROM GRAPH & RETRIEVED CHUNK
   const contextualTitle = primarySeed.name.length > 55 ? primarySeed.name.slice(0, 52) + '...' : primarySeed.name;
 
-  // Clean the PDF excerpt
-  const cleanSnippet = bestChunk.text
-    .split('\n\n')[0]
-    .replace(/^[#\s*-_]+/, '')
-    .replace(/\n/g, ' ')
-    .trim();
+  // Clean the PDF excerpt and find substantial sentences
+  const contentLines = bestChunk.text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 25 && !/^(contents|navigate|deepgrid semi|plain edition|page \d+)/i.test(l));
 
-  const answer = `Semantic entry at [${primarySeed.name}] within community "${communityName}". ${cleanSnippet.slice(0, 260)}...`;
+  const cleanSnippet = contentLines.slice(0, 4).join(' ').replace(/\s+/g, ' ');
+
+  const answer = `Semantic entry at [${primarySeed.name}] within community "${communityName}": ${cleanSnippet.slice(0, 280)}...`;
 
   // Deep 3-Paragraph Grounded Explanation
   const explanation: string[] = [
