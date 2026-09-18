@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import {executeGraphRAG} from './data/graphrag-engine';
 import LiveCouncil from './live-council';
+import VisualGraphTraversal from './visual-graph-traversal';
 
 interface GroundedAnswerViewProps {
   query: string;
@@ -37,27 +38,8 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
           </span>
         </div>
 
-        {/* Real GraphRAG Traversal Path Display */}
-        {result.graphPath.steps.length > 0 && (
-          <div className="dr-graphrag-path-card">
-            <div className="dr-graphrag-path-head">
-              <span className="mono dr-graphrag-path-label">
-                <Network size={13} style={{marginRight: '6px'}} />
-                GRAPHRAG TRAVERSAL TRAIL ({result.seedEntities.length} SEEDS · {result.traversedEdges.length} EDGES)
-              </span>
-              <span className="dr-graphrag-community">{result.communityName}</span>
-            </div>
-            <div className="dr-graphrag-breadcrumbs">
-              {result.graphPath.steps.map((step, idx) => (
-                <div key={idx} className="dr-graphrag-step">
-                  <span className="dr-step-node">{step.source}</span>
-                  <span className="dr-step-rel">──({step.relation})──&gt;</span>
-                  <span className="dr-step-node">{step.target}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Interactive Visual AGUI Graph Traversal Component */}
+        <VisualGraphTraversal result={result} />
 
         {/* Query-Contextual Title */}
         <h2 className="dr-contextual-title">{result.contextualTitle}</h2>
