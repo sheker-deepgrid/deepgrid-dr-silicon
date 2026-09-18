@@ -176,7 +176,7 @@ export default function Home(){
     <div className="thesis-heading">
       <h2>Thirty mission-critical tasks.<br/><em>Standard silicon envelope.</em></h2>
       <div>
-        <p>Beyond motor commutation, DG32 runs edge diagnostics directly on the motor-control SoC without an external coprocessor. By leveraging hardware transforms and 82% unburdened CPU headroom, 24 of 30 industrial use cases execute above 1 kHz sample rates.</p>
+        <p>Beyond motor commutation, DG32 runs edge diagnostics directly on the motor-control SoC without an external coprocessor. By leveraging hardware transforms and 82% unburdened CPU headroom, 24 of 30 industrial use cases execute above 1 kHz sample rates.</p>
         <div className="dr-usecase-header-actions">
           <button className="primary" onClick={()=>go('library?pkg=lite')}>
             Download 30-Use-Cases Whitepaper (PDF) <Download size={16} />
@@ -228,7 +228,7 @@ export default function Home(){
         <strong>Whitepaper Proof:</strong> Verified across CWRU bearing dataset benchmarks, Goertzel broken rotor bar filters, and ISO 13373 vibration standards.
       </div>
       <div className="dr-usecases-links">
-        <button className="text-link" onClick={()=>navigate('control')}>Inspect 100 kHz Control Headroom <ArrowUpRight size={16}/></button>
+        <button className="text-link" onClick={()=>navigate('control')}>Inspect 100 kHz Control Headroom <ArrowUpRight size={16}/></button>
         <button className="text-link" onClick={()=>navigate('family')}>DG32-LITE vs DG32-2DOM Comparison <ArrowUpRight size={16}/></button>
       </div>
     </div>
@@ -266,7 +266,7 @@ export default function Home(){
     <div className="thesis-heading">
       <h2>One unified platform.<br/><em>Explore all seven sections.</em></h2>
       <div>
-        <p>This overview anchors the DeepGrid platform. Dive directly into any specialized section below for interactive 3D silicon package inspection, 100 kHz control loop waveform simulation, QFN-64 electrical limits, executive procurement scorecards, or citation-grounded intelligence queries.</p>
+        <p>This overview anchors the DeepGrid platform. Dive directly into any specialized section below for interactive 3D silicon package inspection, 100 kHz control loop waveform simulation, QFN-64 electrical limits, executive procurement scorecards, or citation-grounded intelligence queries.</p>
       </div>
     </div>
 
@@ -280,7 +280,7 @@ export default function Home(){
           <h3>{sec.title}</h3>
           <p>{sec.summary}</p>
           <div className="dr-hub-footer">
-            <button className="primary" onClick={()=>navigate(sec.hash)}>
+            <button className="text-link" onClick={()=>navigate(sec.hash)}>
               {sec.action} <ArrowUpRight size={16} />
             </button>
             <span className="dr-hub-sub">{sec.sub}</span>
@@ -342,7 +342,7 @@ export default function Home(){
       </div>
       <div className="dr-compliance-badge">
         <span className="mono">AEC-Q100</span>
-        <strong>Grade 1 (-40 °C to +125 °C) Automotive Target</strong>
+        <strong>Grade 1 (-40 °C to +125 °C) Automotive Target</strong>
       </div>
     </div>
   </section>
@@ -376,7 +376,7 @@ export default function Home(){
           <p>{doc.desc}</p>
           <div className="dr-whitepaper-footer">
             <a
-              className="primary dr-download-btn"
+              className="text-link dr-download-btn"
               href={`./downloads/docs/${doc.fileName}`}
               download={doc.fileName}
             >
@@ -405,16 +405,16 @@ export default function Home(){
   </div>
   <div className="dr-links dr-sec-gap">
     <button className="text-link" onClick={()=>navigate('family')}>Explore DG32 Product Family <ArrowUpRight size={16}/></button>
-    <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Budget <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Budget <ArrowUpRight size={16}/></button>
     <button className="text-link" onClick={()=>navigate('roadmap')}>Review Multi-Spin Roadmap <ArrowUpRight size={16}/></button>
     <button className="text-link" onClick={()=>go('library')}>Client-Ready Decks & Films <ArrowUpRight size={16}/></button>
   </div>
  </section>
 
- <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="primary" onClick={()=>navigate('ask')} aria-label="Launch Ask DeepGrid Console">Launch Ask DeepGrid Console <ArrowUpRight size={18} aria-hidden="true"/></button></div></div></section>
+ <section className="content-section"><div className="section-label"><Eyebrow>SILICON INTELLIGENCE</Eyebrow><span>HOW ARE DEEPGRID SPECS & DEFENSE MOATS AUDITED?</span></div><div className="thesis-heading"><h2>Ask DeepGrid.<br/><em>Every spec, cited.</em></h2><div><p>Query the entire 10-chip SKU compendium, mature-node physics (130nm/180nm BCD, SiGe 77GHz), the 198-day silicon shuttle loop, and sovereign defense moats (DAP-2020 Make-II, SCL Mohali). Zero hallucination, strictly vector-grounded in the master whitepaper and technical annex.</p><button className="text-link" onClick={()=>navigate('ask')} aria-label="Launch Ask DeepGrid Console">Launch Ask DeepGrid Console <ArrowUpRight size={18} aria-hidden="true"/></button></div></div></section>
 
  <section id="fault-isolation" className="content-section"><div className="section-label"><Eyebrow>FAULT ISOLATION</Eyebrow><span>HOW DOES HARDWARE TRIP THE BRIDGE IN 39 CYCLES WITHOUT FIRMWARE?</span></div>
-  <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)} aria-label="Inside the safety core">Inside the safety core <ArrowUpRight size={18} aria-hidden="true"/></button> <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Timing <ArrowUpRight size={16}/></button> <button className="text-link" onClick={()=>go('ask')}>Query Safety in Ask DeepGrid <ArrowUpRight size={16}/></button></>}/>
+  <FaultTrace steps={faultPath} intro={<><h2 className="dr-h2">From a wrong value<br/><em>to a safe bridge.</em></h2><p className="dr-lead">Software self-test runs periodically and cannot see a fault between runs. DG32-LITE compares every value the CPU commits, as it commits it, and the path from mismatch to a bridge that is switched off never passes through firmware.</p><p className="dr-lead">Firmware can still prove the path works: a locked injection register fires it on purpose, which is the only way to test it on real silicon.</p><button className="text-link" onClick={()=>openBlock(0)} aria-label="Inside the safety core">Inside the safety core <ArrowUpRight size={18} aria-hidden="true"/></button> <button className="text-link" onClick={()=>navigate('control')}>100 kHz Control Loop Timing <ArrowUpRight size={16}/></button> <button className="text-link" onClick={()=>go('ask')}>Query Safety in Ask DeepGrid <ArrowUpRight size={16}/></button></>}/>
  </section>
 
  <section id="verification-ladder" className="content-section"><div className="section-label"><Eyebrow>VERIFICATION LADDER</Eyebrow><span>WHAT EVIDENCE BACKS EVERY PRE-SILICON SPECIFICATION?</span></div>
@@ -429,14 +429,14 @@ export default function Home(){
 
  <section className="silicon-teaser"><div><Eyebrow>3D DIE EXPLORER</Eyebrow><h2>How is the 64-pin die structured<br/><em>across six functional block groups?</em></h2><p>Safety core, memory and boot, motor drive, sensing, connectivity and the bus that ties them together. Select a group and see where it sits on the die, what each block does and why.</p><button className="primary" onClick={()=>navigate('architecture')} aria-label="Inside the architecture">Inside the architecture <ArrowUpRight size={19} aria-hidden="true"/></button></div><div className="teaser-canvas"><Silicon variant="lite" reduced={reduced} exploded selected={2}/><span className="canvas-caption">EXPLODED ASSEMBLY · DRAG TO ROTATE & PITCH</span></div></section>
 
- <section className="proof-section"><Eyebrow>AUTHORITATIVE MEDIA PACKAGES</Eyebrow><h2>Two chips. <em>Where are the narrated films and client-ready decks?</em></h2><div className="dr-pkg-cards">{packages.filter(p=>p.kind==='architecture').map(p=><article className="dr-pkg-card" key={p.id}><button className="dr-pkg-poster" onClick={()=>go('library?pkg='+p.id)} aria-label={'Watch the '+p.name+' architecture film'}><img src={p.poster} alt="" loading="lazy" width={1280} height={720}/><span className="dr-play"><Play size={20} fill="currentColor"/></span></button><div className="dr-pkg-body"><span className="mono">{p.name} · {p.slides.length} SLIDES · {fmtTime(p.duration)} FILM</span><h3>{p.headline}</h3><p>{p.summary}</p><div className="dr-pkg-actions"><button className="primary" onClick={()=>go('library?pkg='+p.id)}>Watch and browse <ArrowUpRight size={17}/></button><a className="text-link" href={p.deck} download>Download .pptx <Download size={16}/></a></div></div></article>)}</div><div className="dr-pkg-mini">{packages.filter(p=>p.kind==='datasheet').map(p=><button key={p.id} className="dr-pkg-mini-card" onClick={()=>go('library?pkg='+p.id)}><img src={p.poster} alt="" loading="lazy" width={1280} height={720}/><span className="mono">{p.name} {p.doc.toUpperCase()} · {fmtTime(p.duration)}</span><strong>{p.headline}</strong><span className="open-product">Deck and film <ArrowRight size={15}/></span></button>)}</div><div className="proof-bottom"><p>Client-ready PowerPoint decks and narrated films for every source document (the two architecture documents, both datasheets and the tape-in block diagram), plus draw.io diagrams. {PRE_SILICON}</p><button className="text-link" onClick={()=>navigate('library')}>All decks and films <ArrowUpRight size={18}/></button></div></section>
+ <section className="proof-section"><Eyebrow>AUTHORITATIVE MEDIA PACKAGES</Eyebrow><h2>Two chips. <em>Where are the narrated films and client-ready decks?</em></h2><div className="dr-pkg-cards">{packages.filter(p=>p.kind==='architecture').map(p=><article className="dr-pkg-card" key={p.id}><button className="dr-pkg-poster" onClick={()=>go('library?pkg='+p.id)} aria-label={'Watch the '+p.name+' architecture film'}><img src={p.poster} alt="" loading="lazy" width={1280} height={720}/><span className="dr-play"><Play size={20} fill="currentColor"/></span></button><div className="dr-pkg-body"><span className="mono">{p.name} · {p.slides.length} SLIDES · {fmtTime(p.duration)} FILM</span><h3>{p.headline}</h3><p>{p.summary}</p><div className="dr-pkg-actions"><button className="text-link" onClick={()=>go('library?pkg='+p.id)}>Watch and browse <ArrowUpRight size={17}/></button><a className="text-link" href={p.deck} download>Download .pptx <Download size={16}/></a></div></div></article>)}</div><div className="dr-pkg-mini">{packages.filter(p=>p.kind==='datasheet').map(p=><button key={p.id} className="dr-pkg-mini-card" onClick={()=>go('library?pkg='+p.id)}><img src={p.poster} alt="" loading="lazy" width={1280} height={720}/><span className="mono">{p.name} {p.doc.toUpperCase()} · {fmtTime(p.duration)}</span><strong>{p.headline}</strong><span className="open-product">Deck and film <ArrowRight size={15}/></span></button>)}</div><div className="proof-bottom"><p>Client-ready PowerPoint decks and narrated films for every source document (the two architecture documents, both datasheets and the tape-in block diagram), plus draw.io diagrams. {PRE_SILICON}</p><button className="text-link" onClick={()=>navigate('library')}>All decks and films <ArrowUpRight size={18}/></button></div></section>
  </>}
 
  {view==='library'&&<section className="page-wrap"><SectionHead tag="07 / DESIGN DOCUMENTS & MEDIA" title="Authoritative Documents, Decks & Films" copy="Complete publication PDFs, engineering specifications, client-ready PowerPoint decks, and narrated walkthrough films across the DG32 platform."/><Library pkgId={route.params.get('pkg')||'lite'} slide={Number(route.params.get('slide'))||1} onChange={update} go={go}/></section>}
 
  {view==='family'&&<section className="page-wrap"><SectionHead tag="02 / PRODUCT FAMILY" title="One footprint, two chips" copy="DG32-LITE is the motor-control SoC. DG32-2DOM keeps every pin and peripheral and adds an INT8 attention engine, so a board designed for one takes the other."/>
   <div className="dr-parts">{parts.map(p=><article className="dr-part" key={p.id}><div className="dr-part-head"><span className="mono">{p.id==='lite'?'PART 01':'PART 02'} / {p.tagline.toUpperCase()}</span><h2>{p.name}</h2><span className="dr-status"><i/>{p.status}</span><p>{p.summary}</p></div><dl className="dr-specs">{p.specs.map(([k,v])=><div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>{p.adds.length>0&&<div className="dr-adds"><span className="mono">WHAT THE ENGINE IS FOR</span><ul>{p.adds.map(a=><li key={a}><Check size={15}/>{a}</li>)}</ul></div>}<div className="dr-part-links"><button className="primary" onClick={()=>go('architecture'+(p.id==='lite'?'':'?chip=2dom'))}>Inside the architecture <ArrowUpRight size={17}/></button><button className="text-link" onClick={()=>go('library?pkg='+p.id)}>Architecture deck and film <ArrowRight size={16}/></button><button className="text-link" onClick={()=>go('library?pkg='+p.id+'-datasheet')}>Datasheet deck and film <ArrowRight size={16}/></button></div></article>)}</div>
-  <p className="disclaimer">{PRE_SILICON} The ~0.43 W power figure is a vectorless tool estimate at 25 °C and 1.8 V.</p>
+  <p className="disclaimer">{PRE_SILICON} The ~0.43 W power figure is a vectorless tool estimate at 25 °C and 1.8 V.</p>
   <Sec kicker="CHIP COMPARISON" title="What stays identical," em="and what does DG32-2DOM add?" copy="Everything outside the engine is the same design from the same source, which is why a DG32-LITE board takes DG32-2DOM unchanged and the control-loop budget carries over exactly.">
    <DataTable caption="DG32-LITE and DG32-2DOM compared" head={['Area','DG32-LITE','DG32-2DOM']} rows={familyCompare} wide/>
   </Sec>
@@ -447,7 +447,7 @@ export default function Home(){
    ]}/>
    <div className="dr-links dr-sec-gap">
      <button className="text-link" onClick={()=>navigate('architecture')}>Explore the architecture <ArrowUpRight size={16}/></button>
-     <button className="text-link" onClick={()=>navigate('control')}>100 kHz control-loop budget <ArrowUpRight size={16}/></button>
+     <button className="text-link" onClick={()=>navigate('control')}>100 kHz control-loop budget <ArrowUpRight size={16}/></button>
      <button className="text-link" onClick={()=>navigate('pinout')}>QFN-64 package & electrical limits <ArrowUpRight size={16}/></button>
      <button className="text-link" onClick={()=>go('library')}>Official datasheets & publication PDFs <ArrowUpRight size={16}/></button>
      <button className="text-link" onClick={()=>go('ask')}>Query DG32-2DOM in Ask DeepGrid <ArrowUpRight size={16}/></button>
@@ -462,22 +462,22 @@ export default function Home(){
 
  {view==='control'&&<ControlLoop go={go}/>}
 
- {view==='pinout'&&<section className="page-wrap"><SectionHead tag="05 / PINOUT & PACKAGE" title="44 signals in a 9 × 9 mm package" copy="The 64-pin QFN carries every signal a brushless drive needs; the remaining 20 pins are supplies and grounds. DG32-2DOM uses the identical pinout, supplies and limits."/>
+ {view==='pinout'&&<section className="page-wrap"><SectionHead tag="05 / PINOUT & PACKAGE" title="44 signals in a 9 × 9 mm package" copy="The 64-pin QFN carries every signal a brushless drive needs; the remaining 20 pins are supplies and grounds. DG32-2DOM uses the identical pinout, supplies and limits."/>
   <div className="dr-pinout"><PackageDiagram/>
    <div className="table-scroll"><table className="dr-table"><caption>Signal pins by function</caption><thead><tr><th scope="col">Function</th><th scope="col">Signals</th><th scope="col" className="num">Pins</th></tr></thead><tbody>{pinGroups.map(([f,s,n])=><tr key={f}><th scope="row">{f}</th><td>{s}</td><td className="num">{n}</td></tr>)}</tbody><tfoot><tr><th scope="row">Total</th><td>Signal pins</td><td className="num">{pinGroups.reduce((a,[, ,n])=>a+Number(n),0)}</td></tr></tfoot></table></div></div>
-  <Stats items={[['QFN-64','PACKAGE'],['9 × 9 mm','BODY'],['0.5 mm','PITCH'],['Ground','EXPOSED PADDLE'],['1.8 V','CORE SUPPLY'],['3.3 V','I/O SUPPLY']]}/>
+  <Stats items={[['QFN-64','PACKAGE'],['9 × 9 mm','BODY'],['0.5 mm','PITCH'],['Ground','EXPOSED PADDLE'],['1.8 V','CORE SUPPLY'],['3.3 V','I/O SUPPLY']]}/>
   <Sec kicker="POWER, CLOCK AND RESET" title="One rail powers" em="all of the logic." copy="The parts of the datasheet a design commits to first: which supplies exist, the order they come up, and the single clock the whole die runs from.">
    <ExplainedGrid items={powerNotes}/>
   </Sec>
-  <Sec kicker="ELECTRICAL LIMITS" title="Every electrical limit" em="is a nominal until silicon." copy="130 nm process nominals for each supply domain, the same on DG32-LITE and DG32-2DOM. First-silicon characterisation replaces this section.">
+  <Sec kicker="ELECTRICAL LIMITS" title="Every electrical limit" em="is a nominal until silicon." copy="130 nm process nominals for each supply domain, the same on DG32-LITE and DG32-2DOM. First-silicon characterisation replaces this section.">
    <div className="dr-two-tables"><DataTable caption="Recommended operating conditions" head={['Parameter','Min','Typ','Max','Note']} rows={operating}/><DataTable caption="Absolute maximum ratings" head={['Parameter','Min','Max']} rows={absoluteMax}/></div>
-   <p className="disclaimer">Power: ~0.43 W at 50 MHz, a vectorless tool estimate at 25 °C and 1.8 V, not a measurement.</p>
+   <p className="disclaimer">Power: ~0.43 W at 50 MHz, a vectorless tool estimate at 25 °C and 1.8 V, not a measurement.</p>
   </Sec>
   <Sec kicker="DESIGN LOCK STATUS" title="What a design can lock now," em="and what waits for silicon.">
    <div className="dr-fixed">{fixedVsPreliminary.map(f=><div key={f.state}><p className="dr-kicker">{f.state.toUpperCase()}</p><ul>{f.items.map(i=><li key={i}>{i}</li>)}</ul></div>)}</div>
    <div className="dr-links dr-sec-gap">
      <button className="text-link" onClick={()=>go('library')}>Download official QFN-64 datasheets (PDF) <ArrowUpRight size={16}/></button>
-     <button className="text-link" onClick={()=>navigate('control')}>100 kHz hardware control loop <ArrowUpRight size={16}/></button>
+     <button className="text-link" onClick={()=>navigate('control')}>100 kHz hardware control loop <ArrowUpRight size={16}/></button>
      <button className="text-link" onClick={()=>navigate('architecture')}>Inside the safety core & power sequencing <ArrowUpRight size={16}/></button>
      <button className="text-link" onClick={()=>go('ask')}>Ask DeepGrid about 1.8V/3.3V sequencing <ArrowUpRight size={16}/></button>
    </div>
@@ -504,7 +504,7 @@ export default function Home(){
   <div className="dr-links dr-sec-gap">
     <button className="text-link" onClick={()=>go('library')}>Download Master Whitepaper (71-Page PDF) <ArrowUpRight size={16}/></button>
     <button className="text-link" onClick={()=>navigate('pinout')}>Review QFN-64 pinout & package <ArrowUpRight size={16}/></button>
-    <button className="text-link" onClick={()=>navigate('control')}>Inspect 100 kHz control loop budget <ArrowUpRight size={16}/></button>
+    <button className="text-link" onClick={()=>navigate('control')}>Inspect 100 kHz control loop budget <ArrowUpRight size={16}/></button>
     <button className="text-link" onClick={()=>go('ask')}>Audit 10-SKU roadmap in Ask DeepGrid <ArrowUpRight size={16}/></button>
   </div>
  </section>}
@@ -542,28 +542,28 @@ function ControlLoop({go}:{go:(hash:string)=>void}){
  return <section className="page-wrap"><SectionHead tag="04 / CONTROL LOOP" title="The CPU runs two regulators, not the loop" copy="Each field-oriented-control tick samples current, transforms it, regulates it and updates the bridge. DG32 moves every expensive step into hardware, so the loop cost is fixed and known."/>
   <ol className="dr-loop">{loopStages.map(([n,t,d,c])=><li key={n}><span className="dr-loop-n">{n}</span><div><h3>{t}</h3><p>{d}</p></div><strong>{c}</strong></li>)}</ol>
   <ControlWaveform khz={r.khz}/>
-  <p className="disclaimer">Cycle costs measured in simulation at the 50 MHz clock, where one cycle is 20 ns.</p>
+  <p className="disclaimer">Cycle costs measured in simulation at the 50 MHz clock, where one cycle is 20 ns.</p>
 
   <Sec kicker="WHY THE LOOP RUNS IN HARDWARE" title="Why is the CPU fetch-bound," em="and why do peripherals execute the transforms?" copy="The core fetches every instruction over the bus. That one measured constant is what the whole peripheral set is designed around.">
    <div className="dr-factcards">{fetchBound.map(([v,l,d])=><div key={l}><strong>{v}</strong><span className="mono">{l}</span><p>{d}</p></div>)}</div>
    <ExplainedGrid items={controlNotes} cols={2}/>
   </Sec>
 
-  <div className="dr-budget"><div className="dr-budget-copy"><Eyebrow>LOOP TIMING & BUDGET</Eyebrow><h2>How does ~300 cycles of hardware<br/><em>free up CPU execution headroom?</em></h2><p>One ADC sample, two CORDIC operations and a PWM write cost about 300 cycles at any loop rate. Pick a rate to see what is left for the regulators and observers.</p>
+  <div className="dr-budget"><div className="dr-budget-copy"><Eyebrow>LOOP TIMING & BUDGET</Eyebrow><h2>How does ~300 cycles of hardware<br/><em>free up CPU execution headroom?</em></h2><p>One ADC sample, two CORDIC operations and a PWM write cost about 300 cycles at any loop rate. Pick a rate to see what is left for the regulators and observers.</p>
    <div className="dr-rates" role="group" aria-label="Loop rate">{loopRates.map((x,i)=><button key={x.khz} aria-pressed={rate===i} className={rate===i?'active':''} onClick={()=>setRate(i)}>{x.khz} kHz</button>)}</div></div>
    <div className="dr-budget-viz"><div className="dr-stats"><div><strong>{period.toLocaleString('en-US')}</strong><span>CYCLES PER PERIOD</span></div><div><strong>~{HW_FIXED_CYCLES}</strong><span>HARDWARE, FIXED</span></div><div><strong>~{budget.toLocaleString('en-US')}</strong><span>CPU BUDGET</span></div><div><strong>~{Math.floor(budget/CYCLES_PER_INSTRUCTION).toLocaleString('en-US')}</strong><span>CPU INSTRUCTIONS*</span></div></div>
     <div className="dr-stack" role="img" aria-label={`At ${r.khz} kHz, hardware uses ${HW_FIXED_CYCLES} of ${period} cycles (${hwPct.toFixed(0)}%), leaving ${budget} for firmware.`}><div className="dr-seg dr-seg-hw" style={{width:hwPct+'%'}} title={`Hardware: ~${HW_FIXED_CYCLES} cycles`}/><div className="dr-seg dr-seg-cpu" style={{width:(100-hwPct)+'%'}} title={`CPU budget: ~${budget} cycles`}/></div>
     <div className="dr-legend"><span><i className="dr-seg-hw"/>Hardware · {hwPct.toFixed(0)}%</span><span><i className="dr-seg-cpu"/>CPU budget · {(100-hwPct).toFixed(0)}%</span></div>
     <p className="dr-fits"><span className="mono">WHAT FITS AT {r.khz} KHZ</span>{r.fits}</p>
-    <p className="disclaimer">*Derived: CPU budget ÷ ~8 cycles per instruction, the measured cost of this fetch-bound core.</p></div></div>
+    <p className="disclaimer">*Derived: CPU budget ÷ ~8 cycles per instruction, the measured cost of this fetch-bound core.</p></div></div>
 
-  <div className="dr-fmax"><div><Eyebrow>TIMING HEADROOM & FMAX</Eyebrow><h2>Why does the lockstep core<br/><em>set the 50 MHz clock limit?</em></h2><p>Maximum frequency of each hardened block after place-and-route. Every peripheral clears 90 MHz; the lockstep core reaches ~55–62 MHz, which is why the die runs at 50 MHz. The same limit is why DG32-2DOM puts its engine on a second clock instead of raising this one.</p></div>
-   <figure className="dr-chart"><figcaption className="sr-only">Post-route maximum frequency by block, in MHz</figcaption><div className="dr-chart-plot">{fmax.map(([n,v])=><div className="dr-bar-row" key={n}><span className="dr-bar-label">{n}</span><div className="dr-bar-track"><div className={'dr-bar'+(n==='Lockstep core'?' dr-bar-core':'')} style={{width:(v/maxF*100)+'%'}} tabIndex={0} aria-label={`${n}: ${n==='Lockstep core'?'55–62':v} MHz`}><span className="dr-tip" role="tooltip">{n} · {n==='Lockstep core'?'55–62':v} MHz</span></div></div><span className="dr-bar-value">{n==='Lockstep core'?'55–62':v}</span></div>)}<div className="dr-target" style={{left:`calc(var(--label-w) + (100% - var(--label-w) - var(--value-w)) * ${target/maxF})`}}><span>50 MHz target</span></div></div><div className="dr-axis"><span>0</span><span>{maxF} MHz</span></div></figure></div>
-  <p className="disclaimer">Post-route figures on the 130 nm process. The lockstep-core bar is drawn at 55 MHz, the low end of its measured range.</p>
+  <div className="dr-fmax"><div><Eyebrow>TIMING HEADROOM & FMAX</Eyebrow><h2>Why does the lockstep core<br/><em>set the 50 MHz clock limit?</em></h2><p>Maximum frequency of each hardened block after place-and-route. Every peripheral clears 90 MHz; the lockstep core reaches ~55–62 MHz, which is why the die runs at 50 MHz. The same limit is why DG32-2DOM puts its engine on a second clock instead of raising this one.</p></div>
+   <figure className="dr-chart"><figcaption className="sr-only">Post-route maximum frequency by block, in MHz</figcaption><div className="dr-chart-plot">{fmax.map(([n,v])=><div className="dr-bar-row" key={n}><span className="dr-bar-label">{n}</span><div className="dr-bar-track"><div className={'dr-bar'+(n==='Lockstep core'?' dr-bar-core':'')} style={{width:(v/maxF*100)+'%'}} tabIndex={0} aria-label={`${n}: ${n==='Lockstep core'?'55–62':v} MHz`}><span className="dr-tip" role="tooltip">{n} · {n==='Lockstep core'?'55–62':v} MHz</span></div></div><span className="dr-bar-value">{n==='Lockstep core'?'55–62':v}</span></div>)}<div className="dr-target" style={{left:`calc(var(--label-w) + (100% - var(--label-w) - var(--value-w)) * ${target/maxF})`}}><span>50 MHz target</span></div></div><div className="dr-axis"><span>0</span><span>{maxF} MHz</span></div></figure></div>
+  <p className="disclaimer">Post-route figures on the 130 nm process. The lockstep-core bar is drawn at 55 MHz, the low end of its measured range.</p>
 
   <Sec kicker="PERIPHERAL LIMITS & CAPABILITIES" title="What deterministic timing limits" em="can firmware count on?" copy="Capability and timing per block, from the datasheet’s block notes. Design and simulated values, pending silicon.">
    <DataTable caption="Peripheral limits" head={['Block','Limit','Note']} rows={peripheralLimits}/>
-   <Callout label="WITH DG32-2DOM" action={<button className="text-link" onClick={()=>go('architecture?chip=2dom')}>How the engine is isolated <ArrowUpRight size={15}/></button>}>The attention engine runs on its own 114 MHz clock and reaches memory only through clock-domain bridges, so none of these loop numbers change while it runs.</Callout>
+   <Callout label="WITH DG32-2DOM" action={<button className="text-link" onClick={()=>go('architecture?chip=2dom')}>How the engine is isolated <ArrowUpRight size={15}/></button>}>The attention engine runs on its own 114 MHz clock and reaches memory only through clock-domain bridges, so none of these loop numbers change while it runs.</Callout>
   </Sec>
 
   <div className="dr-links dr-sec-gap">

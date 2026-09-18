@@ -347,11 +347,14 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         <div className="dr-ask-input-wrap">
           <Search className="dr-ask-search-icon" size={20} />
           <input 
-            type="text"
+            type="search"
+            name="deepgrid-query"
+            autoComplete="off"
+            spellCheck={false}
             className="dr-ask-input"
             value={query}
             onChange={e => handleQuerySelect(e.target.value)}
-            placeholder="Ask about unit economics, supply chain security, 198-day loop, DAP-2020, ASIL-D safety..."
+            placeholder="Ask about unit economics, supply chain security, 198-day loop, DAP-2020, ASIL-D safety…"
             aria-label="Search DeepGrid knowledge"
           />
           {query && (

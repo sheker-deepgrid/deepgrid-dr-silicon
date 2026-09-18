@@ -226,7 +226,7 @@ export default function ControlWaveform({khz = 100}: WaveformProps) {
           <span><i style={{background: '#d4a36e', border: '1px dashed #f3e8d2'}} />SVPWM Gate Train</span>
         </div>
       </div>
-      <p className="disclaimer">Scrub by scrolling or dragging across the canvas. At 50 MHz, {totalCycles} clock cycles equal exactly one {periodUs} µs loop tick.</p>
+      <p className="disclaimer">Scrub by scrolling or dragging across the canvas. At 50 MHz, {totalCycles} clock cycles equal exactly one {periodUs} µs loop tick.</p>
     </div>
   );
 }

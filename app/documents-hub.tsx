@@ -157,8 +157,11 @@ export default function GroundedDocumentsHub({go}: {go?: (hash: string) => void}
         <div className="dr-docs-search">
           <Search size={16} className="dr-docs-search-icon" />
           <input
-            type="text"
-            placeholder="Search documents by parameter, standard, or title..."
+            type="search"
+            name="document-search"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="Search documents by parameter, standard, or title…"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             aria-label="Search documents"

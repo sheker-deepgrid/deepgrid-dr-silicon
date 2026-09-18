@@ -54,7 +54,7 @@ export default function Library({pkgId,slide,onChange,go}:{pkgId:string;slide:nu
       <button className="text-link" onClick={()=>go('overview')}>01 / Overview &amp; safety thesis <ArrowUpRight size={16}/></button>
       <button className="text-link" onClick={()=>go('family')}>02 / Product family comparison <ArrowUpRight size={16}/></button>
       <button className="text-link" onClick={()=>go('architecture')}>03 / Block architecture &amp; 3D die <ArrowUpRight size={16}/></button>
-      <button className="text-link" onClick={()=>go('control')}>04 / 100 kHz control-loop budget <ArrowUpRight size={16}/></button>
+      <button className="text-link" onClick={()=>go('control')}>04 / 100 kHz control-loop budget <ArrowUpRight size={16}/></button>
       <button className="text-link" onClick={()=>go('pinout')}>05 / QFN-64 pinout &amp; package <ArrowUpRight size={16}/></button>
       <button className="text-link" onClick={()=>go('roadmap')}>06 / Multi-spin roadmap <ArrowUpRight size={16}/></button>
       <button className="text-link" onClick={()=>go('ask')}>08 / Vector Q&amp;A in Ask DeepGrid <ArrowUpRight size={16}/></button>

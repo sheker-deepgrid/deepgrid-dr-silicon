@@ -32,7 +32,7 @@
 .dr-app-view-toggle:hover{background:#1e293b;color:#fff;border-color:#38bdf8}
 .dr-app-view-toggle.active{background:var(--copper);color:#101212;font-weight:600;border-color:var(--copper)}
 .dr-app-3d-hint{position:absolute;bottom:8px;right:8px;z-index:2;background:#000000a6;color:#94a3b8;font:var(--text-meta) monospace;font-size:.62rem;padding:2px 6px;border-radius:3px;letter-spacing:.5px;pointer-events:none}
-.app-3d-canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab;outline:none}
+.app-3d-canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
 .app-3d-canvas:active{cursor:grabbing}
 .dr-app-body{padding:20px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
 .dr-app-body .mono{font:var(--text-meta) monospace;letter-spacing:1px;color:#93a582;font-size:.72rem}
@@ -481,7 +481,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-ask-input-wrap{position:relative;display:flex;align-items:center}
 .dr-ask-search-icon{position:absolute;left:18px;color:var(--copper);pointer-events:none}
 .dr-ask-input{width:100%;background:#131615;border:1px solid #ffffff26;border-radius:3px;padding:16px 48px 16px 50px;color:#eee6d4;font-size:1.05rem;transition:border-color .2s,box-shadow .2s}
-.dr-ask-input:focus{outline:none;border-color:var(--copper);box-shadow:0 0 0 1px var(--copper),0 0 18px #d4a36e1f}
+.dr-ask-input:focus{border-color:var(--copper)}
 .dr-ask-input::placeholder{color:#768379}
 .dr-ask-clear{position:absolute;right:16px;background:none;border:none;color:#8f9c8f;cursor:pointer;display:flex;align-items:center;padding:4px}
 .dr-ask-clear:hover{color:#eee6d4}
@@ -898,7 +898,9 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-graph-node-group{cursor:pointer;transition:transform .15s ease}
 .dr-graph-node-group:hover .dr-node-dot{transform:scale(1.25);filter:brightness(1.2)}
 .dr-node-dot{transition:transform .2s,r .2s;filter:drop-shadow(0 0 3px currentColor)}
-.dr-node-halo{fill:none;stroke-width:0.6;stroke-dasharray:2,2;animation:dr-halo-spin 8s linear infinite}
+/* one turn when a node is selected (each selection mounts a fresh halo), then it holds: a loop with
+   no pause control is motion the reader never asked for */
+.dr-node-halo{fill:none;stroke-width:0.6;stroke-dasharray:2,2;transform-box:fill-box;transform-origin:center;animation:dr-halo-spin 1.4s cubic-bezier(.22,1,.36,1) 1}
 @keyframes dr-halo-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .dr-node-label{font:600 2.2px monospace;paint-order:stroke;stroke:#0f1211;stroke-width:0.9px;letter-spacing:0.2px}
 .dr-graph-node-group.selected .dr-node-label{font-weight:700;fill:#fff;filter:drop-shadow(0 0 2px #fff)}
@@ -1042,7 +1044,6 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
   border: 1px solid var(--rule);
   color: #eee6d4;
   font-size: .88rem;
-  outline: none;
   transition: border-color .16s ease;
 }
 
@@ -1485,9 +1486,9 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
    rather than a shape that was always there. The inline width stays the source of truth; only a
    transform is animated. rail: the roadmap held and travelled sideways on wide viewports. */
 .will-draw .dr-bar,.will-draw.dr-stack .dr-seg{transform:scaleX(0);transform-origin:left center}
-.will-draw .dr-bar{transition:transform .82s cubic-bezier(.22,1,.36,1) var(--draw-d,0ms)}
-.will-draw.dr-stack .dr-seg{transition:transform .9s cubic-bezier(.22,1,.36,1)}
-.will-draw.is-drawn .dr-bar,.will-draw.is-drawn .dr-seg{transform:none}
+/* arming is instant (no transition on the collapse, or the bars visibly shrink first); only the grow animates */
+.will-draw.is-drawn .dr-bar{transform:none;transition:transform .82s cubic-bezier(.22,1,.36,1) var(--draw-d,0ms)}
+.will-draw.is-drawn.dr-stack .dr-seg{transform:none;transition:transform .9s cubic-bezier(.22,1,.36,1)}
 .dr-chart-plot .dr-bar-row:nth-child(1) .dr-bar{--draw-d:0ms}
 .dr-chart-plot .dr-bar-row:nth-child(2) .dr-bar{--draw-d:70ms}
 .dr-chart-plot .dr-bar-row:nth-child(3) .dr-bar{--draw-d:140ms}
@@ -1576,7 +1577,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-related-chip:hover{border-color:var(--copper);background:#202624}
 
 /* --- Executive Impact & Strategic Pillars Grid --- */
-.dr-exec-pillars-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-exec-pillars-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
 .dr-exec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:28px}
 .dr-exec-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 20px #00000033;transition:border-color .2s,transform .2s}
 .dr-exec-card:hover{border-color:var(--copper);transform:translateY(-2px)}
@@ -1600,8 +1601,8 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-pillar-link:hover{text-decoration:underline;color:#eee6d4}
 
 /* --- Platform Directory Section Hub --- */
-.dr-hub-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
-.dr-hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:28px}
+.dr-hub-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
+.dr-hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:20px;margin-top:28px}
 .dr-hub-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px 24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 4px 20px #00000033;transition:border-color .2s ease,transform .2s ease,background-color .2s ease,box-shadow .2s ease}
 .dr-hub-card:hover{border-color:var(--copper);transform:translateY(-2px);background:#141817}
 .dr-hub-card-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--rule)}
@@ -1613,7 +1614,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-hub-sub{font-size:.75rem;color:#7b8e78;line-height:1.4}
 
 /* --- Product Essence (4 Foundations) --- */
-.dr-gist-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-gist-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
 .dr-gist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:28px}
 .dr-gist-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s ease,transform .2s ease,background-color .2s ease}
 .dr-gist-card:hover{border-color:var(--copper);transform:translateY(-2px);background:#131716}
@@ -1626,9 +1627,9 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-gist-ref{font-size:.7rem;color:#7b8e78}
 
 /* --- 30 Industrial Use Cases & Capability Envelope --- */
-.dr-usecases-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-usecases-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
 .dr-usecase-header-actions{display:flex;gap:14px;align-items:center;margin-top:14px;flex-wrap:wrap}
-.dr-usecases-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:20px;margin-top:28px}
+.dr-usecases-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:20px;margin-top:28px}
 .dr-usecase-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px;display:flex;flex-direction:column;gap:14px;transition:border-color .2s ease,background-color .2s ease}
 .dr-usecase-card:hover{border-color:var(--copper);background:#131716}
 .dr-usecase-card-head{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
@@ -1655,9 +1656,9 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-usecases-links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 
 /* --- Procurement Benchmark & Sovereign Horizon --- */
-.dr-procure-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
-.dr-sovereign-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
-.dr-sovereign-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:28px}
+.dr-procure-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
+.dr-sovereign-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
+.dr-sovereign-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:18px;margin-top:28px}
 .dr-sovereign-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
 .dr-sovereign-card:hover{border-color:var(--copper);background:#131716}
 .dr-sovereign-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--rule)}
@@ -1672,7 +1673,7 @@ html{scrollbar-color:#46504a #101212;caret-color:var(--copper)}
 .dr-compliance-badge strong{font-size:.8rem;color:#eee6d4;font-weight:500;line-height:1.35}
 
 /* --- Primary Whitepaper Download Suite --- */
-.dr-docs-suite-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--rule)}
+.dr-docs-suite-section{margin-top:0;padding-top:56px;border-top:1px solid var(--rule)}
 .dr-whitepapers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:28px}
 .dr-whitepaper-card{background:#111413;border:1px solid var(--rule);border-radius:var(--sc-radius-md,6px);padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s ease,background-color .2s ease,transform .2s ease}
 .dr-whitepaper-card:hover{border-color:var(--copper);background:#131716;transform:translateY(-2px)}
@@ -1732,3 +1733,18 @@ input:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* a trace block becomes a real <button> while the trace is pinned; keep it looking like the block */
+button.tr-node{width:100%;text-align:left;font:inherit;color:inherit}
+/* both search fields carry their own clear button; drop the browser's duplicate */
+input[type=search]{-webkit-appearance:none;appearance:none}
+input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
+
+/* Overview rhythm. One boundary between sections (48 below, 56 above, so the gap belongs to the next
+   heading), and the fault trace, the page's one engineered moment, gets the widest breath before it. */
+#fault-isolation{padding-top:112px}
+
+/* One label block per section, not two labels at opposite edges: the question sits under the topic
+   label, at the heading's edge, a step quieter. Every word stays; phones already hide the question. */
+.section-label{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px}
+.section-label>span{font-size:var(--text-meta);letter-spacing:.06em;color:#7f8b81;text-align:left}
