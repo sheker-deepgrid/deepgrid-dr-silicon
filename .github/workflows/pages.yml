@@ -18,7 +18,8 @@ jobs:
       # github.io project site for now. For dr.deepgridsemi.com set PAGES_BASE: / and PAGES_DOMAIN: dr.deepgridsemi.com
       PAGES_BASE: /deepgrid-dr-silicon/
       PAGES_DOMAIN: ''
-      NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # No API keys here. This is a static site: any NEXT_PUBLIC_ value is inlined into the public JS
+      # bundle and readable by every visitor. A model call needs a server-side proxy, not a build env.
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4

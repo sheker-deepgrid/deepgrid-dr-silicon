@@ -215,6 +215,8 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
 /**
  * Background Gemini 2.5 Flash Streamer.
  * Uses NEXT_PUBLIC_GEMINI_API_KEY from background environment.
+ * Not wired into any view, and must not be as-is: a NEXT_PUBLIC_ key is inlined into the static
+ * bundle, so every visitor could read it. Route model calls through a server-side proxy instead.
  */
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
