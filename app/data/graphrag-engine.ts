@@ -1,22 +1,14 @@
 // True GraphRAG Engine for DeepGrid Silicon Intelligence
-// Ingests 419 semantic chunks across all 71 architecture specifications & playbooks.
-// Combines:
-// 1. Full-Corpus Document Vector Embeddings (Sparse-Dense TF-IDF over 5,029 vocabulary terms)
-// 2. K-Hop Relational Traversal over typed graph edges
-// 3. Knowledge Community Cluster Aggregation
-// 4. Dynamic Chunk-Grounded Multi-Tier Synthesis & Primary PDF Citations
+// Core Architecture:
+// 1. Graph Topology: 318 nodes and 430 typed edges from Graphify AST + Domain Knowledge Graph
+// 2. Semantic Entry Point: In-browser sparse-dense vector cosine similarity over 4,418 vocabulary terms
+// 3. Relational Traversal: Dynamic K-hop BFS walking across typed links (contains, imports, depends_on, implements, accelerates)
+// 4. Grounded Synthesis: Grounded in 177 primary PDF pages with exact page citations and downloadable assets
 // 100% Deterministic, $0 Runtime Cost, Fully Static Compatible.
 
-import fullCorpusDataRaw from './graphrag-full-corpus.json';
-import {
-  graphNodes,
-  graphEdges,
-  deepGridCatalog,
-  GraphNode,
-  GraphEdge,
-  DeepGridItem
-} from './deepgrid-knowledge';
-import {groundedDocuments, GroundedDoc} from '../documents-data';
+import unifiedIndexRaw from './graphrag-unified-index.json';
+import { deepGridCatalog, DeepGridItem, GraphNode } from './deepgrid-knowledge';
+import { groundedDocuments, GroundedDoc } from '../documents-data';
 
 export interface TraversedEdge {
   fromNode: GraphNode;
@@ -75,404 +67,274 @@ export interface GraphRAGResult {
   }[];
 }
 
-interface CorpusChunk {
+interface UnifiedNode {
   id: string;
-  file: string;
-  sourcePath?: string;
+  name: string;
+  shortName: string;
+  category: string;
+  communityId: number;
+  communityName: string;
+  description: string;
+  origin: string;
+  vector: Record<string, number>;
+}
+
+interface UnifiedEdge {
+  from: string;
+  to: string;
+  label: string;
+  weight: number;
+}
+
+interface UnifiedChunk {
+  id: string;
   docTitle: string;
   docNum: string;
   pdfPath: string;
   pdfSize: string;
   specPath: string;
+  pageLabel: string;
   section: string;
   text: string;
   vector: Record<string, number>;
 }
 
-interface FullCorpusIndex {
-  totalChunks: number;
+interface UnifiedGraphIndex {
+  nodes: UnifiedNode[];
+  edges: UnifiedEdge[];
+  chunks: UnifiedChunk[];
   vocab: string[];
   idf: number[];
-  chunks: CorpusChunk[];
 }
 
-const fullCorpus = fullCorpusDataRaw as unknown as FullCorpusIndex;
-const vocabMap = new Map<string, number>(fullCorpus.vocab.map((w, i) => [w, i]));
-const idfList = fullCorpus.idf;
+const graphIndex = unifiedIndexRaw as unknown as UnifiedGraphIndex;
+const vocabMap = new Map<string, number>(graphIndex.vocab.map((w, i) => [w, i]));
+const idfList = graphIndex.idf;
 
-// Node lookup map
-const nodeMap = new Map<string, GraphNode>();
-graphNodes.forEach(n => nodeMap.set(n.id, n));
+// Fast lookup map for nodes
+const nodeById = new Map<string, UnifiedNode>();
+graphIndex.nodes.forEach(n => nodeById.set(n.id, n));
 
 /**
- * Computes vector cosine similarity between user query and all 419 corpus chunks.
+ * Computes sparse TF-IDF vector for any query string
  */
-function retrieveTopChunks(query: string, topK = 3): { chunk: CorpusChunk; score: number }[] {
-  const words = query.toLowerCase().match(/[a-z0-9_]+/g) || [];
-  const queryVec: Record<number, number> = {};
+function vectorizeQuery(text: string): Record<number, number> {
+  const words = text.toLowerCase().match(/[a-z0-9_]+/g) || [];
+  const vec: Record<number, number> = {};
   let normSq = 0;
 
   words.forEach(w => {
     if (vocabMap.has(w)) {
       const idx = vocabMap.get(w)!;
-      queryVec[idx] = (queryVec[idx] || 0) + idfList[idx];
+      const weight = (vec[idx] || 0) + idfList[idx];
+      vec[idx] = weight;
     }
   });
 
-  for (const idxStr in queryVec) {
-    const idx = Number(idxStr);
-    normSq += queryVec[idx] * queryVec[idx];
+  for (const idx in vec) {
+    normSq += vec[idx] * vec[idx];
   }
 
   const norm = Math.sqrt(normSq);
   if (norm > 0) {
-    for (const idxStr in queryVec) {
-      const idx = Number(idxStr);
-      queryVec[idx] /= norm;
+    for (const idx in vec) {
+      vec[idx] /= norm;
     }
   }
 
-  const scored: { chunk: CorpusChunk; score: number }[] = [];
-
-  fullCorpus.chunks.forEach(chunk => {
-    let dot = 0;
-    for (const idxStr in chunk.vector) {
-      const idx = Number(idxStr);
-      if (queryVec[idx]) {
-        dot += chunk.vector[idxStr] * queryVec[idx];
-      }
-    }
-    if (dot > 0) {
-      scored.push({ chunk, score: dot });
-    }
-  });
-
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK);
+  return vec;
 }
 
-// Map domain topics to communities
-const communityKeywords: Record<string, {name: string; tag: string; defaultDocIdx: number}> = {
-  safety: {
-    name: 'Hardware Lockstep & ASIL-D Functional Safety',
-    tag: 'FIELD RELIABILITY & FUNCTIONAL SAFETY',
-    defaultDocIdx: 1 // Doc 2
-  },
-  control: {
-    name: '100 kHz Deterministic Control & Silicon RTL Math',
-    tag: 'DETERMINISTIC MOTION & HIGH-SPEED CONTROL',
-    defaultDocIdx: 2 // Doc 3
-  },
-  timing: {
-    name: '50 MHz System Clock & Static Timing Closure',
-    tag: 'PHYSICAL SILICON & TIMING CLOSURE',
-    defaultDocIdx: 3 // Doc 4
-  },
-  neural: {
-    name: 'Dual-Domain Clock Isolation & INT8 Attention Engine',
-    tag: 'DUAL-DOMAIN ARCHITECTURE & EDGE AI',
-    defaultDocIdx: 3 // Doc 4
-  },
-  sovereign: {
-    name: 'Sovereign Dual-Foundry & Mature-Node Economics',
-    tag: 'MATURE-NODE UNIT ECONOMICS & SOVEREIGN SUPPLY',
-    defaultDocIdx: 4 // Doc 5
-  },
-  dshot: {
-    name: 'Hardware DShot Telemetry & High-Speed Actuation',
-    tag: 'HARDWARE PROTOCOLS & MOTOR TELEMETRY',
-    defaultDocIdx: 2 // Doc 3
-  },
-  usecases30: {
-    name: '30 Industrial Use Cases & Scalar Edge AI (Doc #1)',
-    tag: 'EDGE AI & PREDICTIVE DIAGNOSTICS (DOC #1)',
-    defaultDocIdx: 0 // Doc 1: Thirty Use Cases (No Accelerator)
+/**
+ * Computes cosine dot-product
+ */
+function dotProduct(vecA: Record<number, number>, vecB: Record<string, number>): number {
+  let dot = 0;
+  for (const idxStr in vecB) {
+    const idx = Number(idxStr);
+    if (vecA[idx]) {
+      dot += vecA[idx] * vecB[idxStr];
+    }
   }
-};
+  return dot;
+}
 
 export function executeGraphRAG(rawQuery: string): GraphRAGResult {
   const q = rawQuery.trim().toLowerCase();
-  const queryTokens = q.split(/\s+/).filter(w => w.length > 2);
+  const qVec = vectorizeQuery(q);
 
-  // 1. FULL-CORPUS SEMANTIC RETRIEVAL
-  const topMatches = retrieveTopChunks(q, 3);
-  const bestMatch = topMatches.length > 0 ? topMatches[0].chunk : fullCorpus.chunks[0];
+  // 1. SEMANTIC ENTRY POINT: Vector Cosine Similarity over ALL 318 Graph Nodes
+  const scoredNodes: { node: UnifiedNode; score: number }[] = [];
+  graphIndex.nodes.forEach(node => {
+    const score = dotProduct(qVec, node.vector);
+    if (score > 0) {
+      scoredNodes.push({ node, score });
+    }
+  });
 
-  // 2. SEED ENTITY RESOLUTION FROM QUERY & RETRIEVED CHUNK
-  const scoredNodes = graphNodes.map(node => {
-    let score = 0;
-    const text = `${node.name} ${node.description} ${node.category} ${node.shortName || ''}`.toLowerCase();
-    
-    queryTokens.forEach(t => {
-      if (text.includes(t)) score += 10;
-      if (node.name.toLowerCase().includes(t)) score += 15;
-      if (node.id.toLowerCase() === t) score += 25;
-    });
+  scoredNodes.sort((a, b) => b.score - a.score);
+  const primarySeed = scoredNodes.length > 0 ? scoredNodes[0].node : graphIndex.nodes[0];
+  const seedEntities: GraphNode[] = scoredNodes.slice(0, 3).map(s => ({
+    id: s.node.id,
+    name: s.node.name,
+    shortName: s.node.shortName || s.node.name.slice(0, 24),
+    category: (s.node.category as any) || 'architecture',
+    x: 50,
+    y: 50,
+    description: s.node.description
+  }));
 
-    if (bestMatch.text.toLowerCase().includes(node.name.toLowerCase())) score += 20;
-
-    return { node, score };
-  })
-  .filter(item => item.score > 0)
-  .sort((a, b) => b.score - a.score);
-
-  let seedEntities = scoredNodes.slice(0, 3).map(s => s.node);
   if (seedEntities.length === 0) {
-    seedEntities = [graphNodes[0], graphNodes[1]];
+    seedEntities.push({
+      id: primarySeed.id,
+      name: primarySeed.name,
+      shortName: primarySeed.shortName || primarySeed.name.slice(0, 24),
+      category: 'architecture',
+      x: 50,
+      y: 50,
+      description: primarySeed.description
+    });
   }
-  const seedIds = new Set(seedEntities.map(s => s.id));
 
-  // 3. K-HOP RELATIONAL TRAVERSAL
+  // 2. RELATIONAL GRAPH TRAVERSAL: Walk edges from Primary Seed Node
   const traversedEdges: TraversedEdge[] = [];
+  const traversedSteps: { source: string; relation: string; target: string }[] = [];
   const visitedEdgePairs = new Set<string>();
+  const seedId = primarySeed.id;
 
-  graphEdges.forEach(edge => {
-    if (seedIds.has(edge.from) || seedIds.has(edge.to)) {
-      const fromNode = nodeMap.get(edge.from);
-      const toNode = nodeMap.get(edge.to);
+  graphIndex.edges.forEach(edge => {
+    if (edge.from === seedId || edge.to === seedId) {
+      const neighborId = edge.from === seedId ? edge.to : edge.from;
+      const neighbor = nodeById.get(neighborId);
       const pairKey = `${edge.from}->${edge.to}`;
 
-      if (fromNode && toNode && !visitedEdgePairs.has(pairKey)) {
+      if (neighbor && !visitedEdgePairs.has(pairKey)) {
         visitedEdgePairs.add(pairKey);
+        const sourceName = edge.from === seedId ? primarySeed.name : neighbor.name;
+        const targetName = edge.to === seedId ? primarySeed.name : neighbor.name;
+
+        traversedSteps.push({
+          source: sourceName,
+          relation: edge.label,
+          target: targetName
+        });
+
         traversedEdges.push({
-          fromNode,
-          toNode,
+          fromNode: {
+            id: edge.from,
+            name: sourceName,
+            shortName: sourceName.slice(0, 20),
+            category: 'architecture',
+            x: 40,
+            y: 40,
+            description: ''
+          },
+          toNode: {
+            id: edge.to,
+            name: targetName,
+            shortName: targetName.slice(0, 20),
+            category: 'architecture',
+            x: 60,
+            y: 60,
+            description: ''
+          },
           relationLabel: edge.label
         });
       }
     }
   });
 
-  const graphPathSteps = traversedEdges.slice(0, 3).map(e => ({
-    source: e.fromNode.name,
-    relation: e.relationLabel,
-    target: e.toNode.name
-  }));
-
-  const graphPathSummary = graphPathSteps.map(s => `[${s.source}] ──(${s.relation})──> [${s.target}]`).join('  ·  ');
-
-  // 4. COMMUNITY RESOLUTION
-  let communityKey = 'sovereign';
-  if (q.includes('50 mhz') || q.includes('clock') || q.includes('frequency') || q.includes('fmax')) {
-    communityKey = 'timing';
-  } else if (q.includes('safe') || q.includes('lockstep') || q.includes('fault') || q.includes('trip') || q.includes('recall') || q.includes('short')) {
-    communityKey = 'safety';
-  } else if (q.includes('loop') || q.includes('100 khz') || q.includes('jitter') || q.includes('foc')) {
-    communityKey = 'control';
-  } else if (q.includes('2dom') || q.includes('neural') || q.includes('attention') || q.includes('avip') || q.includes('bearing')) {
-    communityKey = 'neural';
-  } else if (q.includes('dshot') || q.includes('telemetry') || q.includes('esc')) {
-    communityKey = 'dshot';
-  } else if (q.includes('30') || q.includes('use case') || q.includes('thirty') || q.includes('envelope') || q.includes('kurtosis') || q.includes('goertzel')) {
-    communityKey = 'usecases30';
-  } else if (q.includes('cost') || q.includes('price') || q.includes('bom') || q.includes('supply') || q.includes('import') || q.includes('sovereign')) {
-    communityKey = 'sovereign';
-  }
-  const community = communityKeywords[communityKey] || communityKeywords.sovereign;
-
-  // 5. MATCH CATALOG ITEM & AUTHORITATIVE DOCUMENT
-  let matchedDoc = groundedDocuments[community.defaultDocIdx];
-  let matchedItem = deepGridCatalog[0];
-  let maxCatScore = -1;
-
-  deepGridCatalog.forEach(item => {
-    const text = `${item.name} ${item.tagline} ${item.summary} ${item.keyFacts.join(' ')} ${item.standards || ''}`.toLowerCase();
-    let score = 0;
-    queryTokens.forEach(w => {
-      if (text.includes(w)) score += 2;
+  // Fallback if isolated node
+  if (traversedSteps.length === 0) {
+    traversedSteps.push({
+      source: primarySeed.name,
+      relation: 'belongs_to',
+      target: primarySeed.communityName
     });
-    if (q.includes(item.id.toLowerCase())) score += 10;
-    if (score > maxCatScore) {
-      maxCatScore = score;
-      matchedItem = item;
+  }
+
+  const graphPathSummary = traversedSteps.slice(0, 3)
+    .map(s => `[${s.source}] ──(${s.relation})──> [${s.target}]`)
+    .join('  ·  ');
+
+  // 3. GROUNDED DOCUMENT RETRIEVAL: Vector Cosine Similarity over ALL 177 PDF Chunks
+  const scoredChunks: { chunk: UnifiedChunk; score: number }[] = [];
+  graphIndex.chunks.forEach(chunk => {
+    const score = dotProduct(qVec, chunk.vector);
+    if (score > 0) {
+      scoredChunks.push({ chunk, score });
     }
   });
 
-  // 6. GRAPH-GROUNDED MULTI-TIER SYNTHESIS
-  let contextualTitle = '';
-  let answer = '';
-  let explanation: string[] = [];
-  let keyBusinessFacts: string[] = [];
-  let citationSection = bestMatch.section;
-  let citationPage = 'p. 1–12';
-  let referenceLinks: { label: string; hash: string; description: string }[] = [];
+  scoredChunks.sort((a, b) => b.score - a.score);
+  const bestChunk = scoredChunks.length > 0 ? scoredChunks[0].chunk : graphIndex.chunks[0];
 
-  if (communityKey === 'usecases30') {
-    contextualTitle = '30 Industrial Diagnostics & Observers on a 50 MHz Scalar Core (No Accelerator)';
-    answer = 'DG32-LITE supports 30 native industrial predictive maintenance, health monitoring, and control observer use cases on its baseline 50 MHz RV32IM core without an external NPU or coprocessor. By leveraging hardware-accelerated CORDIC vector transforms and an 82% unburdened CPU headroom at 10 kHz FOC, 24 of the 30 use cases execute in under 1.0 ms (>1 kHz sample rates).';
-    explanation = [
-      'High-accuracy industrial condition monitoring does not require multi-watt neural accelerators. By exploiting the architectural reality that integer branch comparisons and table lookups cost almost nothing on a RISC-V scalar core, tree ensembles (Random Forests, Gradient Boosting) achieve 95.6% accuracy on bearing fault classification—matching deep neural networks (97–100%) while requiring zero floating-point multiplications and running 50–500× faster within a strict 16.5 KB SRAM budget.',
-      'The 30 use cases span four industrial operational domains: (1) Rotating Machinery (8 models): Bearing Fault Classification, Bearing Severity Trending, Gearbox Mesh Faults, Pump Cavitation, Fan Imbalance, Compressor Valves, Belt Slip, Shaft Misalignment; (2) Electrical & Power Diagnostics (8 models): Broken Rotor Bar Detection via 8-bin Goertzel, Air-Gap Eccentricity, Stator Inter-Turn Short, Phase Loss, Arc-Fault/Discharge, Power-Quality Events, Battery State-of-Health, Winding Thermal Estimation; (3) Control, Motion & Sensing (8 models): Sensorless Rotor Position (EKF), Learned Sensor Plausibility, Operating-Mode Classification (GMM), Duty-Cycle Tracking (HMM), Adaptive Friction Compensation, Stall Detection, Torque Ripple Estimation, Multivariate Anomaly Scoring; (4) Slower-Rate, Sequence & Anomaly (6 models): Remaining Useful Life (RUL), Unsupervised Drift (Autoencoder), Short-Horizon Forecasting (GRU), Raw Waveform 1D-CNN, Novelty Detection (Isolation Forest), Per-Machine Baselining (k-NN).',
-      'Crucially, all 30 predictive models operate in an advisory and telemetry reporting role only. The secondary hardware lockstep core retains exclusive physical authority over inverter bridge tripping, asserting the FAULT_N safe state within 2 clock cycles (<40 ns) upon any hardware overcurrent or phase-fault event. In addition, DeepGrid models are calibrated against realistic physical baselines (65%–80% accuracy on un-instrumented factory machinery) after auditing and removing academic temporal leakage found in standard CWRU benchmark datasets.'
-    ];
-    keyBusinessFacts = [
-      '24 of 30 industrial use cases execute comfortably above 1 kHz sample rates (<1.0 ms latency).',
-      'Zero NPU hardware dependency: Operates within 12.5 MMAC/s scalar budget, 16.5 KB SRAM, and 82% CPU headroom.',
-      'Strict ASIL-D advisory boundary: Lockstep hardware supervisor retains exclusive inverter trip authority in <2 clock cycles.'
-    ];
-    citationSection = 'Section 1–3: Physical Compute Envelope & 30-Use-Case Master Table';
-    citationPage = 'p. 1–12';
-    referenceLinks = [
-      { label: 'Explore 30 Industrial AI Tasks in Overview', hash: 'overview', description: 'Review the full 30 use cases and their physical compute envelopes.' },
-      { label: 'Inspect 100 kHz Control Loop Budget', hash: 'control', description: 'Analyze the cycle budget showing 82% unburdened CPU headroom.' },
-      { label: 'Review Dual-Core Lockstep Safety Gate', hash: 'architecture', description: 'Inspect the hardware fault isolation gate that decouples advisory AI from hard tripping.' }
-    ];
-  } else if (communityKey === 'timing') {
-    contextualTitle = '50 MHz Operating Frequency: Lockstep Margin & Physical Timing Closure';
-    answer = 'DG32 locks its primary control clock at exactly 50 MHz (20.0 ns cycle) to guarantee absolute static timing closure across all PVT corners (-40 °C to +125 °C) while running dual RV32IM cores in cycle-accurate hardware lockstep.';
-    explanation = [
-      'In high-power drive inverters switching hundreds of volts thousands of times per second, clock jitter or metastability causes corrupted PWM transitions and destructive power bridge short-circuits. While standard-cell libraries on SkyWater 130 nm CMOS allow single-core unconstrained synthesis up to ~75 MHz, running a cycle-accurate lockstep shadow core with bus comparators and fault latches establishes a practical physical Fmax of 55–62 MHz under worst-case industrial thermal and voltage conditions.',
-      'Rather than running silicon at a marginal 60 MHz that risks clock skew and compromises noise margins under extreme EMI, DeepGrid fixes the system clock at 50 MHz. This guarantees a deterministic 15–20% static timing margin, ensuring that comparator checks and register commits never violate setup or hold times.',
-      'Because all inner-loop motor trigonometry (Park/Clarke transforms, CORDIC rotation, and space-vector PWM) is hardwired into silicon logic gates, the full control loop executes in just 300 cycles (6.0 µs). At standard 20 kHz PWM (50 µs period), the processor consumes only 12% of available cycles, leaving 88% free execution headroom without requiring a higher, power-hungry core clock.'
-    ];
-    keyBusinessFacts = [
-      'Guarantees 15–20% static timing margin across all automotive temperature corners (-40 °C to +125 °C).',
-      'Hardwired 300-cycle loop (~6.0 µs) leaves 88% CPU headroom at 20 kHz and 40% at 100 kHz without overclocking.',
-      'Low 50 MHz operating frequency reduces high-frequency radiated emissions (EMI) and eliminates heatsink requirements.'
-    ];
-    citationSection = 'Section 2.1: Clock Distribution & Timing Closure Budget';
-    citationPage = 'p. 8–14';
-    referenceLinks = [
-      { label: 'Inspect 100 kHz Control Loop Budget', hash: 'control', description: 'Analyze the 500-cycle timeline showing hardwired math vs CPU firmware headroom.' },
-      { label: 'View Dual-Core Architecture Floorplan', hash: 'architecture', description: 'Inspect the MAIN and CHECKER RV32IM cores and physical comparator registers.' },
-      { label: 'QFN-64 Pinout & Electrical Characteristics', hash: 'pinout', description: 'Review clock input limits, power supply sequencing, and thermal ground dissipation.' }
-    ];
-  } else if (communityKey === 'safety') {
-    contextualTitle = 'Autonomous 39-Cycle Hardware Fault Trip & Field Recall Protection';
-    answer = 'DeepGrid silicon eliminates field recall liabilities by implementing an autonomous hardware-level fault latch that drives power inverter bridges into a high-impedance safe state within 39 clock cycles (780 nanoseconds), completely bypassing firmware.';
-    explanation = [
-      'In high-power drive inverters, a single firmware hang, corrupted branch predictor, or shoot-through condition can short a bridge leg and destroy power MOSFETs or IGBTs in less than 2 microseconds. Legacy microcontrollers rely on software watchdogs and interrupt service routines (ISRs) that take 15 to 50 microseconds to respond—frequently acting long after catastrophic hardware destruction has already occurred.',
-      'DeepGrid implements dual RV32IM cores in physical hardware lockstep: the CHECKER core trails the MAIN core by exactly 2 clock cycles on mirrored inputs. If any store instruction, register write, or memory bus commit diverges between the two cores, the hardware comparator trips immediately, latching the first cause into non-volatile status registers and asserting the physical FAULT_N pin in 39 clock cycles (780 ns).',
-      'Because this mechanism is implemented directly in silicon logic gates rather than firmware, safety trips cannot be overridden, masked, or bypassed by application software errors. For automotive Tier-1 suppliers and drone OEMs, this architecture provides verifiable ASIL-D functional safety compliance and insulates manufacturers against catastrophic field recalls.'
-    ];
-    keyBusinessFacts = [
-      'Zero firmware dependency: Hardware fault isolation activates autonomously in 39 cycles (780 ns).',
-      'Built to ISO 26262 ASIL-D and IEC 61508 SIL-3 automotive functional safety standards.',
-      'Prevents inverter shoot-through and catastrophic gate driver destruction, directly eliminating warranty exposure.'
-    ];
-    citationSection = 'Section 3.2: Dual-Core Lockstep Comparator & Hardware Trip Mechanism';
-    citationPage = 'p. 18–24';
-    referenceLinks = [
-      { label: 'Trace 39-Cycle Fault Sequence', hash: 'overview', description: 'Step through the 7-phase hardware trip sequence from error detection to bridge safe-state.' },
-      { label: 'Review Safety Architecture in Detail', hash: 'architecture', description: 'Inspect the hardware comparator, error injection multiplexer, and FAULT_N pinout.' },
-      { label: 'Compare Safety vs STM32G0 & AURIX', hash: 'roadmap', description: 'Review the head-to-head functional safety procurement benchmark.' }
-    ];
-  } else if (communityKey === 'control') {
-    contextualTitle = 'Deterministic 100 kHz Control Loop & Hardwired Execution Headroom';
-    answer = 'DeepGrid hardwires current sampling, Clarke/Park vector transforms, and PWM edge generation directly into silicon RTL, completing the entire FOC inner loop in a constant 300 cycles (6.0 µs) with zero jitter at switching rates up to 100 kHz.';
-    explanation = [
-      'Next-generation high-speed actuators—such as low-inductance drone ESCs, high-RPM EV traction motors, and micro-robotic joints—require PWM switching frequencies from 20 kHz to 100 kHz. On conventional microcontrollers, running complex trigonometric math in software consumes nearly 100% of the CPU, introducing loop latency jitter whenever telemetry, communications, or safety checks execute.',
-      'DeepGrid offloads vector mathematics from the CPU into dedicated hardware coprocessors: CORDIC vector rotation, Clarke/Park forward and reverse transforms, and space-vector PWM edge calculation run in pure silicon logic. One full motor control loop costs exactly ~300 clock cycles regardless of software workload.',
-      'Because the CPU is relieved of inner-loop trigonometry, the primary RV32IM core retains 82% to 88% free execution headroom at standard 20 kHz PWM and over 40% headroom at 100 kHz. This allows developers to host real-time vibration analytics, bearing condition monitoring, and telemetry communication protocols directly on the primary core without external DSPs.'
-    ];
-    keyBusinessFacts = [
-      'Constant 300-cycle loop (~6.0 µs) guarantees zero timing jitter regardless of communication traffic.',
-      'Supports ultra-low-inductance motors up to 100 kHz PWM with 40%+ free execution headroom.',
-      'Eliminates external mathematical co-processors or discrete DSP chips, lowering system BOM.'
-    ];
-    citationSection = 'Section 2.4: 100 kHz Control Loop Timing & Vector Math Acceleration';
-    citationPage = 'p. 12–17';
-    referenceLinks = [
-      { label: 'Open Interactive Control Loop Scrubber', hash: 'control', description: 'Simulate the 500-cycle waveform timeline and inspect hardware vs CPU budgets.' },
-      { label: 'View CORDIC & PWM Peripheral Architecture', hash: 'architecture', description: 'Inspect the hardwired transform pipeline and ADC triggering interfaces.' },
-      { label: 'Review Thirty Industrial Use Cases', hash: 'overview', description: 'Explore field-proven motor drive use cases operating within this compute envelope.' }
-    ];
-  } else if (communityKey === 'neural') {
-    contextualTitle = 'DG32-2DOM Dual-Domain Architecture: Frozen Safety & 114 MHz Neural Co-Processor';
-    answer = 'DG32-2DOM pairs the frozen DG32-LITE lockstep motor-control core with an asynchronous 114 MHz INT8 neural attention engine across an isolated CDC bridge, enabling real-time bearing condition monitoring with zero risk to motor safety.';
-    explanation = [
-      'Conventional AI motor-control architectures attempt to execute neural network inference on the same CPU that handles safety-critical PWM generation. A single neural inference spike or memory bus conflict can cause missed PWM deadlines, triggering inverter bridge failure.',
-      'DG32-2DOM solves this fundamental conflict through physical dual-clock-domain isolation. The primary motor control domain (RV32IM lockstep, 50 MHz) remains identical and pin-compatible with DG32-LITE. The second domain houses a dedicated 114 MHz INT8 attention engine with its own localized SRAM, communicating exclusively across asynchronous Clock Domain Crossing (CDC) FIFO bridges.',
-      'This dual-domain architecture runs multimodal bearing fault classification (AVIP) in under 1.2 milliseconds directly at the motor edge. If the AI domain experiences a software fault or memory stall, the primary motor control core continues running with deterministic timing, guaranteeing uncompromised functional safety.'
-    ];
-    keyBusinessFacts = [
-      '100% pin-compatible with DG32-LITE: OEMs can upgrade single-board designs to edge AI without redesigning the PCB.',
-      'Asynchronous CDC bridge isolates 114 MHz neural coprocessor from the 50 MHz deterministic safety core.',
-      'Executes AVIP multimodal bearing fault classification in <1.2 ms with 97%+ accuracy on motor vibration data.'
-    ];
-    citationSection = 'Section 1.2: Dual-Domain Clocking & CDC Asynchronous Bridge Isolation';
-    citationPage = 'p. 4–11';
-    referenceLinks = [
-      { label: 'Explore DG32-2DOM Die Architecture', hash: 'architecture', description: 'Inspect the dual-clock boundary, neural attention engine, and shared peripheral map.' },
-      { label: 'Review Bearing Fault Diagnostic Playbook', hash: 'overview', description: 'Explore real-time motor vibration diagnostics and ISO 10816 vibration thresholds.' },
-      { label: 'Compare DG32-LITE vs DG32-2DOM', hash: 'family', description: 'Review the head-to-head silicon specifications and packaging details.' }
-    ];
-  } else if (communityKey === 'dshot') {
-    contextualTitle = 'Hardware DShot Receive (dgrid_dshot_rx) & Zero-Jitter Motor Telemetry';
-    answer = 'The hardwired dgrid_dshot_rx block decodes DShot commands and generates bidirectional telemetry replies entirely in silicon, eliminating all CPU bit-banging and guaranteeing sub-microsecond response latency.';
-    explanation = [
-      'In high-performance tactical UAVs and quadcopters, flight controllers communicate with electronic speed controllers (ESCs) via bidirectional DShot digital protocols. Decoding high-speed DShot bitstreams in software consumes substantial processor cycles and introduces command latency jitter.',
-      'DeepGrid integrates a dedicated hardware peripheral block (dgrid_dshot_rx) that autonomously samples incoming GCR 4b/5b encoded frames, performs hardware CRC verification, and formats bidirectional telemetry packets (RPM, voltage, current, temperature) without CPU intervention.',
-      'This hardware decoding frees the primary RISC-V core to execute advanced flight stability and regenerative braking algorithms, enabling quadcopter motor responsiveness under 100 microseconds.'
-    ];
-    keyBusinessFacts = [
-      'Hardwired DShot300/600/1200 decoding: Zero CPU utilization for signal acquisition and CRC verification.',
-      'Bidirectional telemetry delivers real-time motor RPM, temperature, and current metrics back to flight controller.',
-      'Preserves complete compatibility with Betaflight, ArduPilot, and PX4 open-source drone autopilots.'
-    ];
-    citationSection = 'Section 2.2: DShot Frame Timing, GCR Decoding & Telemetry Pipeline';
-    citationPage = 'p. 6–12';
-    referenceLinks = [
-      { label: 'Download dgrid_dshot_rx Specification PDF', hash: 'library', description: 'Read the complete 18-page RTL block specification and register map.' },
-      { label: 'Inspect Drone ESC Architecture & Pinout', hash: 'pinout', description: 'Review QFN-64 pin assignments for 3-phase gate drive and DShot signals.' },
-      { label: 'Thirty Industrial Drone & Motor Use Cases', hash: 'overview', description: 'Review drone propulsion and tactical flight actuator applications.' }
-    ];
-  } else if (topMatches.length > 0 && topMatches[0].score > 0.10) {
-    // Dynamic Synthesis from Best Retrieved Corpus Chunk across 419 Chunks
-    contextualTitle = bestMatch.section.replace(/^[0-9.]+\s*/, '').trim();
-    const cleanSnippet = bestMatch.text.split('\n\n')[0].replace(/^[#\s*-_]+/, '').replace(/\n/g, ' ').trim();
-    answer = `Grounded in ${bestMatch.docTitle} (${bestMatch.section}): ${cleanSnippet.slice(0, 280)}...`;
+  // 4. COMMUNITY CONTEXT & DOMAIN TAG
+  const communityName = primarySeed.communityName || 'Silicon Architecture & Systems';
+  const domainTag = communityName.toUpperCase();
+
+  // 5. CATALOG ITEM RESOLUTION
+  const matchedItem = deepGridCatalog.find(c => c.id === primarySeed.id) ||
+                      deepGridCatalog.find(c => primarySeed.description.toLowerCase().includes(c.id.toLowerCase())) ||
+                      deepGridCatalog[0];
+
+  // 6. MULTI-TIER GROUNDED SYNTHESIS FROM GRAPH & RETRIEVED CHUNK
+  const contextualTitle = primarySeed.name.length > 55 ? primarySeed.name.slice(0, 52) + '...' : primarySeed.name;
+
+  // Clean the PDF excerpt
+  const cleanSnippet = bestChunk.text
+    .split('\n\n')[0]
+    .replace(/^[#\s*-_]+/, '')
+    .replace(/\n/g, ' ')
+    .trim();
+
+  const answer = `Semantic entry at [${primarySeed.name}] within community "${communityName}". ${cleanSnippet.slice(0, 260)}...`;
+
+  // Deep 3-Paragraph Grounded Explanation
+  const explanation: string[] = [
+    // Paragraph 1: Semantic Entity & Community context
+    `Entity Context: ${primarySeed.name} represents a core architectural building block within the ${communityName} cluster. ${primarySeed.description}`,
     
-    const rawParagraphs = bestMatch.text.split('\n\n').filter(p => p.trim().length > 35);
-    explanation = rawParagraphs.slice(0, 3).map(p => p.replace(/^[#\s*-_]+/, '').trim());
-    if (explanation.length === 0) {
-      explanation = [bestMatch.text.slice(0, 450)];
-    }
+    // Paragraph 2: Relational Graph Traversal Trail
+    `Relational Graph Traversal: Navigating the knowledge graph topology from [${primarySeed.name}] establishes active structural links: ${traversedSteps.slice(0, 3).map(s => `"${s.source}" connects via (${s.relation}) to "${s.target}"`).join('; ')}. This structural pathway ensures deterministic execution boundaries and hardware-level isolation.`,
     
-    keyBusinessFacts = [
-      `Primary Architecture Source: ${bestMatch.docTitle} (${bestMatch.file})`,
-      `Verified Section: ${bestMatch.section}`,
-      `Hardware Implementation: 130nm CMOS / 180nm BCD, ISO 26262 ASIL-D, DAP-2020 Make-II`
-    ];
-    citationSection = bestMatch.section;
-    referenceLinks = [
-      { label: 'Inspect System Architecture', hash: 'architecture', description: 'Review block diagrams, clock domains, and floorplans.' },
-      { label: 'Executive Platform Directory', hash: 'overview', description: 'Explore all specialized sections of the DeepGrid platform.' },
-      { label: 'Download Whitepaper PDF', hash: 'library', description: `Access the full document (${bestMatch.pdfSize}).` }
-    ];
-  } else {
-    // Sovereign Economics Fallback
-    contextualTitle = `${matchedItem.name}: Sovereign Architecture & Economics`;
-    answer = `${matchedItem.summary} Manufactured on mature planar nodes, DeepGrid integrates motor control, hardware lockstep safety, and real-time telemetry into a unified 9 × 9 mm QFN-64 silicon package.`;
-    explanation = [
-      `${matchedItem.name} addresses critical automotive and industrial drive requirements: ${matchedItem.tagline}. By hardwiring critical control functions into silicon, it eliminates software timing jitter and protects power switches from transient faults.`,
-      `Fabricated on ${matchedItem.nodeFoundry || 'SkyWater 130 nm / SCL Mohali 180 nm'}, the silicon delivers robust electrical tolerances (-40 °C to +125 °C AEC-Q100 Grade 1 target) and full compliance with ${matchedItem.standards || 'ISO 26262 ASIL-D and DAP-2020 Make-II'}.`,
-      `This mature-node architectural approach ensures predictable multi-year supply, sub-$3.10 unit pricing, and seamless PCB footprint compatibility across both baseline and AI-enabled drive inverters.`
-    ];
-    keyBusinessFacts = matchedItem.keyFacts.slice(0, 3);
-    citationSection = `Chapter 1: ${matchedItem.name} Engineering Specification`;
-    citationPage = 'p. 6–12';
-    referenceLinks = [
-      { label: 'Executive Procurement Scorecard', hash: 'overview', description: 'Review commercial comparisons across BOM cost, turnaround agility, and export risks.' },
-      { label: 'Sovereign 10-SKU Portfolio Horizon', hash: 'overview', description: 'Explore the 10-SKU roadmap addressing India’s $9B import deficit.' },
-      { label: 'Dual-Foundry Manufacturing Strategy', hash: 'roadmap', description: 'Examine SkyWater 130 nm CMOS and SCL Mohali 180 nm BCD qualification milestones.' }
-    ];
+    // Paragraph 3: Verbatim Grounded PDF Evidence
+    `Primary Grounded Evidence (${bestChunk.docTitle}, ${bestChunk.section}, ${bestChunk.pageLabel}): "${cleanSnippet.slice(0, 480)}..."`
+  ];
+
+  const keyBusinessFacts: string[] = [
+    `Graph Semantic Entry: ${primarySeed.name} (${primarySeed.origin})`,
+    `Knowledge Community: ${communityName} (ID: ${primarySeed.communityId})`,
+    `Primary PDF Source: ${bestChunk.docTitle} · ${bestChunk.pageLabel} (${bestChunk.pdfSize})`
+  ];
+
+  // Map to grounded document asset
+  const primaryDoc = groundedDocuments.find(d => d.title.toLowerCase().includes(bestChunk.docTitle.toLowerCase())) ||
+                     groundedDocuments[0];
+
+  const referenceLinks = traversedSteps.slice(0, 3).map(s => ({
+    label: `Inspect ${s.target.slice(0, 28)}`,
+    hash: 'architecture',
+    description: `Relational link: [${s.source}] ──(${s.relation})──> [${s.target}]`
+  }));
+
+  if (referenceLinks.length === 0) {
+    referenceLinks.push(
+      { label: 'Explore System Architecture', hash: 'architecture', description: 'Review block diagrams, clock domains, and floorplans.' },
+      { label: 'Executive Platform Directory', hash: 'overview', description: 'Explore all specialized sections of the DeepGrid platform.' }
+    );
   }
-
-  const primaryDoc = groundedDocuments.find(d => d.title.toLowerCase().includes(bestMatch.docTitle.toLowerCase())) ||
-                     groundedDocuments[community.defaultDocIdx] ||
-                     matchedDoc;
 
   return {
     query: rawQuery,
-    domainTag: community.tag,
+    domainTag,
     contextualTitle,
-    communityName: community.name,
+    communityName,
     seedEntities,
     traversedEdges,
     graphPath: {
       summary: graphPathSummary,
-      steps: graphPathSteps
+      steps: traversedSteps.slice(0, 3)
     },
     matchedItem,
     matchedDoc: primaryDoc,
@@ -481,25 +343,25 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
     keyBusinessFacts,
     referenceLinks,
     citation: {
-      documentTitle: bestMatch.docTitle || primaryDoc.title,
-      documentNum: bestMatch.docNum || primaryDoc.docNum,
-      section: bestMatch.section || citationSection,
-      page: citationPage,
-      pdfPath: bestMatch.pdfPath || primaryDoc.pdfFile,
-      pdfSize: bestMatch.pdfSize || primaryDoc.fileSizePdf,
-      specPath: bestMatch.specPath || primaryDoc.specFile
+      documentTitle: bestChunk.docTitle,
+      documentNum: bestChunk.docNum,
+      section: bestChunk.section,
+      page: bestChunk.pageLabel,
+      pdfPath: bestChunk.pdfPath,
+      pdfSize: bestChunk.pdfSize,
+      specPath: bestChunk.specPath
     },
     technicalDetails: {
-      summary: 'Silicon Specifications & Electrical Implementation:',
+      summary: `Silicon Specifications for ${primarySeed.name}:`,
       specPoints: [
-        `Fabrication Node: ${matchedItem.nodeFoundry || 'SkyWater 130 nm CMOS (sky130A) / SCL Mohali 180 nm BCD'}`,
-        `Supply Voltage Rails: ${matchedItem.voltageRail || '3.3V I/O, 1.8V Core, 5.0V Analog tolerant'}`,
-        `Quality & Safety Standards: ${matchedItem.standards || 'AEC-Q100 Grade 1 (-40 °C to +125 °C), ISO 26262 ASIL-D, DAP-2020 Make-II'}`,
-        `Physical Packaging: 9 × 9 mm QFN-64 with exposed thermal ground paddle (<0.43 W total dissipation)`
+        `Graph Topology Origin: ${primarySeed.origin} (Community ${primarySeed.communityId}: ${communityName})`,
+        `Fabrication Node: ${matchedItem.nodeFoundry || 'SkyWater 130 nm CMOS / SCL Mohali 180 nm BCD'}`,
+        `Safety Standard: ${matchedItem.standards || 'AEC-Q100 Grade 1, ISO 26262 ASIL-D, DAP-2020 Make-II'}`,
+        `Physical Verification: Grounded in ${bestChunk.docTitle} (${bestChunk.pageLabel})`
       ],
       deepLink: {
-        label: 'Inspect 39-Cycle Fault Sequence',
-        hash: 'overview',
+        label: 'Inspect Subsystem Architecture',
+        hash: 'architecture',
         context: 'Review cycle-by-cycle comparator divergence and safe-state latching.'
       }
     },
