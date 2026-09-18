@@ -31,6 +31,12 @@ export function useScrollVars() {
 // block through the viewport between two observer updates and leave it hidden for good. The sweep
 // reveals every pending block whose top has crossed 88% of the viewport, including any already
 // scrolled past, so nothing can be skipped.
+function settle(el: HTMLElement) {
+  for (const a of el.getAnimations?.() ?? []) {
+    if (a instanceof CSSTransition && (a.transitionProperty === 'opacity' || a.transitionProperty === 'transform')) a.finish();
+  }
+}
+
 export function useReveal(key: string) {
   useEffect(() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -50,8 +56,11 @@ export function useReveal(key: string) {
         const delay = reduce ? 0 : Math.min(i, 6) * 60;
         el.style.setProperty('--rv-d', delay + 'ms');
         el.classList.add('rv-in');
-        // hand transitions back to the element once the entrance is over, so hover and press stay fast
-        timers.push(window.setTimeout(() => el.classList.add('rv-done'), delay + 700));
+        // hand transitions back to the element once the entrance is over, so hover and press stay fast.
+        // Then finish any entrance fade still pending: on a page with several live WebGL canvases a
+        // starved renderer can leave the transition parked at currentTime 0 for seconds, and the
+        // block's visibility must never depend on the renderer getting a frame.
+        timers.push(window.setTimeout(() => { el.classList.add('rv-done'); settle(el); }, delay + 700));
         return false;
       });
       if (!pending.length) removeEventListener('scroll', onScroll);

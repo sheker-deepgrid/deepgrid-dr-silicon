@@ -31,6 +31,7 @@ const watch = (p, tag) => {
   p.on('console', m => { if (m.type() === 'error') errors.push(`${tag} ${m.text()}`); });
   p.on('response', r => { if (r.status() >= 400) failed.push(`${tag} ${r.status()} ${r.url()}`); });
 };
+const settleFrames = p => p.evaluate(() => new Promise(res => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(res)))));
 const instant = (p, y) => p.evaluate(v => scrollTo({top: v, behavior: 'instant'}), y);
 const navH = p => p.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 0);
 
@@ -40,6 +41,10 @@ for (const [tag, viewport] of [['desktop', {width: 1440, height: 900}], ['phone'
   const p = await b.newPage({viewport}); watch(p, tag);
   for (const r of routes) {
     await p.goto(BASE + '#' + r, {waitUntil: 'networkidle'}); await p.waitForTimeout(600);
+    // A hash change applies its scroll reset two frames later. Under a starved renderer those frames
+    // can arrive after the walk has started, snapping the page back to the top so the walk measured
+    // the previous position. Wait for three frames to have actually run before walking.
+    await settleFrames(p);
     await p.evaluate(async () => { for (let y = 0; y <= document.documentElement.scrollHeight; y += 500) { scrollTo({top: y, behavior: 'instant'}); await new Promise(res => setTimeout(res, 70)); } await new Promise(res => setTimeout(res, 1200)); });
     const m = await p.evaluate(() => {
       const text = document.querySelector('main').innerText, targets = [...document.querySelectorAll('[data-rv]')];
