@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import {executeGraphRAG,type SemanticScores} from './data/graphrag-engine';
 import {getSemantic} from './data/semantic';
-import LiveCouncil from './live-council';
 
 interface GroundedAnswerViewProps {
   query: string;
@@ -149,8 +148,6 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
         </div>
       </article>
 
-      {/* Live multi-agent council: in-browser model answer over the same graph, opt-in */}
-      <LiveCouncil query={query} />
 
       {/* 2. Progressive Disclosure: Deeper Technical Specifications */}
       {result.technicalDetails && (

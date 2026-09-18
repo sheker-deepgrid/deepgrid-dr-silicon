@@ -1925,29 +1925,3 @@ input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-sea
    label, at the heading's edge, a step quieter. Every word stays; phones already hide the question. */
 .section-label{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px}
 .section-label>span{font-size:var(--text-meta);letter-spacing:.06em;color:#7f8b81;text-align:left}
-
-/* Live GraphRAG: a generated answer, so it reads as secondary to the verified card above it. */
-.dr-live-rag{margin-top:18px;border:1px solid var(--rule);border-left:2px solid var(--copper);background:#111413;padding:20px 22px;display:grid;gap:14px}
-.dr-live-rag-tag{font:var(--text-meta) monospace;letter-spacing:1px;color:var(--copper)}
-.dr-live-rag-head h3{font:500 var(--sc-t-card,1.2rem)/1.3 var(--serif);color:#eee6d4;margin:6px 0 6px}
-.dr-live-rag-head p{color:var(--ink-2);font-size:.92rem;line-height:1.6;max-width:70ch}
-.dr-live-rag-trail>.mono{display:block;font:var(--text-meta) monospace;letter-spacing:1px;color:#93a582;margin-bottom:8px}
-.dr-live-rag-trail ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
-.dr-live-rag-trail li{border:1px solid var(--rule);padding:3px 9px;font-size:.8rem;color:#c9c4b6;max-width:100%;overflow-wrap:anywhere}
-.dr-live-rag-trail .dr-live-rag-more{color:#93a582}
-.dr-live-rag-run{justify-self:start;gap:10px}
-.dr-live-rag-out:empty{display:none}
-.dr-live-rag-text{display:grid;gap:8px;color:#dcd6c8;font-size:.95rem;line-height:1.65;max-width:75ch}
-.dr-live-rag-text ul{margin:0;padding-left:1.1rem;display:grid;gap:4px;list-style:disc}
-.dr-live-rag-text li::marker{color:var(--copper)}
-.dr-live-rag-text strong{color:#eee6d4}
-.dr-live-rag-wait{color:var(--ink-2);font-size:.9rem}
-.dr-live-rag-note{color:#a7b09f;font-size:.82rem;margin-top:8px}
-
-/* In-depth answer sources: document title linked to its PDF, the cited sections beneath. */
-.dr-council-refs{margin-top:16px;border-top:1px solid var(--rule);padding-top:14px}
-.dr-council-refs>.mono{display:block;font:var(--text-meta) monospace;letter-spacing:1px;color:#93a582;margin-bottom:8px}
-.dr-council-refs ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.dr-council-refs a{display:inline-flex;align-items:center;gap:8px;color:#d4b68f;font-size:.95rem}
-.dr-council-refs a:hover{color:#f3d6b1}
-.dr-council-refs small{display:block;margin:2px 0 0 23px;color:var(--ink-2);font-size:.82rem;line-height:1.5}
