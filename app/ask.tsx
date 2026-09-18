@@ -5,7 +5,7 @@ import {
   Search, ArrowUpRight, ArrowRight, ShieldCheck, 
   BookOpen, X, Check, Network, LayoutGrid, RotateCcw,
   FileText, Compass, HelpCircle, Download, Copy, Users,
-  ExternalLink, Maximize2
+  ExternalLink, Maximize2, Table, ChevronDown, ChevronUp, SlidersHorizontal
 } from 'lucide-react';
 import {SectionHead} from './detail';
 import CouncilView from './council-view';
@@ -94,6 +94,26 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
   const [readingDocContent, setReadingDocContent] = useState<{title: string; text: string} | null>(null);
   const [loadingDocContent, setLoadingDocContent] = useState<boolean>(false);
   const [copiedModalSpec, setCopiedModalSpec] = useState<boolean>(false);
+  const [dossierSearch, setDossierSearch] = useState<string>('');
+  const [dossierLayout, setDossierLayout] = useState<'cards' | 'table'>('cards');
+  const [expandedCardIds, setExpandedCardIds] = useState<Set<string>>(new Set());
+
+  const toggleCardExpansion = (id: string) => {
+    setExpandedCardIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllExpansions = (expand: boolean) => {
+    if (expand) {
+      setExpandedCardIds(new Set(results.map(r => r.id)));
+    } else {
+      setExpandedCardIds(new Set());
+    }
+  };
   
   const [nodePositions, setNodePositions] = useState<Record<string, {x: number; y: number}>>(() => {
     const initial: Record<string, {x: number; y: number}> = {};
@@ -153,11 +173,26 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
     return counts;
   }, []);
 
-  // Filter catalog items with strict document pillar and category scoping
+  // Filter catalog items with localized dossier search, document pillar and category scoping
   const results = useMemo(() => {
-    let list = searchDeepGridKnowledge(query);
+    let list = deepGridCatalog;
 
-    // 1. Filter by selected document pillar
+    // 1. Filter by localized dossier search if provided
+    if (dossierSearch.trim()) {
+      const q = dossierSearch.toLowerCase().trim();
+      list = list.filter(item => 
+        item.name.toLowerCase().includes(q) ||
+        item.tagline.toLowerCase().includes(q) ||
+        item.summary.toLowerCase().includes(q) ||
+        (item.nodeFoundry && item.nodeFoundry.toLowerCase().includes(q)) ||
+        (item.standards && item.standards.toLowerCase().includes(q)) ||
+        (item.voltageRail && item.voltageRail.toLowerCase().includes(q)) ||
+        item.category.toLowerCase().includes(q) ||
+        item.citation.toLowerCase().includes(q)
+      );
+    }
+
+    // 2. Filter by selected document pillar
     if (selectedDocId !== 'all') {
       list = list.filter(item => {
         const doc = resolveItemDocument(item);
@@ -165,13 +200,13 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
       });
     }
 
-    // 2. Filter by category if active
+    // 3. Filter by category if active
     if (activeCategory !== 'all') {
       list = list.filter(item => doesItemMatchCategory(activeCategory, item.category));
     }
 
     return list;
-  }, [query, selectedDocId, activeCategory]);
+  }, [dossierSearch, selectedDocId, activeCategory]);
 
   // Document filter for quick queries: 2 from each of the 6 PDF documents by default
   const filteredPrompts = useMemo(() => {
@@ -317,43 +352,45 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         </span>
       </div>
 
-      {/* Query Search Bar */}
-      <div className="dr-ask-bar" style={{marginBottom: '18px'}}>
-        <div className="dr-ask-input-wrap">
-          <Search className="dr-ask-search-icon" size={20} />
-          <input 
-            type="search"
-            name="deepgrid-query"
-            autoComplete="off"
-            spellCheck={false}
-            className="dr-ask-input"
-            value={query}
-            onChange={e => handleQuerySelect(e.target.value)}
-            placeholder="Ask about unit economics, supply chain security, 198-day loop, DAP-2020, ASIL-D safety…"
-            aria-label="Search DeepGrid knowledge"
-          />
-          {query && (
-            <button className="dr-ask-clear" onClick={() => handleQuerySelect('')} aria-label="Clear query">
-              <X size={18} />
-            </button>
-          )}
-        </div>
+      {/* Query Search Bar (Active for Grounded Answers & Architecture Map) */}
+      {activeView !== 'cards' && (
+        <div className="dr-ask-bar" style={{marginBottom: '18px'}}>
+          <div className="dr-ask-input-wrap">
+            <Search className="dr-ask-search-icon" size={20} />
+            <input 
+              type="search"
+              name="deepgrid-query"
+              autoComplete="off"
+              spellCheck={false}
+              className="dr-ask-input"
+              value={query}
+              onChange={e => handleQuerySelect(e.target.value)}
+              placeholder="Ask about unit economics, supply chain security, 198-day loop, DAP-2020, ASIL-D safety…"
+              aria-label="Search DeepGrid knowledge"
+            />
+            {query && (
+              <button className="dr-ask-clear" onClick={() => handleQuerySelect('')} aria-label="Clear query">
+                <X size={18} />
+              </button>
+            )}
+          </div>
 
-        {/* Quick High-Yield Technical Queries (2 from each PDF document) */}
-        <div className="dr-ask-prompts" style={{marginTop: '10px'}} aria-label="Quick queries">
-          {filteredPrompts.map(p => (
-            <button
-              key={p.id}
-              className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
-              onClick={() => handleQuerySelect(p.query)}
-              title={p.query}
-            >
-              <span className="dr-ask-chip-doc">{p.docBadge}</span>
-              <span className="dr-ask-chip-text">{p.label}</span>
-            </button>
-          ))}
+          {/* Quick High-Yield Technical Queries (2 from each PDF document) */}
+          <div className="dr-ask-prompts" style={{marginTop: '10px'}} aria-label="Quick queries">
+            {filteredPrompts.map(p => (
+              <button
+                key={p.id}
+                className={`dr-ask-chip ${query === p.query ? 'active' : ''}`}
+                onClick={() => handleQuerySelect(p.query)}
+                title={p.query}
+              >
+                <span className="dr-ask-chip-doc">{p.docBadge}</span>
+                <span className="dr-ask-chip-text">{p.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* View 0: Multi-Agent Council Deliberation (Primary View) */}
       {activeView === 'council' && (
@@ -478,29 +515,116 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
         </div>
       )}
 
-      {/* View 2: Traditional Intel Dossier Cards Grid */}
+      {/* View 2: Specification Dossiers (Cards & Spec Matrix Table) */}
       {activeView === 'cards' && (
-        <>
-          {/* Document Pillar Filter Strip */}
-          <div className="dr-deck-strip" style={{marginBottom: '16px'}} role="tablist" aria-label="Filter dossiers by document pillar">
-            {documentSources.map(doc => {
-              const count = doc.id === 'all' ? docCounts.all : (docCounts[doc.id] || 0);
-              return (
+        <div className="dr-dossiers-container">
+          {/* Sticky Document Pillar Filter Strip */}
+          <div className="dr-dossier-sticky-rail">
+            <div className="dr-deck-strip" role="tablist" aria-label="Filter dossiers by document pillar">
+              {documentSources.map(doc => {
+                const count = doc.id === 'all' ? docCounts.all : (docCounts[doc.id] || 0);
+                return (
+                  <button
+                    key={doc.id}
+                    role="tab"
+                    aria-selected={selectedDocId === doc.id}
+                    className={`dr-deck-pill ${selectedDocId === doc.id ? 'active' : ''}`}
+                    onClick={() => setSelectedDocId(doc.id)}
+                    title={doc.title}
+                  >
+                    <span className="dr-doc-pill-badge">{doc.badge}</span>
+                    <span className="dr-doc-pill-label">
+                      {doc.id === 'all' ? `All (${count})` : `${doc.title.split('(')[0].trim()} (${count})`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Dossier Control & Search Toolbar */}
+          <div className="dr-dossier-toolbar">
+            <div className="dr-dossier-search-box">
+              <Search className="dr-dossier-search-icon" size={16} />
+              <input
+                type="search"
+                name="dossier-search"
+                autoComplete="off"
+                spellCheck={false}
+                className="dr-dossier-search-input"
+                placeholder="Filter specifications by SKU, process node, standards, or keywords…"
+                value={dossierSearch}
+                onChange={e => setDossierSearch(e.target.value)}
+                aria-label="Filter specifications"
+              />
+              {dossierSearch && (
                 <button
-                  key={doc.id}
-                  role="tab"
-                  aria-selected={selectedDocId === doc.id}
-                  className={`dr-deck-pill ${selectedDocId === doc.id ? 'active' : ''}`}
-                  onClick={() => setSelectedDocId(doc.id)}
-                  title={doc.title}
+                  type="button"
+                  className="dr-dossier-search-clear"
+                  onClick={() => setDossierSearch('')}
+                  aria-label="Clear dossier filter"
                 >
-                  <span className="dr-doc-pill-badge">{doc.badge}</span>
-                  <span className="dr-doc-pill-label">
-                    {doc.id === 'all' ? `All (${count})` : `${doc.title.split('(')[0].trim()} (${count})`}
-                  </span>
+                  <X size={14} />
                 </button>
-              );
-            })}
+              )}
+            </div>
+
+            {/* Layout Toggle (Cards vs Spec Matrix Table) & Expand All */}
+            <div className="dr-dossier-toolbar-right">
+              <div className="dr-dossier-view-toggle">
+                <button
+                  type="button"
+                  className={`dr-view-toggle-btn ${dossierLayout === 'cards' ? 'active' : ''}`}
+                  onClick={() => setDossierLayout('cards')}
+                  title="Card Grid View"
+                  aria-label="Cards layout"
+                >
+                  <LayoutGrid size={14} /> <span>Cards</span>
+                </button>
+                <button
+                  type="button"
+                  className={`dr-view-toggle-btn ${dossierLayout === 'table' ? 'active' : ''}`}
+                  onClick={() => setDossierLayout('table')}
+                  title="Spec Matrix Comparison Table"
+                  aria-label="Spec matrix table layout"
+                >
+                  <Table size={14} /> <span>Spec Matrix</span>
+                </button>
+              </div>
+
+              {dossierLayout === 'cards' && (
+                <button
+                  type="button"
+                  className="dr-dossier-expand-toggle-btn"
+                  onClick={() => toggleAllExpansions(expandedCardIds.size < results.length)}
+                  title="Expand or collapse all technical highlights"
+                >
+                  {expandedCardIds.size < results.length ? 'Expand All Highlights' : 'Collapse All Highlights'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="dr-dossier-category-strip">
+            <span className="dr-dossier-cat-label">FILTER DOMAIN:</span>
+            {[
+              { id: 'all', label: 'All Domains' },
+              { id: 'sku', label: '10-SKU Portfolio' },
+              { id: 'ai', label: 'Edge AI & Diagnostics' },
+              { id: 'architecture', label: 'Motor RTL & Clocks' },
+              { id: 'defense', label: 'Defence & Moats' },
+              { id: 'finance', label: 'Economics & Capital' }
+            ].map(cat => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`dr-dossier-cat-chip ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
 
           {/* Active Document Pillar Context Banner */}
@@ -552,119 +676,202 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
             </div>
           )}
 
-          {/* Query Filter Status if query is active */}
-          {query.trim() && (
+          {/* Dossier Search Indicator */}
+          {dossierSearch.trim() && (
             <div className="dr-dossier-query-bar">
-              <span>Filtering {results.length} dossiers for &quot;{query}&quot;</span>
+              <span>Showing {results.length} matching specifications for &ldquo;{dossierSearch}&rdquo;</span>
               <button
                 type="button"
                 className="dr-dossier-clear-btn"
-                onClick={() => setQuery('')}
+                onClick={() => setDossierSearch('')}
               >
-                Clear Query
+                Clear Search
               </button>
             </div>
           )}
 
-          <div className="dr-ask-grid">
-          {results.map(item => {
-            const itemDoc = resolveItemDocument(item);
-            return (
-              <article className="dr-ask-card" key={item.id}>
-                <div className="dr-ask-card-header">
-                  <span className="dr-ask-category-tag mono">{itemDoc.badge} · {item.category.toUpperCase()}</span>
-                  <span className="dr-ask-citation mono">{item.citation}</span>
-                </div>
+          {/* LAYOUT OPTION A: Streamlined Dossier Cards Grid */}
+          {dossierLayout === 'cards' && (
+            <div className="dr-ask-grid">
+              {results.map(item => {
+                const itemDoc = resolveItemDocument(item);
+                const isExpanded = expandedCardIds.has(item.id);
+                return (
+                  <article className="dr-ask-card" key={item.id}>
+                    <div className="dr-ask-card-header">
+                      <span className="dr-ask-category-tag mono">{itemDoc.badge} · {item.category.toUpperCase()}</span>
+                      <span className="dr-ask-citation mono">{item.citation}</span>
+                    </div>
 
-                <h3 className="dr-ask-card-title">{item.name}</h3>
-                <p className="dr-ask-card-tagline">{item.tagline}</p>
+                    <h3 className="dr-ask-card-title">{item.name}</h3>
+                    <p className="dr-ask-card-tagline">{item.tagline}</p>
 
-                {/* Hardware Specs Strip */}
-                {(item.nodeFoundry || item.voltageRail || item.standards) && (
-                  <div className="dr-ask-specs">
-                    {item.nodeFoundry && (
-                      <div className="dr-ask-spec-item">
-                        <span className="mono">NODE & FAB</span>
-                        <strong>{item.nodeFoundry}</strong>
+                    {/* Hardware Specs Micro Strip */}
+                    {(item.nodeFoundry || item.voltageRail || item.standards) && (
+                      <div className="dr-ask-specs">
+                        {item.nodeFoundry && (
+                          <div className="dr-ask-spec-item">
+                            <span className="mono">NODE & FAB</span>
+                            <strong className="font-tabular">{item.nodeFoundry}</strong>
+                          </div>
+                        )}
+                        {item.voltageRail && (
+                          <div className="dr-ask-spec-item">
+                            <span className="mono">RAILS / VOLTAGE</span>
+                            <strong className="font-tabular">{item.voltageRail}</strong>
+                          </div>
+                        )}
+                        {item.standards && (
+                          <div className="dr-ask-spec-item">
+                            <span className="mono">STANDARDS</span>
+                            <strong className="font-tabular">{item.standards}</strong>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {item.voltageRail && (
-                      <div className="dr-ask-spec-item">
-                        <span className="mono">RAILS / VOLTAGE</span>
-                        <strong>{item.voltageRail}</strong>
-                      </div>
-                    )}
-                    {item.standards && (
-                      <div className="dr-ask-spec-item">
-                        <span className="mono">STANDARDS</span>
-                        <strong>{item.standards}</strong>
-                      </div>
-                    )}
-                  </div>
-                )}
 
-                <div className="dr-ask-summary">
-                  <p>{item.summary}</p>
-                </div>
+                    <div className="dr-ask-summary">
+                      <p>{item.summary}</p>
+                    </div>
 
-                {/* Key Verified Facts */}
-                <div className="dr-ask-facts">
-                  <span className="dr-ask-facts-title mono">KEY TECHNICAL HIGHLIGHTS</span>
-                  <ul>
-                    {item.keyFacts.map((fact, idx) => (
-                      <li key={idx}>
-                        <Check size={15} className="dr-ask-check-icon" />
-                        <span>{fact}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                    {/* Progressive Disclosure: Collapsible Key Facts */}
+                    <div className="dr-card-accordion-wrap">
+                      <button
+                        type="button"
+                        className="dr-card-accordion-btn"
+                        onClick={() => toggleCardExpansion(item.id)}
+                        aria-expanded={isExpanded}
+                      >
+                        {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        <span>{isExpanded ? 'Hide Key Highlights' : `Key Technical Highlights (${item.keyFacts.length})`}</span>
+                      </button>
 
-                {/* Quick Actions */}
-                <div className="dr-ask-actions">
-                  {item.actions && item.actions.map(act => (
-                    <button
-                      key={act.target}
-                      className="primary"
-                      onClick={() => go(act.target)}
-                    >
-                      {act.label} <ArrowUpRight size={16} />
-                    </button>
-                  ))}
-                  <a 
-                    href={itemDoc.pdfFile}
-                    download={itemDoc.pdfFileName}
-                    className="dr-ask-card-pdf-link"
-                    title={`Download official ${itemDoc.pdfFileName} (${itemDoc.fileSizePdf})`}
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <Download size={13} />
-                    <span>{itemDoc.fileSizePdf} PDF</span>
-                  </a>
-                  <button 
-                    className="text-link"
-                    onClick={() => setSelectedItem(item)}
-                  >
-                    Inspect Technical Dossier <ArrowRight size={15} />
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-          </div>
+                      {isExpanded && (
+                        <div className="dr-ask-facts">
+                          <ul>
+                            {item.keyFacts.map((fact, idx) => (
+                              <li key={idx}>
+                                <Check size={14} className="dr-ask-check-icon" />
+                                <span>{fact}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
 
+                    {/* Card Actions Footer */}
+                    <div className="dr-ask-actions">
+                      {item.actions && item.actions.map(act => (
+                        <button
+                          key={act.target}
+                          className="primary"
+                          onClick={() => go(act.target)}
+                        >
+                          {act.label} <ArrowUpRight size={15} />
+                        </button>
+                      ))}
+                      <a 
+                        href={itemDoc.pdfFile}
+                        download={itemDoc.pdfFileName}
+                        className="dr-ask-card-pdf-link"
+                        title={`Download official ${itemDoc.pdfFileName} (${itemDoc.fileSizePdf})`}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <Download size={13} />
+                        <span>{itemDoc.fileSizePdf} PDF</span>
+                      </a>
+                      <button 
+                        className="text-link"
+                        onClick={() => setSelectedItem(item)}
+                      >
+                        Inspect Dossier <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          {/* LAYOUT OPTION B: High-Density Spec Matrix Comparison Table */}
+          {dossierLayout === 'table' && (
+            <div className="dr-matrix-table-container">
+              <table className="dr-matrix-table">
+                <thead>
+                  <tr>
+                    <th scope="col" style={{minWidth: '220px'}}>Subsystem / Specification</th>
+                    <th scope="col" style={{minWidth: '110px'}}>Document</th>
+                    <th scope="col" style={{minWidth: '180px'}}>Process & Node</th>
+                    <th scope="col" style={{minWidth: '130px'}}>Operating Rails</th>
+                    <th scope="col" style={{minWidth: '180px'}}>Standards & Quality</th>
+                    <th scope="col" style={{minWidth: '140px'}}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map(item => {
+                    const itemDoc = resolveItemDocument(item);
+                    return (
+                      <tr key={item.id} className="dr-matrix-row" onClick={() => setSelectedItem(item)}>
+                        <td className="dr-matrix-cell-name">
+                          <div className="dr-matrix-name-wrap">
+                            <strong className="dr-matrix-item-title">{item.name}</strong>
+                            <span className="dr-matrix-item-tagline">{item.tagline}</span>
+                          </div>
+                        </td>
+                        <td className="dr-matrix-cell-doc">
+                          <span className="dr-matrix-doc-badge">{itemDoc.badge}</span>
+                        </td>
+                        <td className="dr-matrix-cell-node font-tabular">
+                          {item.nodeFoundry || 'SkyWater 130 nm CMOS'}
+                        </td>
+                        <td className="dr-matrix-cell-rails font-tabular">
+                          {item.voltageRail || '1.8 V / 3.3 V'}
+                        </td>
+                        <td className="dr-matrix-cell-standards">
+                          <span className="dr-matrix-standards-tag">{item.standards || 'AEC-Q100 / DAP-2020'}</span>
+                        </td>
+                        <td className="dr-matrix-cell-actions" onClick={e => e.stopPropagation()}>
+                          <div className="dr-matrix-actions-row">
+                            <button
+                              type="button"
+                              className="dr-matrix-btn"
+                              onClick={() => setSelectedItem(item)}
+                              title="Inspect Technical Dossier"
+                            >
+                              Dossier
+                            </button>
+                            <a
+                              href={itemDoc.pdfFile}
+                              download
+                              className="dr-matrix-pdf-link"
+                              title={`Download ${itemDoc.pdfFileName}`}
+                            >
+                              <Download size={12} /> PDF
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Empty State */}
           {results.length === 0 && (
             <div className="dr-ask-empty">
-              <p className="dr-lead">No dossiers found matching &quot;{query}&quot; {selectedDocId !== 'all' ? `in ${activeDoc.title}` : ''}.</p>
+              <p className="dr-lead">No specifications found matching &ldquo;{dossierSearch}&rdquo; {selectedDocId !== 'all' ? `in ${activeDoc.title}` : ''}.</p>
               <p className="muted">
-                Try querying by SKU name (e.g. <code>SKU-1</code>, <code>SKU-4</code>, <code>SKU-7</code>), 
-                domain (<code>198-day loop</code>, <code>radar</code>, <code>SCL Mohali</code>, <code>DAP-2020</code>), 
-                or reset document/query filters.
+                Try searching by SKU name (e.g. <code>SKU-1</code>, <code>SKU-4</code>, <code>SKU-7</code>), 
+                node (<code>130 nm</code>, <code>180 nm</code>, <code>SCL Mohali</code>, <code>SkyWater</code>), 
+                or reset your active filters.
               </p>
               <div style={{display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '12px'}}>
-                {query && (
-                  <button className="primary" onClick={() => handleQuerySelect('')}>
-                    Reset Query Filter
+                {dossierSearch && (
+                  <button className="primary" onClick={() => setDossierSearch('')}>
+                    Reset Search Filter
                   </button>
                 )}
                 {selectedDocId !== 'all' && (
@@ -675,7 +882,7 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
 
 
