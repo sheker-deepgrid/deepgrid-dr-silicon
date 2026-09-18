@@ -1,5 +1,5 @@
 {
- "model": "Xenova/all-MiniLM-L6-v2",
+ "model": "Xenova/bge-small-en-v1.5",
  "dtype": "q8",
  "dims": 384,
  "scale": 127,
@@ -26,5 +26,5 @@
  ],
  "indexSha256": "f6089806a995e03f10a0e903e9de2b464ce7283fbe36802135605ab33b4b9a11",
  "rowKeySha256": "544abbdc7c192ec4cb0c2c8adbabe51502675bd31385014499866ad126658dda",
- "modelSha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1"
+ "modelSha256": "6c9c6101a956d62dfb5e7190c538226c0c5bb9cb27b651234b6df063ee7dbfe4"
 }

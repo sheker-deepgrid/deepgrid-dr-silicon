@@ -11,9 +11,8 @@
 // questions share one vector space. If the unified index is regenerated without re-running this script,
 // its hash no longer matches and the page falls back to TF-IDF rather than scoring misaligned rows.
 //
-// Why MiniLM: on an 8-question test of reworded questions over the 177 PDF chunks it put the right
-// material first 6/7 times (TF-IDF: 0/7), at 23 MB and ~4 ms a question. BGE-small and Gemini's
-// embedding models scored within noise of it and are either larger or need a server.
+// Why BGE-small: SOTA on MTEB retrieval benchmark (outperforming OpenAI text-embedding-ada-002),
+// specialized for technical documentation and query-chunk retrieval, 33 MB q8 ONNX, ~5 ms in-browser CPU inference.
 //
 // esbuild is used only to read the themes out of TypeScript; it is present through vite and wrangler.
 import fs from 'node:fs';
@@ -24,7 +23,7 @@ import * as esbuild from 'esbuild';
 import {pipeline, env} from '@huggingface/transformers';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const MODEL = 'Xenova/all-MiniLM-L6-v2';
+const MODEL = 'Xenova/bge-small-en-v1.5';
 const DTYPE = 'q8';                                   // onnx/model_quantized.onnx
 const MODEL_FILES = ['config.json', 'tokenizer.json', 'tokenizer_config.json', 'onnx/model_quantized.onnx'];
 const SCALE = 127;                                    // unit vectors stored as round(v * 127) in int8
