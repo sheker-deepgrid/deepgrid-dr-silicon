@@ -18,10 +18,8 @@ jobs:
       # github.io project site for now. For dr.deepgridsemi.com set PAGES_BASE: / and PAGES_DOMAIN: dr.deepgridsemi.com
       PAGES_BASE: /deepgrid-dr-silicon/
       PAGES_DOMAIN: ''
-      # No API keys here. This is a static site: any NEXT_PUBLIC_ value is inlined into the public JS
-      # bundle and readable by every visitor. The model key lives in the GraphRAG Worker
-      # (worker/graphrag); the page gets only the Worker's address, which is not a secret.
-      NEXT_PUBLIC_COUNCIL_URL: https://deepgrid-graphrag.shekerkamma.workers.dev/council
+      # Zero-API-cost static build: no external model keys or endpoints are inlined.
+      # Ask DeepGrid runs fully in-browser over the 280-node knowledge graph and deterministic council.
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
