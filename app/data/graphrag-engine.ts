@@ -173,6 +173,11 @@ const communityKeywords: Record<string, {name: string; tag: string; defaultDocId
     name: 'Hardware DShot Telemetry & High-Speed Actuation',
     tag: 'HARDWARE PROTOCOLS & MOTOR TELEMETRY',
     defaultDocIdx: 2 // Doc 3
+  },
+  usecases30: {
+    name: '30 Industrial Use Cases & Scalar Edge AI (Doc #1)',
+    tag: 'EDGE AI & PREDICTIVE DIAGNOSTICS (DOC #1)',
+    defaultDocIdx: 0 // Doc 1: Thirty Use Cases (No Accelerator)
   }
 };
 
@@ -229,6 +234,8 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
     communityKey = 'neural';
   } else if (q.includes('dshot') || q.includes('telemetry') || q.includes('esc')) {
     communityKey = 'dshot';
+  } else if (q.includes('30') || q.includes('use case') || q.includes('thirty') || q.includes('envelope') || q.includes('kurtosis') || q.includes('goertzel')) {
+    communityKey = 'usecases30';
   } else if (q.includes('cost') || q.includes('price') || q.includes('bom') || q.includes('supply') || q.includes('import') || q.includes('sovereign')) {
     communityKey = 'sovereign';
   }
@@ -360,6 +367,26 @@ export function executeGraphRAG(rawQuery: string): GraphRAGResult {
       { label: 'Download dgrid_dshot_rx Specification PDF', hash: 'library', description: 'Read the complete 18-page RTL block specification and register map.' },
       { label: 'Inspect Drone ESC Architecture & Pinout', hash: 'pinout', description: 'Review QFN-64 pin assignments for 3-phase gate drive and DShot signals.' },
       { label: 'Thirty Industrial Drone & Motor Use Cases', hash: 'overview', description: 'Review drone propulsion and tactical flight actuator applications.' }
+    ];
+  } else if (communityKey === 'usecases30') {
+    contextualTitle = '30 Industrial Diagnostics & Observers on a 50 MHz Scalar Core (No Accelerator)';
+    answer = 'DG32-LITE supports 30 native industrial predictive maintenance, health monitoring, and control observer use cases on its baseline 50 MHz RV32IM core without an external NPU or coprocessor. By leveraging hardware-accelerated CORDIC vector transforms and an 82% unburdened CPU headroom at 10 kHz FOC, 24 of the 30 use cases execute in under 1.0 ms (>1 kHz sample rates).';
+    explanation = [
+      'High-accuracy industrial condition monitoring does not require multi-watt neural accelerators. By exploiting the architectural reality that integer branch comparisons and table lookups cost almost nothing on a RISC-V scalar core, tree ensembles (Random Forests, Gradient Boosting) achieve 95.6% accuracy on bearing fault classification—matching deep neural networks (97–100%) while requiring zero floating-point multiplications and running 50–500× faster within a strict 16.5 KB SRAM budget.',
+      'The 30 use cases span four industrial operational domains: (1) Rotating Machinery (8 models): Bearing Fault Classification, Bearing Severity Trending, Gearbox Mesh Faults, Pump Cavitation, Fan Imbalance, Compressor Valves, Belt Slip, Shaft Misalignment; (2) Electrical & Power Diagnostics (8 models): Broken Rotor Bar Detection via 8-bin Goertzel, Air-Gap Eccentricity, Stator Inter-Turn Short, Phase Loss, Arc-Fault/Discharge, Power-Quality Events, Battery State-of-Health, Winding Thermal Estimation; (3) Control, Motion & Sensing (8 models): Sensorless Rotor Position (EKF), Learned Sensor Plausibility, Operating-Mode Classification (GMM), Duty-Cycle Tracking (HMM), Adaptive Friction Compensation, Stall Detection, Torque Ripple Estimation, Multivariate Anomaly Scoring; (4) Slower-Rate, Sequence & Anomaly (6 models): Remaining Useful Life (RUL), Unsupervised Drift (Autoencoder), Short-Horizon Forecasting (GRU), Raw Waveform 1D-CNN, Novelty Detection (Isolation Forest), Per-Machine Baselining (k-NN).',
+      'Crucially, all 30 predictive models operate in an advisory and telemetry reporting role only. The secondary hardware lockstep core retains exclusive physical authority over inverter bridge tripping, asserting the FAULT_N safe state within 2 clock cycles (<40 ns) upon any hardware overcurrent or phase-fault event. In addition, DeepGrid models are calibrated against realistic physical baselines (65%–80% accuracy on un-instrumented factory machinery) after auditing and removing academic temporal leakage found in standard CWRU benchmark datasets.'
+    ];
+    keyBusinessFacts = [
+      '24 of 30 industrial use cases execute comfortably above 1 kHz sample rates (<1.0 ms latency).',
+      'Zero NPU hardware dependency: Operates within 12.5 MMAC/s scalar budget, 16.5 KB SRAM, and 82% CPU headroom.',
+      'Strict ASIL-D advisory boundary: Lockstep hardware supervisor retains exclusive inverter trip authority in <2 clock cycles.'
+    ];
+    citationSection = 'Section 1–3: Physical Compute Envelope & 30-Use-Case Master Table';
+    citationPage = 'p. 1–12';
+    referenceLinks = [
+      { label: 'Explore 30 Industrial AI Tasks in Overview', hash: 'overview', description: 'Review the full 30 use cases and their physical compute envelopes.' },
+      { label: 'Inspect 100 kHz Control Loop Budget', hash: 'control', description: 'Analyze the cycle budget showing 82% unburdened CPU headroom.' },
+      { label: 'Review Dual-Core Lockstep Safety Gate', hash: 'architecture', description: 'Inspect the hardware fault isolation gate that decouples advisory AI from hard tripping.' }
     ];
   } else {
     // Sovereign Economics & Default Graph Traversal
