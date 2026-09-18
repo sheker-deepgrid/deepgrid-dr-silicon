@@ -200,13 +200,8 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
       });
     }
 
-    // 3. Filter by category if active
-    if (activeCategory !== 'all') {
-      list = list.filter(item => doesItemMatchCategory(activeCategory, item.category));
-    }
-
     return list;
-  }, [dossierSearch, selectedDocId, activeCategory]);
+  }, [dossierSearch, selectedDocId]);
 
   // Document filter for quick queries: 2 from each of the 6 PDF documents by default
   const filteredPrompts = useMemo(() => {
@@ -603,28 +598,6 @@ export default function AskDeepGrid({go}: {go: (hash: string) => void}) {
                 </button>
               )}
             </div>
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="dr-dossier-category-strip">
-            <span className="dr-dossier-cat-label">FILTER DOMAIN:</span>
-            {[
-              { id: 'all', label: 'All Domains' },
-              { id: 'sku', label: '10-SKU Portfolio' },
-              { id: 'ai', label: 'Edge AI & Diagnostics' },
-              { id: 'architecture', label: 'Motor RTL & Clocks' },
-              { id: 'defense', label: 'Defence & Moats' },
-              { id: 'finance', label: 'Economics & Capital' }
-            ].map(cat => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`dr-dossier-cat-chip ${activeCategory === cat.id ? 'active' : ''}`}
-                onClick={() => setActiveCategory(cat.id)}
-              >
-                {cat.label}
-              </button>
-            ))}
           </div>
 
           {/* Active Document Pillar Context Banner */}

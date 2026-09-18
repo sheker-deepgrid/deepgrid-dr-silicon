@@ -2215,48 +2215,6 @@ input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-sea
   border-color: #3b5046;
 }
 
-/* Category Filter Chips */
-.dr-dossier-category-strip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 4px 2px;
-}
-
-.dr-dossier-cat-label {
-  font-family: monospace;
-  font-size: 0.65rem;
-  color: var(--copper);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.dr-dossier-cat-chip {
-  background: #0f1412;
-  border: 1px solid #212c26;
-  color: #99aba0;
-  font-size: 0.70rem;
-  font-family: monospace;
-  padding: 3px 9px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.dr-dossier-cat-chip:hover {
-  background: #18201c;
-  color: #e5ede7;
-  border-color: #33443a;
-}
-
-.dr-dossier-cat-chip.active {
-  background: #1d2722;
-  color: #ffffff;
-  border-color: var(--copper);
-  font-weight: 600;
-}
-
 /* Progressive Disclosure Accordion Button */
 .dr-card-accordion-wrap {
   margin-top: auto;
