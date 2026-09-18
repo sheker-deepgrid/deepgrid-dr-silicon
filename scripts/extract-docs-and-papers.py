@@ -19,12 +19,12 @@ import re
 from pathlib import Path
 
 # Use graphify python environment
-GRAPHIFY_ENV = "/home/sheke/.local/share/uv/tools/graphifyy/bin/python"
+GRAPHIFY_ENV = os.environ.get("GRAPHIFY_PYTHON", str(Path.home() / ".local/share/uv/tools/graphifyy/bin/python"))
 
 # Verify fitz for PDF text extraction
 import fitz
 
-PROJECT_ROOT = Path("/home/sheke/deepgrid-dr-site")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = PROJECT_ROOT / "graphify-out"
 OUT_DIR.mkdir(exist_ok=True)
 

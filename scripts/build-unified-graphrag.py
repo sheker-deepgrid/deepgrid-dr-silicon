@@ -3,9 +3,12 @@ import json, re, math
 from pathlib import Path
 import fitz
 
+# repo root, so the script runs from any checkout and any working directory
+ROOT = Path(__file__).resolve().parent.parent
+
 def main():
     # 1. Load Graphify AST Graph
-    with open('/home/sheke/deepgrid-dr-site/graphify-out/graph.json') as f:
+    with open(ROOT / 'graphify-out/graph.json') as f:
         graphify = json.load(f)
 
     nodes = {}
@@ -37,7 +40,7 @@ def main():
     print(f"Graphify base: {len(nodes)} nodes, {len(edges)} edges")
 
     # 2. Extract domain items from deepgrid-knowledge.ts
-    ts_code = Path('/home/sheke/deepgrid-dr-site/app/data/deepgrid-knowledge.ts').read_text(encoding='utf-8')
+    ts_code = (ROOT / 'app/data/deepgrid-knowledge.ts').read_text(encoding='utf-8')
     catalog_blocks = re.findall(
         r"\{\s*id:\s*['\"]([^'\"]+)['\"],\s*name:\s*['\"]([^'\"]+)['\"],.*?tagline:\s*['\"]([^'\"]+)['\"].*?summary:\s*['\"]([^'\"]+)['\"].*?citation:\s*['\"]([^'\"]+)['\"]",
         ts_code,
@@ -91,7 +94,7 @@ def main():
     print(f"Total Unified Graph: {len(nodes)} nodes, {len(edges)} edges")
 
     # 3. Load all 177 PDF Pages from the 8 whitepapers
-    pdf_dir = Path('/home/sheke/deepgrid-dr-site/public/downloads/docs')
+    pdf_dir = (ROOT / 'public/downloads/docs')
     pdfs = sorted(list(pdf_dir.glob('*.pdf')))
     pdf_meta = {
         'deepgrid-mature-node-silicon-master-whitepaper-v3.pdf': {'title': 'Master Whitepaper v3 (Mature-Node Silicon)', 'docNum': '05', 'size': '5.4 MB', 'spec': './downloads/docs/deepgrid-mature-silicon-architecture.md'},
@@ -197,7 +200,7 @@ def main():
         'idf': [round(x, 4) for x in idf]
     }
 
-    out_file = Path('/home/sheke/deepgrid-dr-site/app/data/graphrag-unified-index.json')
+    out_file = (ROOT / 'app/data/graphrag-unified-index.json')
     out_file.write_text(json.dumps(unified_index), encoding='utf-8')
     print(f"Wrote unified GraphRAG index to {out_file} ({round(len(out_file.read_bytes())/1024, 1)} KB)")
 

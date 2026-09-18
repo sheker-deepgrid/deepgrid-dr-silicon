@@ -1,6 +1,7 @@
-// Copies the ONNX runtime Ask DeepGrid's in-browser embedding model runs on into public/ort/, so the
-// site serves it itself. transformers.js would otherwise fetch it from the jsDelivr CDN. The file comes
-// from node_modules (pinned by package-lock), so it is copied at build time rather than committed.
+// Copies the third-party runtime files the site serves itself, so no page depends on a CDN:
+//   public/ort/     the ONNX runtime Ask DeepGrid's in-browser embedding model runs on (else jsDelivr)
+//   public/vendor/  vis-network for the Architecture Map graph (else unpkg), see scripts/publish-graph.mjs
+// Both come from node_modules (pinned by package-lock), so they are copied at build, not committed.
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -12,3 +13,8 @@ for (const f of ['ort-wasm-simd-threaded.wasm', 'ort-wasm-simd-threaded.mjs']) {
   fs.copyFileSync(path.join(from, f), path.join(to, f));
 }
 console.log(`runtime copied to public/ort (${(fs.statSync(path.join(to, 'ort-wasm-simd-threaded.wasm')).size / 1048576).toFixed(1)} MB wasm)`);
+const vis = path.join(ROOT, 'node_modules/vis-network/standalone/umd/vis-network.min.js');
+const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'node_modules/vis-network/package.json'), 'utf8')).version;
+fs.mkdirSync(path.join(ROOT, 'public/vendor'), {recursive: true});
+fs.copyFileSync(vis, path.join(ROOT, `public/vendor/vis-network-${version}.min.js`));
+console.log(`vis-network ${version} copied to public/vendor`);

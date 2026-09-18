@@ -13,7 +13,8 @@
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
     "build:pages": "node scripts/copy-runtime.mjs && node scripts/build.mjs && node scripts/package-pages.mjs",
-    "build:semantic": "node scripts/build-semantic-index.mjs"
+    "build:semantic": "node scripts/build-semantic-index.mjs",
+    "publish:graph": "node scripts/publish-graph.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -54,6 +55,7 @@
     "oxlint-tsgolint": "7.0.2001",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
+    "vis-network": "9.1.6",
     "vite": "8.0.13",
     "wrangler": "4.92.0"
   },

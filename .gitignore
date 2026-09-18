@@ -46,3 +46,12 @@ next-env.d.ts
 
 # ONNX runtime for in-browser embeddings, copied from node_modules at build (scripts/copy-runtime.mjs)
 /public/ort/
+
+# graphify per-run cache and scratch (rebuilt from source every run; LLM extraction outputs stay tracked)
+/graphify-out/cache/
+/graphify-out/.graphify_root
+/graphify-out/.graphify_python
+/graphify-out/.graphify_detect.json
+/graphify-out/.graphify_ast.json
+/graphify-out/.graphify_labels.json.sig
+/public/vendor/
