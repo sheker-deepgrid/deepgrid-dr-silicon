@@ -212,86 +212,134 @@ export function queryGraphify(query: string, maxDepth = 2, maxNodes = 20): Graph
   };
 }
 
-/**
- * The prompt the GraphRAG proxy sends to the model, built from the same deterministic subgraph the
- * page shows as its grounding trail. It lives here, beside queryGraphify, so the proxy and the page
- * cannot drift apart: one function decides what the model is allowed to see. The proxy runs this
- * itself from the query alone, so the key it holds can only ever answer questions about this graph.
- */
-export function buildRagPrompt(query: string, r: GraphSearchResult): string {
-  const nodes = r.subgraphNodes.slice(0, 20).map(n =>
-    `- "${n.label}" (source: ${n.source_file || 'spec'}${n.source_location ? ', ' + n.source_location : ''}; community: ${n.community_name || 'DeepGrid'})`
-  ).join('\n');
-  const edges = r.subgraphLinks.slice(0, 15).map(e => {
-    const src = typeof e.source === 'string' ? e.source : (e.source as { id: string }).id;
-    const tgt = typeof e.target === 'string' ? e.target : (e.target as { id: string }).id;
-    return `- (${nodeMap.get(src)?.label || src}) --[${e.relation}]--> (${nodeMap.get(tgt)?.label || tgt})`;
-  }).join('\n');
+// ---------------------------------------------------------------------------------------------
+// Multi-agent council (the ADK triage pattern: a root agent routes a question to domain
+// specialists, each answers from its own grounding, and a council synthesises). The page and the
+// GraphRAG Worker both import this, so the specialists, their grounding and the event stream are
+// defined once. Prompts are built only here and only in the Worker: the page sends a question.
+// ---------------------------------------------------------------------------------------------
+
+export type SpecialistId = 'safety' | 'hardware' | 'defense';
+
+export const SPECIALISTS: Record<SpecialistId, {name: string; remit: string; seeds: string}> = {
+  safety: {
+    name: 'Safety & Verification Auditor',
+    remit: 'hardware lockstep, fault detection and latching, FAULT_N, fault injection, the verification evidence ladder, functional-safety standards',
+    seeds: 'lockstep fault latch safety verification comparator checker',
+  },
+  hardware: {
+    name: 'Physical Silicon & EDA Lead',
+    remit: 'clocks and timing closure (Fmax), the control loop and its cycle budget, CORDIC/ADC/PWM blocks, pinout and package, die area, the DG32-2DOM second clock domain',
+    seeds: 'clock fmax timing mhz cycles loop cordic pinout package die',
+  },
+  defense: {
+    name: 'Sovereign Moats & Procurement Strategist',
+    remit: 'foundries and supply chain, DAP-2020 and domestic-content rules, cost and procurement position, the multi-spin roadmap',
+    seeds: 'sovereign foundry supply dap make-ii procurement roadmap cost',
+  },
+};
+export const SPECIALIST_IDS = Object.keys(SPECIALISTS) as SpecialistId[];
+
+export interface SpecialistContext {
+  graph: GraphSearchResult;
+  facts: {item: string; citation: string; facts: string[]}[];
+}
+
+/** A specialist's own grounding: a graph walk plus the verified catalog facts, both seeded with its remit. */
+export function specialistContext(id: SpecialistId, question: string): SpecialistContext {
+  const seeded = `${question} ${SPECIALISTS[id].seeds}`;
+  const graph = queryGraphify(seeded, 2, 16);
+  const facts = searchDeepGridKnowledge(seeded).slice(0, 3)
+    .map(i => ({item: i.name, citation: i.citation, facts: i.keyFacts.slice(0, 6)}));
+  return {graph, facts};
+}
+
+const RULES = [
+  'Answer ONLY from the context given. If it does not contain the answer, say so plainly and name what is missing.',
+  'Never invent a number, part, date, standard or confidence score. DG32 figures are pre-silicon design values, not measurements; say so when you quote one.',
+  'Plain text: "- " bullets and **bold** for at most three key terms. No headings, no tables.',
+].join('\n');
+
+export function buildTriagePrompt(question: string): string {
   return [
-    'You are the DeepGrid Semi silicon architect answering a diligence question.',
-    'Answer ONLY from the knowledge-graph context below. If the context does not contain the answer, say so plainly and name what is missing. Never invent a number, part, date or standard.',
-    'All DG32 figures are pre-silicon design values, not measurements; say so when you quote one.',
-    'Write 120 to 220 words: a one-sentence answer first, then at most five short bullets. Use plain text with "- " bullets and **bold** for at most three key terms. No headings, no tables.',
+    'You are the root triage agent of a silicon diligence council. Route the question to the specialists whose remit it needs: one if it is narrow, two or three only if it genuinely spans them.',
+    ...SPECIALIST_IDS.map(id => `- ${id}: ${SPECIALISTS[id].name}. Remit: ${SPECIALISTS[id].remit}.`),
+    'For each chosen specialist write a focused sub-question in their terms. Give a one-sentence reason for the routing.',
     '',
-    `Question: ${query}`,
-    '',
-    'Verified facts from the matched catalog entry:',
-    r.instantSynthesis,
-    '',
-    'Graph entities reached from the question:',
-    nodes || '- (none)',
-    '',
-    'Graph relationships:',
-    edges || '- (none)',
+    `Question: ${question}`,
   ].join('\n');
 }
 
+export function buildSpecialistPrompt(id: SpecialistId, question: string, subQuestion: string, ctx: SpecialistContext): string {
+  const nodes = ctx.graph.subgraphNodes.slice(0, 16).map(n => `- ${n.label}`).join('\n');
+  const facts = ctx.facts.map(f => `From "${f.item}" (${f.citation}):\n${f.facts.map(x => '- ' + x).join('\n')}`).join('\n\n');
+  return [
+    `You are the ${SPECIALISTS[id].name} on a silicon diligence council. Your remit: ${SPECIALISTS[id].remit}.`,
+    RULES,
+    'Write 60 to 130 words: one sentence that answers the sub-question, then at most four bullets. Stay inside your remit.',
+    '',
+    `Original question: ${question}`,
+    `Your sub-question: ${subQuestion}`,
+    '',
+    'Verified catalog facts:',
+    facts || '- (none)',
+    '',
+    'Knowledge-graph entities reached:',
+    nodes || '- (none)',
+  ].join('\n');
+}
+
+export function buildSynthesisPrompt(question: string, answers: {name: string; text: string}[]): string {
+  return [
+    'You chair a silicon diligence council. Merge the specialists’ answers below into one answer to the question.',
+    'Use only claims the specialists made; do not add facts. Where they disagree or one lacks the data, say so in one line.',
+    RULES,
+    'Write 100 to 200 words: a one-sentence answer first, then at most five bullets.',
+    '',
+    `Question: ${question}`,
+    '',
+    ...answers.map(a => `${a.name}:\n${a.text}\n`),
+  ].join('\n');
+}
+
+/** Events the Worker streams while the council works; the page renders them as a trajectory. */
+export type CouncilUsage = {model: string; ms: number; tokensIn: number; tokensOut: number};
+export type CouncilEvent =
+  | {type: 'triage'; routes: {id: SpecialistId; subQuestion: string}[]; reason: string; fallback?: boolean; usage?: CouncilUsage}
+  | {type: 'specialist-start'; id: SpecialistId; grounding: string[]; sources: string[]}
+  | {type: 'specialist'; id: SpecialistId; text: string; usage: CouncilUsage}
+  | {type: 'specialist-error'; id: SpecialistId}
+  | {type: 'final'; text: string; usage: CouncilUsage}
+  | {type: 'done'; ms: number}
+  | {type: 'error'; stage: string};
+
 /**
- * Stream a live GraphRAG synthesis from the proxy. The model key lives in the proxy, never in this
- * static bundle: the page sends only the question. Resolves to the full text, or null when the proxy
- * is unavailable, rate-limited or out of quota, so the caller can fall back to the deterministic
- * synthesis instead of showing an error.
+ * Convene the council through the proxy and hand each event to the page as it arrives. The page
+ * sends only the question; the model key lives in the proxy. Resolves false when the proxy is
+ * unreachable or refuses, so the caller can fall back to the deterministic synthesis.
  */
-export async function streamGraphRAG(
-  url: string,
-  query: string,
-  onChunk: (text: string) => void,
-  signal?: AbortSignal
-): Promise<string | null> {
+export async function streamCouncil(url: string, query: string, onEvent: (e: CouncilEvent) => void, signal?: AbortSignal): Promise<boolean> {
   let res: Response;
   try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({query}),
-      signal,
-    });
+    res = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({query}), signal});
   } catch {
-    return null;
+    return false;
   }
-  if (!res.ok || !res.body) return null;
+  if (!res.ok || !res.body) return false;
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
-  let buffer = '', text = '';
+  let buffer = '', any = false;
   for (;;) {
     const {done, value} = await reader.read();
     if (done) break;
-    // strip CRs so \r\n-framed events split too; a CR inside a JSON string is escaped, never literal
     buffer += decoder.decode(value, {stream: true}).replace(/\r/g, '');
-    // SSE events end with a blank line; keep any partial event for the next read
     const events = buffer.split('\n\n');
     buffer = events.pop() || '';
     for (const ev of events) {
-      for (const line of ev.split('\n')) {
-        if (!line.startsWith('data:')) continue;
-        const json = line.slice(5).trim();
-        if (!json || json === '[DONE]') continue;
-        try {
-          const part = JSON.parse(json)?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (part) { text += part; onChunk(text); }
-        } catch { /* a malformed event is skipped, not fatal */ }
-      }
+      const line = ev.split('\n').find(l => l.startsWith('data:'));
+      if (!line) continue;
+      try { onEvent(JSON.parse(line.slice(5)) as CouncilEvent); any = true; } catch { /* skip a malformed event */ }
     }
   }
-  return text || null;
+  return any;
 }

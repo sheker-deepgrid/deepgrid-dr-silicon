@@ -1,5 +1,5 @@
 {
-  // GraphRAG proxy for Ask DeepGrid. Deploy: npx wrangler deploy -c worker/graphrag/wrangler.jsonc
+  // Multi-agent GraphRAG council for Ask DeepGrid (POST /council). Deploy: npx wrangler deploy -c worker/graphrag/wrangler.jsonc
   // Key: npx wrangler secret put GEMINI_API_KEY -c worker/graphrag/wrangler.jsonc
   "name": "deepgrid-graphrag",
   "main": "src/index.ts",
@@ -9,6 +9,6 @@
     "ALLOWED_ORIGINS": "https://shekerkamma.github.io"
   },
   "ratelimits": [
-    {"name": "LIMITER", "namespace_id": "4201", "simple": {"limit": 8, "period": 60}}
+    {"name": "LIMITER", "namespace_id": "4201", "simple": {"limit": 4, "period": 60}}
   ]
 }
