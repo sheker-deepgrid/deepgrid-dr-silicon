@@ -46,6 +46,13 @@ for (const [tag, viewport] of [['desktop', {width: 1440, height: 900}], ['phone'
     // the previous position. Wait for three frames to have actually run before walking.
     await settleFrames(p);
     await p.evaluate(async () => { for (let y = 0; y <= document.documentElement.scrollHeight; y += 500) { scrollTo({top: y, behavior: 'instant'}); await new Promise(res => setTimeout(res, 70)); } await new Promise(res => setTimeout(res, 1200)); });
+    // Count what a visitor would see once the page has painted, not what a starved software renderer
+    // had not yet processed: the reveal sweep runs in a frame callback, so wait for frames to have run,
+    // then let entrances already under way finish (capped at 3 s). A block still hidden after that is a
+    // real failure; one that never started or never finishes still fails.
+    await settleFrames(p);
+    await p.evaluate(async () => { const t0 = performance.now(); while (document.querySelector('[data-rv].rv-in:not(.rv-done)') && performance.now() - t0 < 3000) await new Promise(res => setTimeout(res, 100)); });
+    await settleFrames(p);
     const m = await p.evaluate(() => {
       const text = document.querySelector('main').innerText, targets = [...document.querySelectorAll('[data-rv]')];
       return {fits: document.documentElement.scrollWidth === document.documentElement.clientWidth, targets: targets.length,
