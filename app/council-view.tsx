@@ -7,7 +7,9 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  Network
+  Network,
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 import {executeGraphRAG,type SemanticScores} from './data/graphrag-engine';
 import {getSemantic} from './data/semantic';
@@ -148,6 +150,44 @@ export default function GroundedAnswerView({query, onSelectQuery, go}: GroundedA
         </div>
       </article>
 
+      {/* 1.5 Grounded Visual & Schematic Evidence Card */}
+      {result.visualEvidence && (
+        <section className="dr-visual-evidence-card">
+          <div className="dr-visual-card-header">
+            <div className="dr-visual-badge-group">
+              <span className="dr-visual-chip">
+                <Sparkles size={12} /> {result.visualEvidence.type}
+              </span>
+              <span className="dr-visual-title">{result.visualEvidence.title}</span>
+            </div>
+            <a
+              href={`./${result.visualEvidence.filePath}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dr-visual-link-btn"
+              title="Open full resolution in new tab"
+            >
+              <span>Full Resolution</span>
+              <ExternalLink size={13} />
+            </a>
+          </div>
+
+          <div className="dr-visual-img-container">
+            <img
+              src={`./${result.visualEvidence.filePath}`}
+              alt={result.visualEvidence.title}
+              className="dr-visual-img"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="dr-visual-footer">
+            <p className="dr-visual-caption">
+              <strong>Ground Truth Artifact:</strong> {result.visualEvidence.caption}
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* 2. Progressive Disclosure: Deeper Technical Specifications */}
       {result.technicalDetails && (
