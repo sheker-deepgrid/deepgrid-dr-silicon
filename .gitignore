@@ -55,3 +55,5 @@ next-env.d.ts
 /graphify-out/.graphify_ast.json
 /graphify-out/.graphify_labels.json.sig
 /public/vendor/
+app/data/.multimodal_embed_cache.json
+*.tmp
